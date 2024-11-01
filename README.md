@@ -1,66 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel + Traefik + FrankenPHP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is a boilerplate that you can copy/paste into any Laravel project that you intend to dockerize. 
+It addresses the most basic needs a developer has when running Laravel locally.
 
-## About Laravel
+### The benefits of this boilerplate include:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Everything runs through HTTPS with self-signed certificates, providing an environment closely resembling production right on your local machine.
+- It does not require installing any development tools on your actual machine (except Docker), avoiding annoyance for developers who prefer to keep their development computer clean.
+- The setup instructions serve as an easy-to-follow guide for anyone onboarding to the project.
+- It also provides production-ready files to set up the same environment seamlessly and with ease on a production server.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Tips:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Pre-configure your `.env.example` file with the correct values so that when other users clone the repository and follow the instructions below, the project works out of the box with zero friction.
+- Review the `docker-compose.yml` file and add/remove/update the services according to your own needs.
+- Review the Docker file located at `./docker/php/php.x.dockerfile`; it includes all the extensions needed for Laravel to function, but you may require more.
+- If your project has seeds that set up default user accounts, also include the default login/password below to make it easier to log in to the application.
 
-## Learning Laravel
+You can delete everything above this and input your own instructions specific to your project.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# Local Development Setup Guide
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Step 1: Download / Clone the Project
 
-## Laravel Sponsors
+Clone this repository and navigate into it. If you are on Windows, I recommend using WSL2, or at least utilize Git Bash instead of CMD or PowerShell to execute the next commands along.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Step 2: Download mkcert
 
-### Premium Partners
+Download [mkcert](https://github.com/FiloSottile/mkcert), a tool for generating self-signed SSL certificates. Get the binary from the [release](https://github.com/FiloSottile/mkcert/releases) page.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+> **Note**: This is a one-time setup, and you can reuse the generated certificates for any subsequent projects on the same machine.
 
-## Contributing
+Execute the following command in your terminal after obtaining the mkcert binary:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```shell
+mkcert -install -cert-file ./traefik/tls/cert.pem -key-file ./traefik/tls/key.pem "*.docker.localhost" docker.localhost
+```
+> **Note**: If you plan to use other domains, simply replace `docker.localhost` with the desired domain. You can add multiple domains to the list as needed. Keep in mind that any domain not ending in `.localhost` will require a manual edit of the hosts file.
 
-## Code of Conduct
+> **Note**: If you are on Windows using WSL2, you have to run this command on the Windows side. This is because mkcert needs to install the certificates in your Windows trust store, not on Linux.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Step 3: Start the Containers
 
-## Security Vulnerabilities
+- Build the images and start the containers with:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```shell
+docker-compose up -d
+```
 
-## License
+- Ensure correct file permissions for modified files within the container. Set the entire directory's ownership to the user with a UID of 1000:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```shell
+chown -R 1000:1000 .
+```
+> **Note**: This is because the container runs as a non-root user with a UID of 1000.
+
+Make necessary scripts executable:
+
+```shell
+chmod +x ./php ./composer
+```
+
+Install dependencies and prepare framework:
+
+```shell
+./composer install
+./php artisan key:generate
+./php artisan migrate:fresh --seed
+```
+
+> **Note**: The `./` at the beginning of each command is an alias to `docker compose exec php`, allowing you to run commands within the container without entering it.
+
+You're done! Open https://app.docker.localhost to view application.
