@@ -76,14 +76,21 @@ services:
       - postgres-data:/home/postgres/pgdata/data
     ports:
       - ${DB_PORT}:5432
+#
+#  vectorizer-worker:
+#    image: timescale/pgai-vectorizer-worker:0.1.0
+#    environment:
+#      PGAI_VECTORIZER_WORKER_DB_URL: postgres://$DB_USERNAME:$DB_PASSWORD@db:$DB_PORT/$DB_DATABASE
+#      OPENAI_API_KEY: <your-api-key>
 
   comfy:
     image: yanwk/comfyui-boot:rocm
     ports:
       - "8188:8188"
-    runtime: amd
+    environment:
+      CLI_ARGS: --cpu
     volumes:
-      - .comfy:/home/runner
+      - .comfy/runner:/home/runner
 
 #  open-webui:
 #    image: ghcr.io/open-webui/open-webui:main
