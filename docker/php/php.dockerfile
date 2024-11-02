@@ -1,6 +1,6 @@
 ARG ENVIRONMENT
 
-FROM dunglas/frankenphp:1.2-php8.3-alpine as base
+FROM dunglas/frankenphp:1.2-php8.3-alpine AS base
 
 ARG REDIS_VERSION=6.0.2
 

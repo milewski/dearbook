@@ -1,0 +1,430 @@
+{
+  "3": {
+    "inputs": {
+      "seed": 522234824024463,
+      "steps": 20,
+      "cfg": 2,
+      "sampler_name": "dpmpp_2m_sde_gpu",
+      "scheduler": "exponential",
+      "denoise": 1,
+      "model": [
+        "20",
+        0
+      ],
+      "positive": [
+        "27:1",
+        0
+      ],
+      "negative": [
+        "27:2",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "4": {
+    "inputs": {
+      "ckpt_name": "juggernautXL_juggXIByRundiffusion.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple"
+  },
+  "5": {
+    "inputs": {
+      "width": 776,
+      "height": 816,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "20": {
+    "inputs": {
+      "lora_name": "childrens_story_book.safetensors",
+      "strength_model": 1,
+      "strength_clip": 1,
+      "model": [
+        "4",
+        0
+      ],
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "LoraLoader"
+  },
+  "28": {
+    "inputs": {
+      "seed": 534164747813183,
+      "steps": 20,
+      "cfg": 2,
+      "sampler_name": "dpmpp_2m_sde_gpu",
+      "scheduler": "exponential",
+      "denoise": 1,
+      "model": [
+        "20",
+        0
+      ],
+      "positive": [
+        "29:1",
+        0
+      ],
+      "negative": [
+        "29:2",
+        0
+      ],
+      "latent_image": [
+        "38",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "38": {
+    "inputs": {
+      "width": 1984,
+      "height": 1080,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "39": {
+    "inputs": {
+      "lora_name": "childrens_story_book.safetensors",
+      "strength_model": 1,
+      "strength_clip": 1,
+      "model": [
+        "4",
+        0
+      ],
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "LoraLoader"
+  },
+  "44": {
+    "inputs": {
+      "seed": 671078443007788,
+      "steps": 20,
+      "cfg": 2,
+      "sampler_name": "dpmpp_2m_sde_gpu",
+      "scheduler": "exponential",
+      "denoise": 1,
+      "model": [
+        "20",
+        0
+      ],
+      "positive": [
+        "45:1",
+        0
+      ],
+      "negative": [
+        "45:2",
+        0
+      ],
+      "latent_image": [
+        "47",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "47": {
+    "inputs": {
+      "width": 512,
+      "height": 512,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "48": {
+    "inputs": {
+      "seed": 1016605440478490,
+      "steps": 20,
+      "cfg": 2,
+      "sampler_name": "dpmpp_2m_sde_gpu",
+      "scheduler": "exponential",
+      "denoise": 1,
+      "model": [
+        "20",
+        0
+      ],
+      "positive": [
+        "49:1",
+        0
+      ],
+      "negative": [
+        "49:2",
+        0
+      ],
+      "latent_image": [
+        "51",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "51": {
+    "inputs": {
+      "width": 512,
+      "height": 512,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "52": {
+    "inputs": {
+      "seed": 1016605440478490,
+      "steps": 20,
+      "cfg": 2,
+      "sampler_name": "dpmpp_2m_sde_gpu",
+      "scheduler": "exponential",
+      "denoise": 1,
+      "model": [
+        "20",
+        0
+      ],
+      "positive": [
+        "53:1",
+        0
+      ],
+      "negative": [
+        "53:2",
+        0
+      ],
+      "latent_image": [
+        "55",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "55": {
+    "inputs": {
+      "width": 512,
+      "height": 512,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "27:1": {
+    "inputs": {
+      "text": "Children's Illustration Style book cover: \":title:\", \n\ncinematic photo, 4k, highly detailed, uhd image, intricate details",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "27:2": {
+    "inputs": {
+      "text": "text, watermark, scary, title, banner, copyright, logo, low quality, deformation, blur",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "29:1": {
+    "inputs": {
+      "text": "Children's Illustration Style book, \n\nan envrioment scene, background, (\":title:\": \":subject:\")\n\ncinematic photo, 4k, highly detailed, uhd image, intricate details\n\ndetailed scene background, detailed, 8k, trending, amazing art, colorful",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "29:2": {
+    "inputs": {
+      "text": "text, watermark, scary, title, banner, copyright, logo, low quality, deformation, blur",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "45:1": {
+    "inputs": {
+      "text": "Children's Illustration Style book: \n\n\":title:\", \":subject:\"\n\na close up: (:paragraph-1:)\n\ncinematic photo, 4k, highly detailed, uhd image, intricate details\n\ndetailed, 8k, trending, amazing art, colorful",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "45:2": {
+    "inputs": {
+      "text": "text, watermark, scary, title, banner, copyright, logo, low quality, deformation, blur, crop",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "49:1": {
+    "inputs": {
+      "text": "Children's Illustration Style book: \n\n\":title:\", \":subject:\"\n\na close up: (:paragraph-2:)\n\ncinematic photo, 4k, highly detailed, uhd image, intricate details\n\ndetailed, 8k, trending, amazing art, colorful",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "49:2": {
+    "inputs": {
+      "text": "text, watermark, scary, title, banner, copyright, logo, low quality, deformation, blur, crop",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "53:1": {
+    "inputs": {
+      "text": "Children's Illustration Style book: \n\na close up: (:paragraph-10:)\n\n:title:, :subject:\n\ncinematic photo, 4k, highly detailed, uhd image, intricate details\n\ndetailed, 8k, trending, amazing art, colorful",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "53:2": {
+    "inputs": {
+      "text": "text, watermark, scary, title, banner, copyright, logo, low quality, deformation, blur, crop",
+      "clip": [
+        "20",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "36:0": {
+    "inputs": {
+      "samples": [
+        "3",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "36:1": {
+    "inputs": {
+      "filename_prefix": "book-cover",
+      "images": [
+        "36:0",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "37:0": {
+    "inputs": {
+      "samples": [
+        "28",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "37:1": {
+    "inputs": {
+      "filename_prefix": "subject-background",
+      "images": [
+        "37:0",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "46:0": {
+    "inputs": {
+      "samples": [
+        "44",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "46:1": {
+    "inputs": {
+      "filename_prefix": "paragraph-1",
+      "images": [
+        "46:0",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "50:0": {
+    "inputs": {
+      "samples": [
+        "48",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "50:1": {
+    "inputs": {
+      "filename_prefix": "paragraph-2",
+      "images": [
+        "50:0",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "54:0": {
+    "inputs": {
+      "samples": [
+        "52",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "54:1": {
+    "inputs": {
+      "filename_prefix": "paragraph-10",
+      "images": [
+        "54:0",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  }
+}

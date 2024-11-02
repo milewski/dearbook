@@ -8,9 +8,15 @@ x-php: &php
   working_dir: /srv
   volumes:
     - .:/srv
-    - ~/.composer:/home/composer/.cache/composer
-    - ~/.composer/auth.json:/config/composer/auth.json
-    - ./vendor:/srv/vendor:delegated
+
+x-nvidia: &nvidia
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: cdi # https://nixos.org/manual/nixpkgs/unstable/#running-docker-or-podman-containers-with-cuda-support
+            device_ids:
+              - nvidia.com/gpu=all
 
 services:
 
@@ -60,6 +66,7 @@ services:
       - redis-data:/data
 
   ollama:
+    <<: *nvidia
     image: ollama/ollama
     ports:
       - "11434:11434"
@@ -74,9 +81,10 @@ services:
       POSTGRES_PASSWORD: $DB_PASSWORD
     volumes:
       - postgres-data:/home/postgres/pgdata/data
+    command: bash -c "postgres -c ai.ollama_host=http://ollama:11434"
     ports:
       - ${DB_PORT}:5432
-#
+
 #  vectorizer-worker:
 #    image: timescale/pgai-vectorizer-worker:0.1.0
 #    environment:
@@ -84,13 +92,18 @@ services:
 #      OPENAI_API_KEY: <your-api-key>
 
   comfy:
-    image: yanwk/comfyui-boot:rocm
-    ports:
-      - "8188:8188"
-    environment:
-      CLI_ARGS: --cpu
+    <<: *nvidia
+    image: yanwk/comfyui-boot:cu121
+    user: 1000:1000
+    restart: unless-stopped
     volumes:
       - .comfy/runner:/home/runner
+      - .comfy/models:/home/custom/models
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.comfy.entryPoints=web-secure
+      - traefik.http.routers.comfy.rule=Host(`comfy.docker.localhost`)
+      - traefik.http.routers.comfy.tls=true
 
 #  open-webui:
 #    image: ghcr.io/open-webui/open-webui:main
