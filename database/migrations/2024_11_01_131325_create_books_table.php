@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->json('tags');
             $table->json('paragraphs');
             $table->json('assets')->nullable();
+            $table->json('illustrations')->nullable();
             $table->vector('embedding', 1024);
             $table->timestamps();
         });

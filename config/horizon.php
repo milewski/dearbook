@@ -28,7 +28,7 @@ return [
     |
     */
 
-    'path' => env('HORIZON_PATH', 'horizon'),
+    'path' => env('HORIZON_PATH', '/'),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,7 +56,7 @@ return [
 
     'prefix' => env(
         'HORIZON_PREFIX',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_horizon:'
+        Str::slug(env('APP_NAME', 'laravel'), '_') . '_horizon:'
     ),
 
     /*
@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    'middleware' => [ 'web' ],
 
     /*
     |--------------------------------------------------------------------------
@@ -182,7 +182,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['default'],
+            'queue' => [ 'default' ],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,
@@ -190,7 +190,7 @@ return [
             'maxJobs' => 0,
             'memory' => 128,
             'tries' => 1,
-            'timeout' => 60,
+            'timeout' => (60 * 10) - 10,
             'nice' => 0,
         ],
     ],
@@ -206,7 +206,7 @@ return [
 
         'local' => [
             'supervisor-1' => [
-                'maxProcesses' => 3,
+                'maxProcesses' => 5,
             ],
         ],
     ],

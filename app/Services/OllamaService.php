@@ -59,6 +59,34 @@ class OllamaService
         return $response->json();
     }
 
+    /**
+     * @throws ConnectionException
+     */
+    public function unloadAll(): void
+    {
+        foreach (Model::cases() as $model) {
+            $this->unloadModel($model);
+        }
+
+        foreach (Embedding::cases() as $model) {
+            $this->unloadModel($model);
+        }
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function unloadModel(Model|Embedding $model): array
+    {
+        $response = $this->request()->post('/generate', [
+            'model' => $model->value,
+            'keep_alive' => 0,
+            'stream' => false,
+        ]);
+
+        return $response->json();
+    }
+
     private function request(): PendingRequest
     {
         return Http::timeout(60 * 5)

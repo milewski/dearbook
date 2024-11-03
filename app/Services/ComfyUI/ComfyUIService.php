@@ -5,7 +5,9 @@ namespace App\Services\ComfyUI;
 use App\Data\Assets;
 use App\Data\FileDescriptor;
 use App\Data\Tokens;
+use App\Enums\Model;
 use App\Models\Book;
+use App\Services\OllamaService;
 use App\Services\Traits\Resolvable;
 use Exception;
 use Illuminate\Http\Client\ConnectionException;
@@ -30,15 +32,22 @@ class ComfyUIService
     {
         $tokens = Tokens::make()
             ->add_token(':title:', $book->title)
+            ->add_token(':tags:', $book->tags->implode(', '))
             ->add_token(':subject:', $book->subject);
 
         foreach ($book->paragraphs as $index => $paragraph) {
             $tokens->add_token(sprintf(':paragraph-%s:', ++$index), $paragraph);
         }
 
+        foreach ($book->illustrations as $index => $illustration) {
+            $tokens->add_token(sprintf(':illustration-%s:', ++$index), $illustration);
+        }
+
+        dump($tokens->tokens);
+
         $workflowId = $this->prompt(
             prompt: $this->prepareWorkflow($workflow, $tokens),
-            clientId: '6d46451b65c843e19f07e4d4c2bf8dac', //$book->id
+            clientId: 'c44977bbf182478ca0f41f001df045ac', //$book->id
         );
 
         $book->assets = $this->fetchOutputs($workflowId);
@@ -73,6 +82,8 @@ class ComfyUIService
 
                 $response = $this->request()->get("/history/$id");
 
+                logger()->info('history', $response->json("$id.status"));
+
                 $isCompleted = $response->json("$id.status.completed");
 
                 if ($isCompleted) {
@@ -86,6 +97,8 @@ class ComfyUIService
                         ]);
 
                 }
+
+                dump("trying again..");
 
                 throw new Exception('try again...');
 

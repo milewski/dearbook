@@ -18,7 +18,7 @@ class BookData extends Data
 
     public function isValid(): bool
     {
-        return count($this->paragraphs) >= 10;
+        return count($this->paragraphs) === 10;
     }
 
     public function toSummary(): string

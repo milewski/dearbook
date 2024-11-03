@@ -14,9 +14,10 @@ class Book extends Model
     {
         return [
             'embedding' => Vector::class,
-            'assets' => 'assets',
-            'tags' => 'array',
-            'paragraphs' => 'array',
+            'assets' => 'collection',
+            'illustrations' => 'collection',
+            'tags' => 'collection',
+            'paragraphs' => 'collection',
         ];
     }
 }
