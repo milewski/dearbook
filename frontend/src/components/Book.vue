@@ -1,24 +1,28 @@
 <template>
 
-    <Swiper
-        :modules="[ Pagination, EffectCreative ]"
-        :effect="'creative'"
-        :creativeEffect="creativeEffect"
-        :auto-height="true"
-        :slides-per-view="1"
-        :slidesPerGroup="1"
-        :space-between="0"
-        :pagination="{ dynamicBullets: true }">
+    <div v-if="book" class="relative min-h-screen flex justify-center items-center bg-[#242424]">
 
-        <SwiperSlide v-if="book">
-            <Intro :title="book.title" :subject="book.subject" :cover="book.cover" :backdrop="book.backdrop"/>
-        </SwiperSlide>
+        <Swiper
+            :modules="[ Pagination, EffectCreative ]"
+            :effect="'creative'"
+            :creativeEffect="creativeEffect"
+            :auto-height="true"
+            :slides-per-view="1"
+            :slidesPerGroup="1"
+            :space-between="0"
+            :pagination="{ dynamicBullets: true }">
 
-        <SwiperSlide v-for="({ illustration, text }, index) of book?.paragraphs">
-            <Slide1 :key="index" :image="illustration" :text="text" :page="index + 1"/>
-        </SwiperSlide>
+            <SwiperSlide>
+                <Intro :title="book.title" :subject="book.subject" :cover="book.cover" :backdrop="book.backdrop"/>
+            </SwiperSlide>
 
-    </Swiper>
+            <SwiperSlide v-for="({ illustration, text }, index) of book?.paragraphs">
+                <Slide1 :key="index" :image="illustration" :text="text" :page="index + 1"/>
+            </SwiperSlide>
+
+        </Swiper>
+
+    </div>
 
 </template>
 
@@ -26,6 +30,8 @@
 
     import { Swiper, SwiperSlide } from 'swiper/vue'
     import { Pagination, EffectCreative } from 'swiper/modules'
+
+    defineProps<{ book: ViewBookResponse }>()
 
     import 'swiper/css'
     import 'swiper/css/pagination'
@@ -53,7 +59,7 @@
         },
     }
 
-    type ViewBookResponse = {
+    export type ViewBookResponse = {
         title: string,
         subject: string,
         cover: string,
@@ -64,13 +70,13 @@
         }>
     }
 
-    const book = ref<ViewBookResponse>()
-
-    fetch('https://api.docker.localhost/book/9')
-        .then(response => response.json())
-        .then((response: ViewBookResponse) => {
-            book.value = response
-        })
+    // const book = ref<ViewBookResponse>()
+    //
+    // fetch('https://api.docker.localhost/book/9')
+    //     .then(response => response.json())
+    //     .then((response: ViewBookResponse) => {
+    //         book.value = response
+    //     })
 
 </script>
 

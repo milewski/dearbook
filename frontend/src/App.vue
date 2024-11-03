@@ -1,5 +1,49 @@
 <template>
 
+    <Drawer direction="bottom">
+
+        <DrawerTrigger as-child>
+            <Button variant="outline">
+                Open Drawer
+            </Button>
+        </DrawerTrigger>
+
+        <DrawerContent>
+
+            <div class="mx-auto w-full max-w-xl py-10">
+
+                <DrawerHeader>
+
+
+                    <DrawerTitle>Generate your own story</DrawerTitle>
+
+                    <DrawerDescription>Write down what your story should be about</DrawerDescription>
+
+                </DrawerHeader>
+
+                <DrawerFooter>
+
+                    <div class="grid w-full gap-2">
+                        <Textarea placeholder="Write a funny story about how the dinosaur turned into chickens..."/>
+                        <Button>Generate!</Button>
+                    </div>
+
+                </DrawerFooter>
+
+            </div>
+
+        </DrawerContent>
+
+    </Drawer>
+
+    <Drawer @update:open="drawer.shouldOpen = $event" :modal="false" :open="drawer.shouldOpen" direction="bottom" :dismissible="true">
+
+        <DrawerContent>
+            <Book :book="drawer.book"/>
+        </DrawerContent>
+
+    </Drawer>
+
     <div class="flex flex-col justify-center items-center space-y-20 text-black">
 
         <img src="./assets/girl.png" alt="">
@@ -13,9 +57,9 @@
 
         <div class="space-y-8">
 
-            <div class="flex space-x-4 text-center" v-for="_ in 4">
+            <div class="flex space-x-4 text-center" v-for="row in 4">
 
-                <div v-for="_ in 4" class="w-60 space-y-2">
+                <div v-for="column in 4" class="w-60 space-y-2" @click="loadBook(row, column)">
 
                     <img class="rounded-2xl " src="./assets/cover.png" alt="">
 
@@ -29,13 +73,66 @@
 
         </div>
 
+        <div class="absolute hidden">
+            <Book v-show="prerender" :key="prerender?.key" :book="prerender?.data"/>
+        </div>
+
     </div>
 
 </template>
 
 <script lang="ts" setup>
 
-    import Book from './components/Book.vue'
+    import Book, { ViewBookResponse } from './components/Book.vue'
+    import { Button } from '../@/components/ui/button'
+    import { Textarea } from '../@/components/ui/textarea'
+
+    import {
+        Dialog,
+        DialogContent,
+        DialogDescription,
+        DialogFooter,
+        DialogHeader,
+        DialogTitle,
+        DialogTrigger,
+    } from '../@/components/ui/dialog'
+
+    import {
+        Drawer,
+        DrawerClose,
+        DrawerContent,
+        DrawerDescription,
+        DrawerFooter,
+        DrawerHeader,
+        DrawerTitle,
+        DrawerTrigger,
+    } from '../@/components/ui/drawer'
+    import { Minus, Plus } from 'lucide-vue-next'
+    import { ref } from 'vue'
+
+    const drawer = ref({
+        shouldOpen: false,
+        book: false,
+    })
+
+    const prerender = ref({})
+
+    function loadBook(row, column) {
+
+        const id = `${ row }-${ column }`
+
+        fetch('https://api.docker.localhost/book/10')
+            .then(response => response.json())
+            .then((response: ViewBookResponse) => {
+                // console.log(drawer.value)
+                // book.value = response
+
+                drawer.value.shouldOpen = true
+                drawer.value.book = response
+
+            })
+
+    }
 
 </script>
 
