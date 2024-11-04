@@ -5,16 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
+    "@vee-validate/zod": "^4.14.6",
     "@vueuse/core": "^11.2.0",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "gsap": "^3.12.5",
     "lucide-vue-next": "^0.454.0",
     "postcss": "^8.4.47",
     "radix-vue": "^1.9.8",
@@ -23,12 +23,18 @@
     "tailwindcss": "^3.4.14",
     "tailwindcss-animate": "^1.0.7",
     "vaul-vue": "^0.2.0",
-    "vue": "^3.5.12"
+    "vee-validate": "^4.14.6",
+    "vue": "^3.5.12",
+    "vue-sonner": "^1.2.5",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
+    "laravel-echo": "^1.16.1",
+    "pusher-js": "^8.4.0-rc2",
     "typescript": "~5.6.2",
     "vite": "^5.4.10",
     "vue-tsc": "^2.1.8"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

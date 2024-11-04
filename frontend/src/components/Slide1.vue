@@ -16,7 +16,7 @@
 
         </div>
 
-        <div class="absolute font-bold p-4 rounded-2xl text-2xl bottom-16 text-center w-11/12 lg:w-4/12">
+        <div class="absolute font-bold p-4 rounded-2xl text-xl sm:text-2xl bottom-16 text-center w-10/12 xl:w-4/12">
             {{ text }}
         </div>
 

@@ -3,14 +3,13 @@
 @tailwind utilities;
 
 :root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: 'Source Serif 4', ui-serif, serif;
     line-height: 1.5;
-    font-weight: 400;
+    font-weight: 500;
 
     color-scheme: light dark;
     color: rgba(255, 255, 255, 0.87);
-    /*background-color: #242424;*/
-    background-color: #E6D3BB;
+    /*background-color: #E6D3BB;*/
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -19,11 +18,18 @@
 }
 
 body {
+    background-color: #e5d1bb !important;
     margin: 0;
     display: flex;
     place-items: center;
     min-width: 320px;
     min-height: 100vh;
+    background-image: url("assets/texture.jpg") ;
+}
+
+html {
+    overflow-x: hidden;
+    margin-right: calc(-1 * (100vw - 100%));
 }
 
 #app {

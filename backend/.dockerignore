@@ -1,0 +1,9 @@
+.comfy
+.ollama
+bootstrap/cache/*.php
+storage/logs/*.log
+storage/framework/views/*.php
+storage/app/public/*.png
+traefik
+vendor
+.env

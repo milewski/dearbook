@@ -1,19 +1,29 @@
 <template>
 
-    <div v-if="book" class="relative min-h-screen flex justify-center items-center bg-[#242424]">
+    <div v-if="book" class="book relative min-h-screen flex justify-center items-center bg-[#242424]">
+
+        <div @click="$emit('close')"
+             class="absolute bg-white w-10 h-10 rounded-full flex justify-center items-center top-5 right-5 cursor-pointer transition-all hover:scale-95 active:scale-75 transform-gpu">
+
+            <X :size="20"/>
+
+        </div>
 
         <Swiper
-            :modules="[ Pagination, EffectCreative ]"
+            @key-press="closeOnEsc"
+            :modules="[ Pagination, EffectCreative, Keyboard, Mousewheel ]"
+            :mousewheel="true"
             :effect="'creative'"
-            :creativeEffect="creativeEffect"
+            :keyboard="{ enabled: true, onlyInViewport: false }"
+            :creative-effect="creativeEffect"
             :auto-height="true"
             :slides-per-view="1"
-            :slidesPerGroup="1"
+            :slides-per-group="1"
             :space-between="0"
             :pagination="{ dynamicBullets: true }">
 
             <SwiperSlide>
-                <Intro :title="book.title" :subject="book.subject" :cover="book.cover" :backdrop="book.backdrop"/>
+                <Intro v-bind="book"/>
             </SwiperSlide>
 
             <SwiperSlide v-for="({ illustration, text }, index) of book?.paragraphs">
@@ -29,20 +39,27 @@
 <script lang="ts" setup>
 
     import { Swiper, SwiperSlide } from 'swiper/vue'
-    import { Pagination, EffectCreative } from 'swiper/modules'
-
-    defineProps<{ book: ViewBookResponse }>()
-
-    import 'swiper/css'
-    import 'swiper/css/pagination'
-    import 'swiper/css/effect-coverflow'
-    import 'swiper/css/effect-creative'
-
+    import { Pagination, EffectCreative, Keyboard, Mousewheel } from 'swiper/modules'
+    import { CreativeEffectOptions, Swiper as SwiperType } from 'swiper/types'
+    import { X } from 'lucide-vue-next'
     import Slide1 from './Slide1.vue'
     import Intro from './Intro.vue'
 
-    import { CreativeEffectOptions } from 'swiper/types'
-    import { ref } from 'vue'
+    import 'swiper/css'
+    import 'swiper/css/pagination'
+    import 'swiper/css/keyboard'
+    import 'swiper/css/effect-creative'
+    import { BookIndexResource } from '../api.ts'
+
+    const emit = defineEmits([ 'close' ])
+
+    function closeOnEsc(swiper: SwiperType, keyCode: string): void {
+        if (parseInt(keyCode) === 27) {
+            emit('close')
+        }
+    }
+
+    defineProps<{ book: BookIndexResource }>()
 
     const creativeEffect: Partial<CreativeEffectOptions> = {
         perspective: true,
@@ -59,34 +76,15 @@
         },
     }
 
-    export type ViewBookResponse = {
-        id: number,
-        title: string,
-        subject: string,
-        cover: string,
-        backdrop: string,
-        paragraphs: Array<{
-            illustration: string,
-            text: string
-        }>
-    }
-
-    // const book = ref<ViewBookResponse>()
-    //
-    // fetch('https://api.docker.localhost/book/9')
-    //     .then(response => response.json())
-    //     .then((response: ViewBookResponse) => {
-    //         book.value = response
-    //     })
-
 </script>
 
 <style>
-    :root {
-        --swiper-pagination-bottom: 10px;
-    }
 
-    .swiper-pagination-horizontal {
+    .book .swiper-pagination-horizontal {
+
+        --swiper-pagination-bottom: 35px;
+
         @apply bg-white p-2 rounded-full;
     }
+
 </style>

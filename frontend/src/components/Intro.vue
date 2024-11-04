@@ -11,17 +11,17 @@
             <img class="rounded-2xl" :src="backdrop" alt="">
         </div>
 
-        <div class="absolute flex justify-center items-center flex-column text-white p-4 rounded-2xl bottom-28">
+        <div class="absolute flex justify-center items-center flex-column text-white p-4 rounded-2xl bottom-14 sm:bottom-28">
 
-            <img class="rounded-xl h-60 mr-8 shadow-2xl border border-2" :src="cover" alt="">
+            <img class="rounded-xl h-80 mr-4 shadow-2xl border border-4 hidden sm:block" :src="cover" alt="">
 
-            <div class="w-7/12">
+            <div class="px-4 sm:w-7/12 text-center sm:text-left">
 
-                <h1 class="text-4xl font-bold">
+                <h1 class="text-2xl sm:text-4xl font-bold">
                     {{ title }}
                 </h1>
 
-                <p class="text-2xl mt-5">
+                <p class="sm:text-2xl mt-5">
                     {{ subject }}
                 </p>
 

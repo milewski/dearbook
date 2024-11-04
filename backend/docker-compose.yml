@@ -1,0 +1,173 @@
+x-local-network: &local-network
+  networks:
+    - local-network
+
+x-php: &php
+  healthcheck:
+    disable: true
+  build:
+    context: docker/php
+    dockerfile: php.dockerfile
+    args:
+      ENVIRONMENT: development
+  restart: unless-stopped
+  working_dir: /srv
+  volumes:
+    - .:/srv
+
+x-nvidia: &nvidia
+#  environment:
+#    - CLI_ARGS=--cpu
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: cdi # https://nixos.org/manual/nixpkgs/unstable/#running-docker-or-podman-containers-with-cuda-support
+            device_ids:
+              - nvidia.com/gpu=all
+
+x-cpu: &cpu
+  environment:
+    - CLI_ARGS=--cpu
+
+services:
+
+  traefik:
+    image: traefik:v3.2
+    restart: unless-stopped
+    networks:
+      - local-network
+      - traefik-network
+    command: >-
+      --entryPoints.web.address=:80
+      --entryPoints.web.http.redirections.entrypoint.to=web-secure
+      --entryPoints.web.http.redirections.entrypoint.scheme=https
+      --entryPoints.web-secure.address=:443
+      --api=true
+      --api.dashboard=true
+      --providers.docker=true
+      --providers.docker.exposedByDefault=false
+      --providers.file.directory=/srv/configs
+      --providers.file.watch=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik:/srv
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.docker.localhost`)
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.services.traefik.loadBalancer.server.port=8080
+
+  php:
+    <<: *php
+    networks:
+      - local-network
+      - traefik-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.php.entryPoints=web-secure
+      - traefik.http.routers.php.rule=Host(`$API_DOMAIN`) || Host(`$ASSETS_DOMAIN`) || Host(`$HORIZON_DOMAIN`)
+      - traefik.http.routers.php.tls=true
+
+  queue:
+    <<: *php
+    command: php artisan horizon
+    networks:
+      - local-network
+      - traefik-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.horizon.entryPoints=web-secure
+      - traefik.http.routers.horizon.rule=Host(`$HORIZON_DOMAIN`)
+      - traefik.http.routers.horizon.tls=true
+
+  reverb:
+    <<: *php
+    command: php artisan reverb:start --debug
+    networks:
+      - local-network
+      - traefik-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.reverb.entryPoints=web-secure
+      - traefik.http.routers.reverb.rule=Host(`reverb.docker.localhost`)
+      - traefik.http.routers.reverb.tls=true
+      - traefik.http.services.reverb.loadBalancer.server.port=8080
+
+  scheduler:
+    <<: [ *php, *local-network ]
+    command: supercronic /srv/docker/php/config/schedule.cron
+
+  redis:
+    <<: *local-network
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+  ollama:
+    <<: [ *nvidia, *local-network ]
+    networks:
+      - local-network
+      - traefik-network
+    image: ollama/ollama:0.3.14
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - .ollama:/root/.ollama
+
+  timescaledb:
+    <<: *local-network
+    image: timescale/timescaledb-ha:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: $DB_DATABASE
+      POSTGRES_USER: $DB_USERNAME
+      POSTGRES_PASSWORD: $DB_PASSWORD
+    command: ["postgres", "-c", "ai.ollama_host=http://ollama:11434"]
+    volumes:
+      - timescaledb-data:/home/postgres/pgdata/data
+    ports:
+      - ${DB_PORT}:5432
+
+  comfyui:
+    <<: [ *nvidia, *local-network ]
+    build:
+      dockerfile: comfyui.dockerfile
+      context: docker/comfyui
+    restart: unless-stopped
+    volumes:
+      - .comfy:/home/runner
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.comfyui.entryPoints=web-secure
+      - traefik.http.routers.comfyui.rule=Host(`$COMFYUI_DOMAIN`)
+      - traefik.http.routers.comfyui.tls=true
+
+#  open-webui:
+#    image: ghcr.io/open-webui/open-webui:main
+#    volumes:
+#      - open-webui:/app/backend/data
+#    depends_on:
+#      - ollama
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - 'OLLAMA_BASE_URL=http://ollama:11434'
+#      - 'WEBUI_SECRET_KEY='
+
+volumes:
+  redis-data:
+  timescaledb-data:
+  open-webui:
+
+networks:
+  local-network:
+  traefik-network:
+    name: traefik-network
+    external: true

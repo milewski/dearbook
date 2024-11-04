@@ -1,0 +1,14 @@
+*
+!@
+!docker
+!public
+!src
+!index.html
+!package.json
+!postcss.config.js
+!tailwind.config.js
+!tsconfig.node.json
+!tsconfig.app.json
+!tsconfig.json
+!vite.config.ts
+!yarn.lock

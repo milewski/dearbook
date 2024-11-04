@@ -1,5 +1,6 @@
 const animate = require("tailwindcss-animate")
-
+const {fontFamily} = require('tailwindcss/defaultTheme')
+console.log(fontFamily.serif)
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     darkMode: ["class"],
@@ -22,6 +23,9 @@ module.exports = {
             },
         },
         extend: {
+            fontFamily: {
+                'serif': ['Source Serif 4', 'ui-serif', 'serif'],
+            },
             colors: {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",

@@ -1,0 +1,25 @@
+services:
+  node:
+    image: node:20-alpine
+    restart: unless-stopped
+    command: sh -c "yarn && yarn dev -- --host=0.0.0.0 --port 8080"
+    networks:
+      - traefik-network
+    working_dir: /srv
+    environment:
+      - VITE_REVERB_APP_KEY=dearbook
+      - VITE_REVERB_HOST=reverb.docker.localhost
+      - VITE_API_HOST=api.docker.localhost
+    volumes:
+      - .:/srv
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dearbook.entryPoints=web-secure
+      - traefik.http.routers.dearbook.rule=Host(`dearbook.docker.localhost`)
+      - traefik.http.routers.dearbook.tls=true
+      - traefik.http.services.dearbook.loadBalancer.server.port=8080
+
+networks:
+  traefik-network:
+    name: traefik-network
+    external: true

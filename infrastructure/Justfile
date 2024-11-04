@@ -1,0 +1,34 @@
+set dotenv-load
+
+apply:
+    terraform apply -var-file variables.tfvars
+
+login-registry:
+    echo $REGISTRY_PASSWORD | docker login $REGISTRY -u $REGISTRY_USER --password-stdin
+
+build-frontend:
+    docker build -f ../frontend/docker/Dockerfile ../frontend \
+        --build-arg VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY \
+        --build-arg VITE_REVERB_HOST=$VITE_REVERB_HOST \
+        --build-arg VITE_API_HOST=$VITE_API_HOST \
+        --tag $REGISTRY/frontend:latest
+
+build-backend:
+    docker build -f ../backend/docker/php/backend.dockerfile ../backend \
+        --tag $REGISTRY/backend:latest
+
+build-comfyui:
+    docker build -f ../backend/docker/comfyui/comfyui.dockerfile ../backend/docker/comfyui \
+        --tag $REGISTRY/comfyui:latest
+
+publish-comfyui:
+    just login-registry
+    docker push $REGISTRY/comfyui:latest
+
+publish-backend:
+    just login-registry
+    docker push $REGISTRY/backend:latest
+
+publish-frontend:
+    just login-registry
+    docker push $REGISTRY/frontend:latest

@@ -1,0 +1,22 @@
+https://civitai.com/api/download/models/782002?type=Model&format=SafeTensor&size=full&fp=fp16
+  dir=checkpoints
+  out=juggernautXL_juggXIByRundiffusion.safetensors
+
+https://civitai.com/api/download/models/205809?type=Model&format=SafeTensor
+  dir=loras
+  out=Childrens_book_illustration-000001.safetensors
+
+https://huggingface.co/ByteDance/SDXL-Lightning/resolve/main/sdxl_lightning_8step_lora.safetensors
+  dir=loras
+  out=sdxl_lightning_8step_lora.safetensors
+
+https://huggingface.co/milewski/pgai-and-ollama-dev-challenge/resolve/main/Drawing_cute_animals__Isa_Bel-000008.safetensors
+  dir=loras
+  out=Drawing_cute_animals__Isa_Bel-000008.safetensors
+
+https://huggingface.co/milewski/pgai-and-ollama-dev-challenge/resolve/main/childrens_story_book.safetensors
+  dir=loras
+  out=childrens_story_book.safetensors
+
+
+
