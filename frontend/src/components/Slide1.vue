@@ -4,7 +4,7 @@
 
 <template>
 
-    <div class="flex justify-center text-white">
+    <div class="flex justify-center text-white p-4">
 
         <div class="relative before:opacity-75 before:rounded-2xl before:absolute before:from-black before:bg-gradient-to-t before:w-full before:h-96 before:left-0 before:bottom-0">
 

@@ -61,6 +61,10 @@ services:
     <<: *php
     command: php artisan horizon
 
+  scheduler:
+    <<: *php
+    command: supercronic /srv/docker/php/config/schedule.cron
+
   redis:
     image: redis:7-alpine
     restart: unless-stopped

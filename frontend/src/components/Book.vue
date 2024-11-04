@@ -60,6 +60,7 @@
     }
 
     export type ViewBookResponse = {
+        id: number,
         title: string,
         subject: string,
         cover: string,

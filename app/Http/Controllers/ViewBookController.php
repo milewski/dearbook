@@ -10,6 +10,7 @@ class ViewBookController extends Controller
     public function __invoke(Book $book): array
     {
         return [
+            'id' => $book->id,
             'title' => $book->title,
             'subject' => $book->subject,
             'cover' => Storage::disk('public')->url($book->assets->get('cover')),
