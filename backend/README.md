@@ -1,4 +1,4 @@
-# Backend for the pgai and Ollama Dev Challenge
+# Backend for: The Open Source AI Challenge
 
 https://dev.to/challenges/pgai
 

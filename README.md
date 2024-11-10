@@ -2,7 +2,7 @@
 https://dearbook.fun
 <p align="center"><img width="1000" src="frontend/public/cover.png"></p>
 
-This is the main repository for my submission to the [pgai & Ollama dev challenge](https://dev.to/challenges/pgai).
+This is the main repository for my submission to [The Open Source AI Challenge](https://dev.to/challenges/pgai).
 
 The project is organized into three folders:
 
