@@ -1,6 +1,6 @@
 # DearBook
 https://dearbook.fun
-<p align="center"><img width="1000" src="frontend/public/cover.png"></p>
+<p align="center"><img width="1000" src="https://github.com/user-attachments/assets/ca158f7f-1966-4be3-8daf-74cd79baca8e"></p>
 
 This is the main repository for my submission to [The Open Source AI Challenge](https://dev.to/challenges/pgai).
 
