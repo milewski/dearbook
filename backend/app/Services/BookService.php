@@ -7,11 +7,11 @@ namespace App\Services;
 use App\Data\BookData;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
+use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
-use phpDocumentor\Reflection\Exception;
 use Throwable;
 
 class BookService
@@ -24,6 +24,17 @@ class BookService
         private readonly OllamaService $ollama,
     )
     {
+    }
+
+    /**
+     * @return Collection<int, Book
+     */
+    public function getFailedBooks(): Collection
+    {
+        return Book::query()
+            ->whereNull('assets')
+            ->where('updated_at', '<=', now()->subMinutes(10))
+            ->get();
     }
 
     public function searchByTerm(?string $term = null): Paginator
