@@ -1,9 +1,9 @@
 <template>
 
-    <div v-if="book" class="book relative min-h-screen flex justify-center items-center bg-[#242424]">
+    <div v-if="book" class="book relative min-h-dvh flex justify-center items-center bg-[#242424]">
 
         <div @click="$emit('close')"
-             class="absolute bg-white w-10 h-10 rounded-full flex justify-center items-center top-5 right-5 cursor-pointer transition-all hover:scale-95 active:scale-75 transform-gpu">
+             class="absolute z-10 bg-white w-10 h-10 rounded-full flex justify-center items-center top-5 right-5 cursor-pointer transition-all hover:scale-95 active:scale-75 transform-gpu">
 
             <X :size="20"/>
 

@@ -1,6 +1,6 @@
 const animate = require("tailwindcss-animate")
 const {fontFamily} = require('tailwindcss/defaultTheme')
-console.log(fontFamily.serif)
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     darkMode: ["class"],

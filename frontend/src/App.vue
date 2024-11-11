@@ -33,7 +33,7 @@
                 <Input
                     type="text"
                     :placeholder="randomSearchTermPlaceholder"
-                    class="text-[#230202] text-opacity-70 bg-[#F18533] transition-all shadow-xl placeholder:opacity-25 placeholder:text-[#230202] p-8 rounded-full text-2xl border-none h-full w-full focus-visible:ring-[#230202]"
+                    class="text-[#230202] text-opacity-70 text-ellipsis pr-14 bg-[#F18533] transition-all shadow-xl placeholder:opacity-25 placeholder:text-[#230202] py-8 pl-8 rounded-full text-2xl border-none h-full w-full focus-visible:ring-[#230202]"
                     :disabled="searching"
                     @keydown.enter="onSearch"
                     v-model="searchTerm"/>

@@ -8,7 +8,7 @@
 
         <div class="relative before:opacity-75 before:rounded-2xl before:absolute before:from-black before:bg-gradient-to-t before:w-full before:h-96 before:left-0 before:bottom-0">
 
-            <img class="rounded-2xl" :src="image" alt="">
+            <img class="rounded-2xl sm:h-[90vh]" :src="image" alt="">
 
             <div class="absolute opacity-45 rounded-full flex justify-center items-center text-sm font-bold bottom-4 right-4 shadow-2xl">
                 {{ page }}
@@ -16,7 +16,7 @@
 
         </div>
 
-        <div class="absolute font-bold p-4 rounded-2xl text-xl sm:text-2xl bottom-16 text-center w-10/12 xl:w-4/12">
+        <div class="absolute font-bold p-4 rounded-2xl text-xl sm:text-2xl bottom-16 text-center w-[85vw] sm:w-8/12 xl:w-4/12">
             {{ text }}
         </div>
 

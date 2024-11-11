@@ -13,7 +13,7 @@
 
         <div class="absolute flex justify-center items-center flex-column text-white p-4 rounded-2xl bottom-14 sm:bottom-28">
 
-            <img class="rounded-xl h-80 mr-4 shadow-2xl border border-4 hidden sm:block" :src="cover" alt="">
+            <img class="rounded-xl h-80 mr-4 shadow-2xl border-4 hidden sm:block" :src="cover" alt="">
 
             <div class="px-4 sm:w-7/12 text-center sm:text-left">
 
@@ -21,7 +21,7 @@
                     {{ title }}
                 </h1>
 
-                <p class="sm:text-2xl mt-5">
+                <p class="sm:text-2xl mt-2 sm:mt-5">
                     {{ subject }}
                 </p>
 
