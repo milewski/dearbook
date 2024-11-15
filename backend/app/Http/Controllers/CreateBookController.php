@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
-use App\Jobs\CreateBookJob;
+use App\Jobs\GenerateBookStory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Throwable;
@@ -23,7 +23,7 @@ class CreateBookController extends Controller
         $prompt = $request->input('prompt');
         $id = Str::uuid();
 
-        CreateBookJob::dispatch($id, $prompt);
+        GenerateBookStory::dispatch($id, $prompt);
 
         return [
             'id' => $id,

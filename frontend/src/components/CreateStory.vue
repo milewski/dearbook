@@ -136,7 +136,7 @@
     import { Button } from '../../@/components/ui/button'
     import { FormControl, FormField, FormItem, FormMessage } from '../../@/components/ui/form'
     import { Textarea } from '../../@/components/ui/textarea'
-    import { Flame, LoaderPinwheel, Sparkles } from 'lucide-vue-next'
+    import { LoaderPinwheel, Sparkles } from 'lucide-vue-next'
     import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../../@/components/ui/drawer'
     import { toTypedSchema } from '@vee-validate/zod'
     import * as z from 'zod'
@@ -224,7 +224,12 @@
 
     if (Object.keys(storage.value).length) {
 
-        checkBatches(Object.keys(storage.value)).then((response: Record<string, boolean | BookIndexResource>) => {
+        const currentInStorage = Object.keys(storage.value)
+
+        checkBatches(currentInStorage).then((response: Record<string, boolean | BookIndexResource>) => {
+
+            const keys = Object.keys(response)
+            const missing = currentInStorage.filter(current => !keys.includes(current))
 
             for (const key in response) {
 
@@ -241,21 +246,6 @@
 
                         listenOnce(key)
 
-                    } else {
-
-                        delete storage.value[ key ]
-
-                        toast('Failed to generate book!', {
-                            description: 'Something went wrong...',
-                            icon: Flame,
-                            important: true,
-                            actionButtonStyle: { padding: '16px', borderRadius: '100px' },
-                            action: {
-                                label: 'Try again!',
-                                onClick: () => createDrawerState.value = true,
-                            },
-                        })
-
                     }
 
                 } else {
@@ -263,6 +253,17 @@
                     userBooks.value.unshift(response[ key ])
 
                 }
+
+            }
+
+            for (const key of missing) {
+
+                userBooks.value.unshift({
+                    batch_id: key,
+                    type: 'placeholder',
+                })
+
+                listenOnce(key)
 
             }
 

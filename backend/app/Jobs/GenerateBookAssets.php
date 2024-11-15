@@ -2,10 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace App\Listeners;
+namespace App\Jobs;
 
-use App\Events\AssetsWereGenerated;
-use App\Events\BookWasCreated;
+use App\Models\Book;
 use App\Services\ComfyUI\ComfyUIService;
 use App\Services\OllamaService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,11 +12,13 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
 use Throwable;
 
-class GenerateAssets implements ShouldQueue
+class GenerateBookAssets implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct()
+    public function __construct(
+        private readonly Book $book,
+    )
     {
         if (config('app.low_vram_mode') === false) {
             $this->onQueue('comfyui');
@@ -28,16 +29,14 @@ class GenerateAssets implements ShouldQueue
      * @throws ConnectionException
      * @throws Throwable
      */
-    public function handle(BookWasCreated $event): void
+    public function handle(): void
     {
         if (config('app.low_vram_mode') === true) {
             OllamaService::resolve()->unloadAll();
         }
 
         ComfyUIService::resolve()->execute(
-            'main.workflow.json', $event->book,
+            'main.workflow.json', $this->book,
         );
-
-        AssetsWereGenerated::dispatch($event->book);
     }
 }

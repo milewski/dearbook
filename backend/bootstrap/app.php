@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-use App\Jobs\RetryFailedJobs;
+use App\Jobs\FetchWorkflowOutput;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -28,6 +28,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
     ->withSchedule(function (Schedule $schedule) {
-        $schedule->job(new RetryFailedJobs())->everyFiveMinutes();
+        $schedule->job(new FetchWorkflowOutput())->everyTenSeconds();
     })
     ->create();

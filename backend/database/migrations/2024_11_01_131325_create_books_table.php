@@ -18,6 +18,7 @@ return new class () extends Migration
 
             $table->id();
             $table->uuid('batch_id')->index();
+            $table->uuid('workflow_id')->nullable();
             $table->text('user_prompt')->nullable();
 
             $table->string('title');

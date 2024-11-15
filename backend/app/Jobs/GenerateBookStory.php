@@ -4,14 +4,13 @@ declare(strict_types = 1);
 
 namespace App\Jobs;
 
-use App\Events\BookWasCreated;
 use App\Services\BookService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
 use Throwable;
 
-class CreateBookJob implements ShouldQueue
+class GenerateBookStory implements ShouldQueue
 {
     use Queueable;
 
@@ -36,6 +35,6 @@ class CreateBookJob implements ShouldQueue
             userPrompt: $this->prompt,
         );
 
-        BookWasCreated::dispatch($book);
+        GenerateBookAssets::dispatch($book);
     }
 }

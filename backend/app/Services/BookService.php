@@ -37,6 +37,17 @@ class BookService
             ->get();
     }
 
+    /**
+     * @return Collection<int, Book
+     */
+    public function getByWorkflowId(): Collection
+    {
+        return Book::query()
+            ->whereNotNull('workflow_id')
+            ->whereNull('assets')
+            ->get();
+    }
+
     public function searchByTerm(?string $term = null): Paginator
     {
         return Book::query()
@@ -68,6 +79,7 @@ class BookService
     {
         return Book::query()
             ->whereIn('batch_id', $batchIds)
+            ->oldest()
             ->get();
     }
 

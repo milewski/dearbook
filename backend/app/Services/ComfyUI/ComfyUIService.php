@@ -6,9 +6,9 @@ namespace App\Services\ComfyUI;
 
 use App\Data\FileDescriptor;
 use App\Data\Tokens;
+use App\Jobs\CompressAssets;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
-use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Collection;
@@ -45,7 +45,7 @@ class ComfyUIService
             clientId: $book->batch_id,
         );
 
-        $book->assets = $this->fetchOutputs($workflowId);
+        $book->workflow_id = $workflowId;
         $book->save();
     }
 
@@ -75,40 +75,56 @@ class ComfyUIService
     }
 
     /**
+     * @throws FilesystemException
      * @throws ConnectionException
-     * @throws Throwable
-     * @return Collection<int, FileDescriptor>
      */
-    public function fetchOutputs(string $id): Collection
+    public function fetchOutputs(Book $book): void
     {
-        return retry(
-            times: 100,
-            callback: function () use ($id) {
+        $id = $book->workflow_id;
 
-                $response = $this->request()->get("/history/$id");
-                $isCompleted = $response->json("$id.status.completed");
+        $response = $this->request()->get("/history/$id");
+        $isCompleted = $response->json("$id.status.completed");
 
-                if ($isCompleted) {
+        /**
+         * Workflow has not completed yet
+         */
+        if ($isCompleted === null) {
+            return;
+        }
 
-                    $assets = $response
-                        ->collect("$id.outputs")
-                        ->flatten(2)
-                        ->map(fn (array $output) => FileDescriptor::from($output))
-                        ->mapWithKeys(fn (FileDescriptor $file) => [
-                            $file->name() => $this->downloadImage($file),
-                        ]);
+        /**
+         * Workflow failed...so invalidate the workflow and regenerate it again...
+         */
+        if ($isCompleted === false) {
 
-                    $this->deleteWorkflow($id);
+            $book->workflow_id = null;
+            $book->save();
 
-                    return $assets;
+            return;
 
-                }
+        }
 
-                throw new Exception('try again...');
+        /**
+         * Generation was completed with success!
+         */
+        if ($isCompleted === true) {
 
-            },
-            sleepMilliseconds: 1000 * 5,
-        );
+            $assets = $response
+                ->collect("$id.outputs")
+                ->flatten(2)
+                ->map(fn (array $output) => FileDescriptor::from($output))
+                ->mapWithKeys(fn (FileDescriptor $file) => [
+                    $file->name() => $this->downloadImage($file),
+                ]);
+
+            $this->deleteWorkflow($id);
+
+            $book->assets = $assets;
+            $book->save();
+
+            CompressAssets::dispatch($book);
+
+        }
     }
 
     /**

@@ -49,7 +49,7 @@
     import 'swiper/css/pagination'
     import 'swiper/css/keyboard'
     import 'swiper/css/effect-creative'
-    import { BookIndexResource } from '../api.ts'
+    import { BookDetailResource } from '../api.ts'
 
     const emit = defineEmits([ 'close' ])
 
@@ -59,7 +59,7 @@
         }
     }
 
-    defineProps<{ book: BookIndexResource }>()
+    defineProps<{ book: BookDetailResource }>()
 
     const creativeEffect: Partial<CreativeEffectOptions> = {
         perspective: true,
