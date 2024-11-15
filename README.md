@@ -18,4 +18,10 @@ as everything has been containerized, running `docker compose up` is all that’
 > [!WARNING]
 > You need a good NVIDIA GPU to run this project!!. 
 
-For a more detailed overview, including screenshots, you can read the submission sent to the challenge here: [https://dev.to/milewski/dearbook-create-magical-illustrated-childrens-stories-with-ai-4mpe](https://dev.to/milewski/dearbook-create-magical-illustrated-childrens-stories-with-ai-4mpe).
+For a more detailed overview, including screenshots, you can read the submission sent to the challenge here: 
+
+https://dev.to/milewski/dearbook-create-magical-illustrated-childrens-stories-with-ai-4mpe
+
+### Winner announcement:
+
+https://dev.to/devteam/congrats-to-the-winners-of-the-open-source-ai-challenge-with-pgai-and-ollama-46b6
