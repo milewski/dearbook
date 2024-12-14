@@ -10,8 +10,7 @@ class BookData extends Data
 {
     public function __construct(
         public string $title,
-        public string $subject,
-        public array $tags,
+        public string $synopsis,
         public array $paragraphs,
     )
     {
@@ -21,15 +20,5 @@ class BookData extends Data
     public function isValid(): bool
     {
         return count($this->paragraphs) === 10;
-    }
-
-    public function toSummary(): string
-    {
-        return collect([
-            "Title: $this->title",
-            "Subject: $this->subject",
-            'Tags:', ...$this->tags,
-            'History:', ...$this->paragraphs,
-        ])->implode(PHP_EOL);
     }
 }

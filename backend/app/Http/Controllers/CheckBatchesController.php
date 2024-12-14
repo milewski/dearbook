@@ -9,41 +9,19 @@ use App\Models\Book;
 use App\Services\BookService;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class CheckBatchesController extends Controller
 {
-    public function __invoke(Request $request, DatabaseBatchRepository $repository): array
+    public function __invoke(Request $request, DatabaseBatchRepository $repository): Collection
     {
         $ids = $request->validate([
             'ids' => [ 'required', 'array' ],
-            'ids.*' => [ 'required', 'string', 'uuid' ],
+            'ids.*' => [ 'required', 'string', 'ulid' ],
         ]);
 
-        $response = collect();
-        $batches = BookService::resolve()->findManyByBatchIds($ids[ 'ids' ]);
-
-        /**
-         * @var Book $book
-         */
-        foreach ($batches as $book) {
-
-            $response->put($book->batch_id, true);
-
-            if ($book->assets?->isNotEmpty()) {
-
-                $response->put(
-                    key: $book->batch_id,
-                    value: $book ? new BookIndexResource($book) : true,
-                );
-
-            }
-
-            if (in_array($book->batch_id, $ids[ 'ids' ]) === false) {
-                $response->put($book->batch_id, false);
-            }
-
-        }
-
-        return $response->toArray();
+        return BookService::resolve()->findManyByBatchIds($ids[ 'ids' ])->mapWithKeys(fn(Book $book) => [
+            $book->id => new BookIndexResource($book),
+        ]);
     }
 }

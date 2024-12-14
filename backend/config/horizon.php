@@ -180,55 +180,32 @@ return [
      */
 
     'defaults' => [
-        ...with(env('LOW_VRAM_MODE', true), function (bool $lowVram) {
-
-            return match ($lowVram) {
-                false => [
-                    'ollama' => [
-                        'connection' => 'redis',
-                        'queue' => [ 'ollama' ],
-                        'balance' => 'auto',
-                        'autoScalingStrategy' => 'time',
-                        'maxProcesses' => env('OLLAMA_QUEUE_WORKERS_COUNT'),
-                        'maxTime' => 0,
-                        'maxJobs' => 0,
-                        'memory' => 128,
-                        'tries' => 1,
-                        'timeout' => (60 * 5) - 10,
-                        'nice' => 0,
-                    ],
-                    'comfyui' => [
-                        'connection' => 'redis',
-                        'queue' => [ 'default', 'comfyui' ],
-                        'balance' => 'auto',
-                        'autoScalingStrategy' => 'time',
-                        'maxProcesses' => env('COMFYUI_QUEUE_WORKERS_COUNT'),
-                        'maxTime' => 0,
-                        'maxJobs' => 0,
-                        'memory' => 128,
-                        'tries' => 1,
-                        'timeout' => (60 * 5) - 10,
-                        'nice' => 0,
-                    ],
-                ],
-                true => [
-                    'default' => [
-                        'connection' => 'redis',
-                        'queue' => [ 'default' ],
-                        'balance' => 'auto',
-                        'autoScalingStrategy' => 'time',
-                        'maxProcesses' => env('OLLAMA_QUEUE_WORKERS_COUNT'),
-                        'maxTime' => 0,
-                        'maxJobs' => 0,
-                        'memory' => 128,
-                        'tries' => 1,
-                        'timeout' => (60 * 5) - 10,
-                        'nice' => 0,
-                    ],
-                ],
-            };
-
-        }),
+        'ollama' => [
+            'connection' => 'redis',
+            'queue' => [ 'ollama' ],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => env('OLLAMA_QUEUE_WORKERS_COUNT'),
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 128,
+            'tries' => 1,
+            'timeout' => (60 * 5) - 10,
+            'nice' => 0,
+        ],
+        'comfyui' => [
+            'connection' => 'redis',
+            'queue' => [ 'default', 'comfyui' ],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => env('COMFYUI_QUEUE_WORKERS_COUNT'),
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 128,
+            'tries' => 1,
+            'timeout' => (60 * 5) - 10,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [

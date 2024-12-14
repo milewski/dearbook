@@ -17,6 +17,24 @@ class OllamaService
     /**
      * @throws ConnectionException
      */
+    public function generateJsonSchema(string $prompt, array $schema): Collection
+    {
+        $response = $this->request()->post('/generate', [
+            'model' => config('app.ollama.model'),
+            'prompt' => $prompt,
+            'format' => $schema,
+            'stream' => false,
+        ]);
+
+        return collect(json_decode(
+            json: $response->json('response'),
+            associative: true,
+        ));
+    }
+
+    /**
+     * @throws ConnectionException
+     */
     public function generateJson(string $prompt): Collection
     {
         $response = $this->request()->post('/generate', [

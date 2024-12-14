@@ -11,9 +11,7 @@
         "php": "^8.2",
         "laravel/framework": "^11.9",
         "laravel/horizon": "^5.29",
-        "laravel/reverb": "^1.0",
         "laravel/tinker": "^2.9",
-        "pgvector/pgvector": "^0.2.0",
         "spatie/laravel-data": "^4.11",
         "spatie/laravel-image-optimizer": "^1.8"
     },

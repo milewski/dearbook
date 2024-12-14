@@ -69,7 +69,25 @@
     },
     "class_type": "LoraLoader"
   },
-  "130:1": {
+  "195": {
+    "inputs": {
+      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "196": {
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "201": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-1:",
       "clip": [
@@ -79,17 +97,7 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "130:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "138:1": {
+  "204": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-2:",
       "clip": [
@@ -99,9 +107,9 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "138:2": {
+  "207": {
     "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
+      "text": "Children's Illustration Style book cover: \n\n\":title:\" \n\ncinematic photo, 4k, highly detailed, uhd image, intricate details",
       "clip": [
         "189",
         1
@@ -109,7 +117,7 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "142:1": {
+  "209": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-3:",
       "clip": [
@@ -119,37 +127,7 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "142:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "158:1": {
-    "inputs": {
-      "text": "Children's Illustration Style book cover: \n\n\":title:\" (:tags:)\n\ncinematic photo, 4k, highly detailed, uhd image, intricate details",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "158:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "169:1": {
+  "211": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-4:",
       "clip": [
@@ -159,17 +137,7 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "169:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, overworkflow_apisaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "170:1": {
+  "214": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-5:",
       "clip": [
@@ -179,17 +147,7 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "170:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "171:1": {
+  "216": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-6:",
       "clip": [
@@ -199,17 +157,7 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "171:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "175:1": {
+  "217": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-7:",
       "clip": [
@@ -219,17 +167,7 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "175:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "176:1": {
+  "219": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-8:",
       "clip": [
@@ -239,17 +177,7 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "176:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "177:1": {
+  "221": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-9:",
       "clip": [
@@ -259,17 +187,7 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "177:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
-  "191:1": {
+  "223": {
     "inputs": {
       "text": "childrens_book_illustration\n\n:illustration-10:",
       "clip": [
@@ -279,19 +197,9 @@
     },
     "class_type": "CLIPTextEncode"
   },
-  "191:2": {
-    "inputs": {
-      "text": "blurry, blurred detail, poorly hands, poorly face, enhanced hands, missing fingers, mutated hands, fused fingers, deformed, malformed limbs, disfigured, watermarked, text, extremely grainy, very chromatic aberration, oversaturated",
-      "clip": [
-        "189",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode"
-  },
   "187:1": {
     "inputs": {
-      "text": "Children's Book Illustration Style\n\n:title: - :subject:\n\n(only 1 subject:2)\n\n(background, environment, clean background:1.5)",
+      "text": "Children's Book Illustration Style\n\n:title: - :synopsis:\n\n(only 1 subject:2)\n\n(background, environment, clean background:1.5)",
       "clip": [
         "189",
         1
@@ -308,644 +216,6 @@
       ]
     },
     "class_type": "CLIPTextEncode"
-  },
-  "166:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "166:1": {
-    "inputs": {
-      "seed": 84991852352141,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "130:1",
-        0
-      ],
-      "negative": [
-        "130:2",
-        0
-      ],
-      "latent_image": [
-        "166:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "166:2": {
-    "inputs": {
-      "samples": [
-        "166:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "166:3": {
-    "inputs": {
-      "filename_prefix": "illustration-1",
-      "images": [
-        "166:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "167:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "167:1": {
-    "inputs": {
-      "seed": 84991852352141,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "138:1",
-        0
-      ],
-      "negative": [
-        "138:2",
-        0
-      ],
-      "latent_image": [
-        "167:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "167:2": {
-    "inputs": {
-      "samples": [
-        "167:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "167:3": {
-    "inputs": {
-      "filename_prefix": "illustration-2",
-      "images": [
-        "167:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "168:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "168:1": {
-    "inputs": {
-      "seed": 84991852352142,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "142:1",
-        0
-      ],
-      "negative": [
-        "142:2",
-        0
-      ],
-      "latent_image": [
-        "168:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "168:2": {
-    "inputs": {
-      "samples": [
-        "168:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "168:3": {
-    "inputs": {
-      "filename_prefix": "illustration-3",
-      "images": [
-        "168:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "165:0": {
-    "inputs": {
-      "width": 688,
-      "height": 1032,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "165:1": {
-    "inputs": {
-      "seed": 84991852352141,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "158:1",
-        0
-      ],
-      "negative": [
-        "158:2",
-        0
-      ],
-      "latent_image": [
-        "165:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "165:2": {
-    "inputs": {
-      "samples": [
-        "165:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "165:3": {
-    "inputs": {
-      "filename_prefix": "cover",
-      "images": [
-        "165:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "172:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "172:1": {
-    "inputs": {
-      "seed": 84991852352141,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "169:1",
-        0
-      ],
-      "negative": [
-        "169:2",
-        0
-      ],
-      "latent_image": [
-        "172:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "172:2": {
-    "inputs": {
-      "samples": [
-        "172:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "172:3": {
-    "inputs": {
-      "filename_prefix": "illustration-4",
-      "images": [
-        "172:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "173:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "173:1": {
-    "inputs": {
-      "seed": 84991852352141,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "170:1",
-        0
-      ],
-      "negative": [
-        "170:2",
-        0
-      ],
-      "latent_image": [
-        "173:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "173:2": {
-    "inputs": {
-      "samples": [
-        "173:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "173:3": {
-    "inputs": {
-      "filename_prefix": "illustration-5",
-      "images": [
-        "173:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "174:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "174:1": {
-    "inputs": {
-      "seed": 84991852352141,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "171:1",
-        0
-      ],
-      "negative": [
-        "171:2",
-        0
-      ],
-      "latent_image": [
-        "174:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "174:2": {
-    "inputs": {
-      "samples": [
-        "174:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "174:3": {
-    "inputs": {
-      "filename_prefix": "illustration-6",
-      "images": [
-        "174:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "178:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "178:1": {
-    "inputs": {
-      "seed": 84991852352141,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "175:1",
-        0
-      ],
-      "negative": [
-        "175:2",
-        0
-      ],
-      "latent_image": [
-        "178:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "178:2": {
-    "inputs": {
-      "samples": [
-        "178:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "178:3": {
-    "inputs": {
-      "filename_prefix": "illustration-7",
-      "images": [
-        "178:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "179:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "179:1": {
-    "inputs": {
-      "seed": 84991852352141,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "176:1",
-        0
-      ],
-      "negative": [
-        "176:2",
-        0
-      ],
-      "latent_image": [
-        "179:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "179:2": {
-    "inputs": {
-      "samples": [
-        "179:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "179:3": {
-    "inputs": {
-      "filename_prefix": "illustration-8",
-      "images": [
-        "179:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "180:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "180:1": {
-    "inputs": {
-      "seed": 84991852352141,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "177:1",
-        0
-      ],
-      "negative": [
-        "177:2",
-        0
-      ],
-      "latent_image": [
-        "180:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "180:2": {
-    "inputs": {
-      "samples": [
-        "180:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "180:3": {
-    "inputs": {
-      "filename_prefix": "illustration-9",
-      "images": [
-        "180:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
-  },
-  "192:0": {
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage"
-  },
-  "192:1": {
-    "inputs": {
-      "seed": 84991852352142,
-      "steps": 8,
-      "cfg": 1,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "beta",
-      "denoise": 1,
-      "model": [
-        "189",
-        0
-      ],
-      "positive": [
-        "191:1",
-        0
-      ],
-      "negative": [
-        "191:2",
-        0
-      ],
-      "latent_image": [
-        "192:0",
-        0
-      ]
-    },
-    "class_type": "KSampler"
-  },
-  "192:2": {
-    "inputs": {
-      "samples": [
-        "192:1",
-        0
-      ],
-      "vae": [
-        "95",
-        2
-      ]
-    },
-    "class_type": "VAEDecode"
-  },
-  "192:3": {
-    "inputs": {
-      "filename_prefix": "illustration-10",
-      "images": [
-        "192:2",
-        0
-      ]
-    },
-    "class_type": "SaveImage"
   },
   "188:0": {
     "inputs": {
@@ -1000,6 +270,564 @@
       "filename_prefix": "backdrop",
       "images": [
         "188:2",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "203:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "201",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "203:1": {
+    "inputs": {
+      "samples": [
+        "203:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "203:2": {
+    "inputs": {
+      "filename_prefix": "illustration-1",
+      "images": [
+        "203:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "205:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "204",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "205:1": {
+    "inputs": {
+      "samples": [
+        "205:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "205:2": {
+    "inputs": {
+      "filename_prefix": "illustration-2",
+      "images": [
+        "205:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "165:0": {
+    "inputs": {
+      "width": 688,
+      "height": 1032,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "165:1": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "207",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "165:0",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "165:2": {
+    "inputs": {
+      "samples": [
+        "165:1",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "165:3": {
+    "inputs": {
+      "filename_prefix": "cover",
+      "images": [
+        "165:2",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "210:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "209",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "210:1": {
+    "inputs": {
+      "samples": [
+        "210:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "210:2": {
+    "inputs": {
+      "filename_prefix": "illustration-3",
+      "images": [
+        "210:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "212:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "211",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "212:1": {
+    "inputs": {
+      "samples": [
+        "212:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "212:2": {
+    "inputs": {
+      "filename_prefix": "illustration-4",
+      "images": [
+        "212:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "213:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "214",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "213:1": {
+    "inputs": {
+      "samples": [
+        "213:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "213:2": {
+    "inputs": {
+      "filename_prefix": "illustration-5",
+      "images": [
+        "213:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "215:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "216",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "215:1": {
+    "inputs": {
+      "samples": [
+        "215:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "215:2": {
+    "inputs": {
+      "filename_prefix": "illustration-6",
+      "images": [
+        "215:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "218:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "217",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "218:1": {
+    "inputs": {
+      "samples": [
+        "218:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "218:2": {
+    "inputs": {
+      "filename_prefix": "illustration-7",
+      "images": [
+        "218:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "220:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "219",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "220:1": {
+    "inputs": {
+      "samples": [
+        "220:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "220:2": {
+    "inputs": {
+      "filename_prefix": "illustration-8",
+      "images": [
+        "220:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "222:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "221",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "222:1": {
+    "inputs": {
+      "samples": [
+        "222:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "222:2": {
+    "inputs": {
+      "filename_prefix": "illustration-9",
+      "images": [
+        "222:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "224:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "223",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "224:1": {
+    "inputs": {
+      "samples": [
+        "224:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "224:2": {
+    "inputs": {
+      "filename_prefix": "illustration-10",
+      "images": [
+        "224:1",
         0
       ]
     },

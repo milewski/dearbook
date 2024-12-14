@@ -4,29 +4,15 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
-use App\Jobs\GenerateBookStory;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Throwable;
+use App\Http\Requests\CreateBookRequest;
+use App\Services\BookService;
 
 class CreateBookController extends Controller
 {
-    /**
-     * @throws Throwable
-     */
-    public function __invoke(Request $request): array
+    public function __invoke(CreateBookRequest $request, BookService $service): array
     {
-        $request->validate([
-            'prompt' => [ 'nullable', 'max:500' ],
-        ]);
-
-        $prompt = $request->input('prompt');
-        $id = Str::uuid();
-
-        GenerateBookStory::dispatch($id, $prompt);
-
         return [
-            'id' => $id,
+            'id' => $service->createPendingBook($request->input('prompt'))->id,
         ];
     }
 }

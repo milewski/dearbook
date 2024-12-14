@@ -5,13 +5,15 @@ declare(strict_types = 1);
 namespace App\Services;
 
 use App\Data\BookData;
+use App\Http\Requests\PostWorkRequest;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\UploadedFile;
+use Symfony\Component\Uid\Ulid;
 use Throwable;
 
 class BookService
@@ -26,6 +28,33 @@ class BookService
     {
     }
 
+    public function finish(PostWorkRequest $request): void
+    {
+        /**
+         * @var Book $book
+         */
+        $book = Book::find($request->input('id'));
+
+        $book->title = $request->input('title');
+        $book->synopsis = $request->input('synopsis');
+        $book->paragraphs = $request->input('paragraphs');
+
+        $book->assets = collect($request->allFiles())->mapWithKeys(fn(UploadedFile $file, string $name) => [
+            $name => $file->store(options: [ 'disk' => 'public' ]),
+        ]);
+
+        $book->save();
+    }
+
+    public function createPendingBook(string $prompt): Book
+    {
+        $book = new Book();
+        $book->user_prompt = $prompt;
+        $book->save();
+
+        return $book;
+    }
+
     /**
      * @return Collection<int, Book
      */
@@ -35,6 +64,21 @@ class BookService
             ->whereNull('assets')
             ->where('updated_at', '<=', now()->subMinutes(10))
             ->get();
+    }
+
+    public function getPendingBook(): ?Book
+    {
+        $book = Book::query()
+            ->whereNull('assets')
+            ->where('updated_at', '<=', now()->subMinutes(10))
+            ->orderBy('created_at')
+            ->first();
+
+        if ($book) {
+            $book->touch();
+        }
+
+        return $book;
     }
 
     /**
@@ -48,38 +92,21 @@ class BookService
             ->get();
     }
 
-    public function searchByTerm(?string $term = null): Paginator
+    public function getRandomBooks(): Paginator
     {
         return Book::query()
             ->whereNotNull('assets')
-            ->when($term, fn (Builder $query, string $term) => $query
-                ->selectRaw('id, title, assets, batch_id, embedding <=> ai.ollama_embed(?, ?) as distance', [ config('app.ollama.embedding'), $term ])
-                ->orderBy('distance'),
-            )
-            ->when(blank($term), fn (Builder $query) => $query->inRandomOrder())
+            ->inRandomOrder()
             ->simplePaginate(12);
     }
 
-    public function findTop10SimilarEmbeddings(): Collection
-    {
-        $topEmbeddings = Book::query()
-            ->selectRaw('embedding, COUNT(*) as frequency')
-            ->groupBy('embedding')
-            ->orderByDesc('frequency')
-            ->limit(10);
-
-        return Book::query()
-            ->select('id', 'title')
-            ->joinSub($topEmbeddings, 'top_embeddings', 'books.embedding', '=', 'top_embeddings.embedding')
-            ->orderByDesc('top_embeddings.frequency')
-            ->get();
-    }
-
-    public function findManyByBatchIds(array $batchIds): Collection
+    public function findManyByBatchIds(array $ids): Collection
     {
         return Book::query()
-            ->whereIn('batch_id', $batchIds)
+            ->whereIn('id', $ids)
+            ->whereNotNull('assets')
             ->oldest()
+            ->limit(10)
             ->get();
     }
 
@@ -88,14 +115,10 @@ class BookService
      * @throws Exception
      * @throws ConnectionException
      */
-    public function createBook(string $batchId, ?string $userPrompt = null): Book
+    public function createBook(Ulid $id, string $userPrompt): Book
     {
-        if (filled($userPrompt) && $this->isSafeForChildren($userPrompt) === false) {
-            throw new Exception('the prompt is not safe for children...');
-        }
-
         return $this->createBookModel(
-            batchId: $batchId,
+            id: $id,
             userPrompt: $userPrompt,
             data: $book = $this->generateBookMainStoryLine($userPrompt),
             illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
@@ -111,23 +134,16 @@ class BookService
     {
         return retry($this->tries, function () use ($paragraphs) {
 
-            $response = OllamaService::resolve()->generateJson(
-                prompt: $this->describeIllustrationPrompt($paragraphs),
-            );
+            $illustrations = $this->describeIllustrationPrompt($paragraphs)
+                ->map(function (array $response) {
+                    return OllamaService::resolve()->generateJsonSchema(...$response)->get('illustration');
+                });
 
-            if (count($illustrations = $response->get('illustrations')) !== count($paragraphs)) {
+            if (count($illustrations) !== count($paragraphs)) {
                 throw new Exception('Generated illustration prompt is not valid...');
             }
 
-            foreach ($illustrations as $illustration) {
-
-                if (!is_string($illustration)) {
-                    throw new Exception('Generated illustration prompt is not valid...');
-                }
-
-            }
-
-            return $illustrations;
+            return $illustrations->toArray();
 
         });
     }
@@ -141,15 +157,11 @@ class BookService
     {
         return retry($this->tries, function () use ($prompt) {
 
-            $exceptAboutTheseTopic = $this
-                ->findTop10SimilarEmbeddings()
-                ->map(fn (Book $book) => $book->title)
-                ->implode(', ');
+            [ $prompt, $schema ] = $this->generateStoryFromPrompt($prompt);
 
-            $response = $this->ollama->generateJson(
-                prompt: filled($prompt)
-                    ? $this->generateStoryFromPrompt($prompt, $exceptAboutTheseTopic)
-                    : $this->generateStoryPrompt($exceptAboutTheseTopic),
+            $response = $this->ollama->generateJsonSchema(
+                prompt: $prompt,
+                schema: $schema,
             );
 
             $data = BookData::from($response);
@@ -163,54 +175,45 @@ class BookService
         });
     }
 
-    /**
-     * @throws ConnectionException
-     */
-    private function createBookModel(string $batchId, ?string $userPrompt, BookData $data, array $illustrations): Book
+    private function createBookModel(Ulid $id, string $userPrompt, BookData $data, array $illustrations): Book
     {
-        [ $embedding ] = $this->ollama->generateEmbedding([ $data->toSummary() ]);
-
         $book = new Book();
 
-        $book->batch_id = $batchId;
+        $book->id = $id;
         $book->user_prompt = $userPrompt;
-        $book->subject = $data->subject;
         $book->title = $data->title;
-        $book->tags = $data->tags;
-        $book->embedding = $embedding;
+        $book->synopsis = $data->synopsis;
         $book->paragraphs = $data->paragraphs;
         $book->illustrations = $illustrations;
+        $book->updated_at = now()->subMinutes(10);
 
         $book->save();
 
         return $book;
     }
 
-    /**
-     * @throws Exception
-     * @throws Throwable
-     * @throws ConnectionException
-     */
-    private function isSafeForChildren(string $prompt): bool|int
+    private function generateStoryFromPrompt(string $prompt): array
     {
-        return retry($this->tries, function () use ($prompt) {
+        $schema = [
+            'type' => 'object',
+            'required' => [ 'title', 'synopsis', 'paragraphs' ],
+            'properties' => [
+                'title' => [
+                    'type' => 'string',
+                ],
+                'synopsis' => [
+                    'type' => 'string',
+                ],
+                'paragraphs' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'string',
+                    ],
+                ],
+            ],
+        ];
 
-            $response = $this->ollama->generateJson(
-                prompt: $this->askIfPromptIsSafeForChildren($prompt),
-            );
-
-            if ($response->has('isSafe') === false) {
-                throw new Exception('invalid json payload received...');
-            }
-
-            return $response[ 'isSafe' ] === true;
-
-        });
-    }
-
-    private function generateStoryFromPrompt(string $prompt, string $except): string
-    {
-        return <<<PROMPT
+        $prompt = <<<PROMPT
         Write a humorous and engaging children's book with exactly 10 paragraphs, each paragraph should be written in a simple and playful tone suitable for children,
         and needs to be very short in length, have it written with language that’s easy to understand and captivating for young children.
 
@@ -220,119 +223,59 @@ class BookService
         $prompt
         ----- end_of_user_input_content
 
-        Ensure that the story is original in both style and content, distinct from the themes, names, or styles used in the following titles:
-
-        --- start existing stories
-        $except
-        --- end existing stories
-
         Each story should be unique in its plot, tone, and characters.
 
-        Please respond in JSON format with the following structure:
-
-        ```json
-        {
-            "title": "<book title>",
-            "subject": "<main subject of the story and its characteristics>",
-            "tags": [ "<main objects / animals / fruits present on the story>", ],
-            "paragraphs": [
-                "<short paragraph 1>",
-                "<short paragraph 2>",
-                ...
-                "<short paragraph 10>"
-            ]
-        }
-        ```
-
-        Make sure the JSON response is valid and correctly structured.
+        Respond using JSON
         PROMPT;
+
+        return [ $prompt, $schema ];
     }
 
-    private function generateStoryPrompt(string $except): string
+    private function describeIllustrationPrompt(array $paragraphs): \Illuminate\Support\Collection
     {
-        return <<<PROMPT
-        Write a humorous and engaging children's book with exactly 10 paragraphs, each paragraph should be written in a simple and playful tone suitable for children,
-        and needs to be very short in length, have it written with language that’s easy to understand and captivating for young children.
-
-        Ensure that the story is original in both style and content, distinct from the themes, names, or styles used in the following titles:
-
-        --- start existing stories
-        $except
-        --- end existing stories
-
-        Each story should be unique in its plot, tone, and characters.
-
-        Please respond in JSON format with the following structure:
-
-        ```json
-        {
-            "title": "<book title>",
-            "subject": "<main subject of the story and its characteristics>",
-            "tags": [ "<main objects / animals / fruits present on the story>", ],
-            "paragraphs": [
-                "<short paragraph 1>",
-                "<short paragraph 2>",
-                ...
-                "<short paragraph 10>"
-            ]
-        }
-        ```
-
-        Make sure the JSON response is valid and correctly structured.
-        PROMPT;
-    }
-
-    private function describeIllustrationPrompt(array $paragraphs): string
-    {
-        $paragraphs = collect($paragraphs)
-            ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
+        $story = collect($paragraphs)
+            ->map(fn(string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
-        return <<<PROMPT
-        Generate a creative prompt for a generative image AI tool to create an illustration for each paragraph in the following children's book. For each illustration prompt:
+        $schema = [
+            'type' => 'object',
+            'required' => [ 'illustration' ],
+            'properties' => [
+                'illustration' => [
+                    'type' => 'string',
+                ],
+            ],
+        ];
 
-        1. **Describe the main action** occurring in the paragraph.
-        2. **Include all relevant contextual elements** in each prompt individually, as the AI will not have context from previous paragraphs. Ensure each prompt fully describes the mood, setting, and character details.
-        3. **Maintain consistency** with the overall tone and visual style of the book.
-        4. **Refer to characters by their type,** not by their names. For example:
-           - If the paragraph mentions "Sammy," refer to him as "a turtle" instead of using his name.
-           - If the paragraph mentions "Willy," refer to him as "a boy" rather than by his name.
+        return collect($paragraphs)->map(function (string $paragraph) use ($story, $schema) {
+            $prompt = <<<PROMPT
+            Generate a creative image prompt for a generative AI tool to create an illustration for the following paragraph in the children's book. You will receive the full story context for reference, but respond with one image prompt at a time, focusing on the provided paragraph.
 
-        The final response should be in the following JSON format, where each paragraph's prompt is a string within the "illustrations" array:
+            ----- start_of_story
+            $story
+            ----- end_of_story
 
-        ```json
-        {
-            "illustrations": [
-                "<prompt for paragraph 1>",
-                "<prompt for paragraph 2>",
-                ...
-                "<prompt for paragraph 10>",
-            ]
-        }
+            For the provided paragraph, follow these instructions:
+            1. **Summarize the main action** occurring in the paragraph.
+            2. **Describe the setting, mood, and characters** with enough detail so the AI can visualize the scene, ensuring it makes sense even when the paragraph is isolated.
+            3. **Use broad character descriptions** rather than names. For example, if the paragraph mentions a character like "Sammy," refer to them as "a turtle," or "Willy" as "a boy."
+            4. **Ensure consistency** with the overall visual style and tone of the full story.
 
-        $paragraphs
-        PROMPT;
-    }
+            ----- start_of_paragraph
+            $paragraph
+            ----- end_of_paragraph
 
-    private function askIfPromptIsSafeForChildren(string $prompt): string
-    {
-        return <<<PROMPT
-        Analyze the following user input prompt and determine if it is an appropriate and safe theme for a children's book.
-        Consider themes, language, and any sensitive content to ensure suitability for young readers.
+            For the paragraph provided, do the following:
+            1. Identify the key scene and describe it in detail, including any relevant emotions or atmosphere.
+            2. Use context from the full story to maintain accuracy and consistency in tone and style.
 
-        ----- start_of_user_input_content
-        $prompt
-        ----- end_of_user_input_content
+            Respond in JSON format for the paragraph provided.
+            PROMPT;
 
-        Return only the following JSON response:
-
-        ```json
-        {
-          "isSafe": <boolean>
-        }
-        ```
-
-        Make sure the JSON response is valid and correctly structured.
-        PROMPT;
+            return [
+                $prompt,
+                $schema,
+            ];
+        });
     }
 }

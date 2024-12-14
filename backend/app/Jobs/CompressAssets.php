@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Events\GenerationComplete;
 use App\Models\Book;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -30,7 +29,5 @@ class CompressAssets implements ShouldQueue
             );
 
         }
-
-        GenerationComplete::broadcast($this->book);
     }
 }

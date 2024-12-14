@@ -18,7 +18,6 @@ class BookIndexResource extends JsonResource
     {
         return [
             'id' => $this->resource->id,
-            'batch_id' => $this->resource->batch_id,
             'title' => $this->resource->title,
             'cover' => Storage::disk('public')->url($this->resource->assets->get('cover')),
         ];
