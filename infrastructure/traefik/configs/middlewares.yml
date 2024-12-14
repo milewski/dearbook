@@ -1,6 +1,0 @@
-http:
-  middlewares:
-    basic-auth:
-      basicAuth:
-        users:
-          - admin:$apr1$e5axwh6o$3xaXgBpesI6YmceuKrNwm1 #secret
