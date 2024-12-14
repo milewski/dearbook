@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    defineProps<{ cover: string, backdrop: string, title: string, subject: string }>()
+    defineProps<{ cover: string, backdrop: string, title: string, synopsis: string }>()
 </script>
 
 <template>
@@ -22,7 +22,7 @@
                 </h1>
 
                 <p class="sm:text-2xl mt-2 sm:mt-5">
-                    {{ subject }}
+                    {{ synopsis }}
                 </p>
 
             </div>

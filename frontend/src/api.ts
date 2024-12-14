@@ -1,16 +1,18 @@
+export type BookId = string;
+
 export type BookIndexResource = {
-    id: number,
+    id: BookId,
     batch_id: string,
     title: string,
     cover: string,
 }
 
 export type BookDetailResource = {
-    id: number,
+    id: BookId,
     batch_id: string,
     type: 'book',
     title: string,
-    subject: string,
+    synopsis: string,
     cover: string,
     backdrop: string,
     paragraphs: Array<{
@@ -30,7 +32,7 @@ const headers = {
 
 const API_HOST = import.meta.env.VITE_API_HOST
 
-export async function fetchBookById(bookId: number, controller: AbortController): Promise<BookDetailResource> {
+export async function fetchBookById(bookId: BookId, controller: AbortController): Promise<BookDetailResource> {
 
     return fetch(`https://${ API_HOST }/book/${ bookId }`, { signal: controller.signal, headers })
         .then(response => response.json())
@@ -64,7 +66,7 @@ export async function createBook(prompt: string | undefined): Promise<{ id: stri
 
 }
 
-export async function checkBatches(ids: string[]): Promise<Record<string, boolean | BookIndexResource>> {
+export async function checkBatches(ids: string[]): Promise<Record<string, BookIndexResource>> {
 
     return fetch(`https://${ API_HOST }/check/batches`, {
         method: 'POST',
