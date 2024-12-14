@@ -68,6 +68,7 @@ class BackendService
     {
         return Http::timeout(60 * 5)
             ->baseUrl(config('app.backend.url'))
+            ->withHeader('x-api-key', config('app.backend.worker_api_key'))
             ->acceptJson();
     }
 }

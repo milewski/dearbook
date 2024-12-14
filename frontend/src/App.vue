@@ -226,7 +226,7 @@
 
             tokens.push(controller)
 
-            return fetch(source, { signal: controller.signal, cache: 'force-cache' })
+            return fetch(source, { signal: controller.signal, cache: 'default' })
                 .then(response => response.blob())
                 .then(blob => URL.createObjectURL(blob))
                 .then(resolve)

@@ -13,6 +13,7 @@ return [
 
     'backend' => [
         'url' => env('BACKEND_URL'),
+        'worker_api_key' => env('WORKER_API_KEY'),
     ],
 
     'ollama' => [
@@ -60,7 +61,7 @@ return [
     |
      */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------

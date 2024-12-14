@@ -185,7 +185,7 @@ class BookService
         $book->synopsis = $data->synopsis;
         $book->paragraphs = $data->paragraphs;
         $book->illustrations = $illustrations;
-        $book->updated_at = now()->subMinutes(10);
+        $book->updated_at = now()->addMinutes(10);
 
         $book->save();
 
