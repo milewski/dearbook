@@ -1,0 +1,7 @@
+tls:
+  certificates:
+    - certFile: /srv/tls/cert.pem
+      keyfile: /srv/tls/key.pem
+  options:
+    default:
+      minVersion: VersionTLS13
