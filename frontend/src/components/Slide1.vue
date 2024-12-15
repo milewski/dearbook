@@ -4,9 +4,9 @@
 
 <template>
 
-    <div class="flex justify-center text-white p-4">
+    <div class="flex justify-center text-white p-4 h-screen items-center">
 
-        <div class="relative before:opacity-75 before:rounded-2xl before:absolute before:from-black before:bg-gradient-to-t before:w-full before:h-96 before:left-0 before:bottom-0">
+        <div class="relative before:opacity-75 before:rounded-2xl sm:before:absolute before:from-black before:bg-gradient-to-t before:w-full before:h-96 before:left-0 before:bottom-0 mb-[10vh] sm:mb-0">
 
             <img class="rounded-2xl max-h-[90vh] max-w-[90vw]" :src="image" alt="">
 
@@ -16,7 +16,7 @@
 
         </div>
 
-        <div class="absolute font-bold p-4 rounded-2xl text-xl sm:text-2xl bottom-16 text-center w-[85vw] sm:w-8/12 xl:w-4/12">
+        <div class="absolute font-bold p-4 rounded-2xl text-xl sm:text-2xl bottom-28 sm:bottom-20 text-center w-[85vw] sm:w-8/12 xl:w-4/12">
             {{ text }}
         </div>
 

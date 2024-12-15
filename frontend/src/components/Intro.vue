@@ -4,18 +4,17 @@
 
 <template>
 
-    <div class="flex justify-center p-4">
+    <div class="flex justify-center p-4 h-screen items-center">
 
-        <div
-            class="relative before:rounded-2xl before:opacity-75 before:absolute before:from-black before:bg-gradient-to-t before:w-full before:h-5/6 before:left-0 before:bottom-0">
+        <div class="relative before:rounded-2xl before:opacity-75 before:absolute before:from-black before:bg-gradient-to-t before:w-full before:h-5/6 before:left-0 before:bottom-0 mb-[10vh] sm:mb-0">
             <img class="rounded-2xl" :src="backdrop" alt="">
         </div>
 
-        <div class="absolute flex justify-center items-center flex-column text-white p-4 rounded-2xl bottom-14 sm:bottom-28">
+        <div class="absolute flex justify-center items-center flex-column text-white p-4 rounded-2xl bottom-40 sm:bottom-28 w-full">
 
             <img class="rounded-xl h-80 mr-4 shadow-2xl border-4 hidden sm:block" :src="cover" alt="">
 
-            <div class="px-4 sm:w-7/12 text-center sm:text-left">
+            <div class="px-4 sm:w-7/12 text-center sm:text-left absolute sm:relative">
 
                 <h1 class="text-2xl sm:text-4xl font-bold">
                     {{ title }}

@@ -41,14 +41,20 @@
                     class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
             </Manifesto>
 
-            <Twitter
-                class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            <a href="https://x.com/DearBookToken" target="_blank">
+                <Twitter
+                    class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            </a>
 
-            <Github
-                class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            <a href="https://github.com/milewski/dearbook" target="_blank">
+                <Github
+                    class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            </a>
 
-            <Telegram
-                class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            <a href="https://t.me/dearbookcommunity" target="_blank">
+                <Telegram
+                    class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            </a>
 
         </div>
 
