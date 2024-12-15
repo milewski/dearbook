@@ -5,7 +5,7 @@
         <DrawerTrigger as-child>
 
             <Button size="lg" class=" z-20 px-8 py-6 top-8 right-8 rounded-full text-2xl bg-[#230202] shadow-2xl">
-                Create Your Own Adventure!
+                Generate your AI story now!
             </Button>
 
         </DrawerTrigger>

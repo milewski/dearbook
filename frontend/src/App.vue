@@ -20,19 +20,19 @@
 
     <div class="flex max-w-3xl justify-center items-center mt-9 mx-auto space-x-8 pb-10 flex-col-reverse lg:flex-row">
 
-<!--        <div class="relative w-full px-8 sm:px-0 mt-4 lg:mt-0">-->
+        <div class="relative w-full px-8 sm:px-0 mt-4 lg:mt-0">
 
-<!--            <Input-->
-<!--                type="text"-->
-<!--                class="text-[#230202] text-opacity-70 bg-[#F18533] pl-12 transition-all placeholder:opacity-25 placeholder:text-[#230202] rounded-full text-md border-none focus-visible:ring-[#230202]"-->
-<!--                readonly-->
-<!--                default-value=""/>-->
+            <Input
+                type="text"
+                class="text-[#230202] text-opacity-70 bg-[#F18533] pl-12 transition-all placeholder:opacity-25 placeholder:text-[#230202] rounded-full text-md border-none focus-visible:ring-[#230202]"
+                readonly
+                default-value="zPf8M7V2YznAvLzsnauyBb3gefYpYbrMotzifXJpump"/>
 
-<!--            <div class="absolute h-full items-center flex text-center justify-center left-12 sm:left-4 top-0">-->
-<!--                CA:-->
-<!--            </div>-->
+            <div class="absolute h-full items-center flex text-center justify-center left-12 sm:left-4 top-0">
+                CA:
+            </div>
 
-<!--        </div>-->
+        </div>
 
         <div class="flex space-x-4 text-[#230202]">
 
@@ -65,7 +65,7 @@
         <img src="./assets/logo.png" class="w-44" alt="">
 
         <h1 class="text-5xl sm:text-6xl text-center font-serif max-w-[750px] text-[#230202] ">
-            Discover Thousands of Magical Stories!
+            The first AI-Powered Children's Book Generator Memecoin
         </h1>
 
         <CreateStory :view-book="viewBook" :loading="loading"/>
@@ -180,6 +180,18 @@
             </div>
 
         </div>
+
+    </div>
+
+    <div class="w-full flex justify-center mt-20">
+
+        <Manifesto class="text-center">
+
+            <h1 class="cursor-pointer text-5xl hover:underline sm:text-6xl text-center font-serif max-w-[750px] text-[#230202] ">
+                Manifesto
+            </h1>
+
+        </Manifesto>
 
     </div>
 

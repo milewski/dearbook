@@ -94,10 +94,12 @@ class BookService
 
     public function getRandomBooks(): Paginator
     {
-        return Book::query()
-            ->whereNotNull('assets')
-            ->inRandomOrder()
-            ->simplePaginate(12);
+        return cache()->flexible('books', [ 5, 10 ], function () {
+            return Book::query()
+                ->whereNotNull('assets')
+                ->inRandomOrder()
+                ->simplePaginate(12);
+        });
     }
 
     public function findManyByBatchIds(array $ids): Collection
