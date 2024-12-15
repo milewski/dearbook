@@ -33,7 +33,7 @@ html {
 }
 
 #app {
-    @apply rounded-2xl overflow-hidden mx-auto max-w-screen-2xl;
+    @apply mx-auto max-w-screen-2xl;
 }
 
 @media (prefers-color-scheme: light) {

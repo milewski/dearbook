@@ -5,6 +5,7 @@
     <Drawer
         v-if="activeBook.content"
         @update:open="activeBook.visible = $event"
+        should-scale-background
         :modal="true"
         :open="activeBook.visible"
         direction="bottom"
@@ -16,56 +17,88 @@
 
     </Drawer>
 
-    <CreateStory :view-book="viewBook" :loading="loading"/>
 
-    <div class="flex flex-col justify-center items-center space-y-10 text-black">
+    <div class="flex max-w-3xl justify-center items-center mt-9 mx-auto space-x-8 pb-10 flex-col-reverse lg:flex-row">
 
-        <img src="./assets/logo.png" class="w-44 my-10" alt="">
+<!--        <div class="relative w-full px-8 sm:px-0 mt-4 lg:mt-0">-->
 
-        <h1 class="text-5xl sm:text-6xl text-center font-serif max-w-[750px] text-[#230202] pb-4">
-            Discover Thousands of Magical Stories, or Create a Unique Adventure!
-        </h1>
+<!--            <Input-->
+<!--                type="text"-->
+<!--                class="text-[#230202] text-opacity-70 bg-[#F18533] pl-12 transition-all placeholder:opacity-25 placeholder:text-[#230202] rounded-full text-md border-none focus-visible:ring-[#230202]"-->
+<!--                readonly-->
+<!--                default-value=""/>-->
 
-        <div class="w-full max-w-4xl px-8 sm:px-0 p-2 rounded-full flex h-16">
+<!--            <div class="absolute h-full items-center flex text-center justify-center left-12 sm:left-4 top-0">-->
+<!--                CA:-->
+<!--            </div>-->
 
-            <div class="relative w-full flex justify-center items-center">
+<!--        </div>-->
 
-                <Input
-                    type="text"
-                    :placeholder="randomSearchTermPlaceholder"
-                    class="text-[#230202] text-opacity-70 text-ellipsis pr-14 bg-[#F18533] transition-all shadow-xl placeholder:opacity-25 placeholder:text-[#230202] py-8 pl-8 rounded-full text-2xl border-none h-full w-full focus-visible:ring-[#230202]"
-                    :disabled="searching"
-                    @keydown.enter="onSearch"
-                    v-model="searchTerm"/>
+        <div class="flex space-x-4 text-[#230202]">
 
-                <LoaderPinwheel
-                    v-if="searching"
-                    :size="40"
-                    class="absolute z-10 right-0 bottom-0 top-0 m-auto opacity-25 mr-3 animate-spin text-[#230202]"/>
+            <Manifesto>
+                <Manifest
+                    class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            </Manifesto>
 
-                <div v-else
-                     class="absolute z-10 text-white right-0 m-auto mr-3 opacity-45 hover:opacity-60 transition-all cursor-pointer">
+            <a href="https://x.com/DearBookToken" target="_blank">
+                <Twitter
+                    class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            </a>
 
-                    <PackageSearch v-if="!searchTerm" :size="40" class="text-[#230202]" @click="onSearch"/>
+            <a href="https://github.com/milewski/dearbook" target="_blank">
+                <Github
+                    class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            </a>
 
-                    <CircleX v-else :size="40" class="text-[#230202]" @click="searchTerm = null"/>
-
-                </div>
-
-                <!--                <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">-->
-                <!--                  <Search class="size-10 text-muted-foreground"/>-->
-                <!--                </span>-->
-
-                <!--                <div class="flex mt-4 space-x-2">-->
-
-                <!--                    <div class="bg-[#F18533] text-[#230202] hover:bg-[#e77d2b] transition-all text-opacity-60 rounded-full py-1 px-3 text-sm font-bold font-sans" v-for="_ in 5">-->
-                <!--                    </div>-->
-
-                <!--                </div>-->
-
-            </div>
+            <a href="https://t.me/dearbookcommunity" target="_blank">
+                <Telegram
+                    class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            </a>
 
         </div>
+
+    </div>
+
+    <div class="flex flex-col justify-center items-center space-y-10 my-10 text-black">
+
+        <img src="./assets/logo.png" class="w-44" alt="">
+
+        <h1 class="text-5xl sm:text-6xl text-center font-serif max-w-[750px] text-[#230202] ">
+            Discover Thousands of Magical Stories!
+        </h1>
+
+        <CreateStory :view-book="viewBook" :loading="loading"/>
+
+        <!--        <div class="w-full max-w-4xl px-8 sm:px-0 p-2 rounded-full flex h-16">-->
+
+        <!--            <div class="relative w-full flex justify-center items-center">-->
+
+        <!--                <Input-->
+        <!--                    type="text"-->
+        <!--                    :placeholder="randomSearchTermPlaceholder"-->
+        <!--                    class="text-[#230202] text-opacity-70 text-ellipsis pr-14 bg-[#F18533] transition-all shadow-xl placeholder:opacity-25 placeholder:text-[#230202] py-8 pl-8 rounded-full text-2xl border-none h-full w-full focus-visible:ring-[#230202]"-->
+        <!--                    :disabled="searching"-->
+        <!--                    @keydown.enter="onSearch"-->
+        <!--                    v-model="searchTerm"/>-->
+
+        <!--                <LoaderPinwheel-->
+        <!--                    v-if="searching"-->
+        <!--                    :size="40"-->
+        <!--                    class="absolute z-10 right-0 bottom-0 top-0 m-auto opacity-25 mr-3 animate-spin text-[#230202]"/>-->
+
+        <!--                <div v-else-->
+        <!--                     class="absolute z-10 text-white right-0 m-auto mr-3 opacity-45 hover:opacity-60 transition-all cursor-pointer">-->
+
+        <!--                    <PackageSearch v-if="!searchTerm" :size="40" class="text-[#230202]" @click="onSearch"/>-->
+
+        <!--                    <CircleX v-else :size="40" class="text-[#230202]" @click="searchTerm = null"/>-->
+
+        <!--                </div>-->
+
+        <!--            </div>-->
+
+        <!--        </div>-->
 
         <div class="space-y-4 px-8 w-full">
 
@@ -96,11 +129,11 @@
                      @keydown.space.prevent="viewBook(book.id)"
                      @keydown.enter.prevent="viewBook(book.id)"
                      :tabindex="0"
-                     class="space-y-2 mx-auto relative cursor-pointer w-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 border-none rounded-2xl focus-visible:ring-offset-2 border-none pb-2 focus-visible:ring-[#230202]"
+                     class="space-y-2 mx-auto relative cursor-pointer w-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 rounded-2xl focus-visible:ring-offset-2 border-none pb-2 focus-visible:ring-[#230202]"
                      @click="viewBook(book.id)">
 
                     <div
-                        class="relative rounded-2xl transition-all hover:scale-[1.08] transform-gpu border border-8 border-transparent hover:border-[white] overflow-hidden hover:z-10 hover:shadow-2xl [&:hover~div]:underline [&:hover~div]:z-50"
+                        class="relative rounded-2xl transition-all hover:scale-[1.08] transform-gpu border-8 border-transparent hover:border-[white] overflow-hidden hover:z-10 hover:shadow-2xl [&:hover~div]:underline [&:hover~div]:z-50"
                         :class="{
                             'hover:rotate-[-1deg]': index % 4 === 0,
                             'hover:rotate-[-2deg]': index % 4 === 1,
@@ -110,7 +143,7 @@
 
                         <AspectRatio
                             :ratio="2/3"
-                            class="cover-placeholder bg-[#230202] bg-opacity-25 bg-cover overflow-hidden">
+                            class="bg-[#230202] bg-opacity-25 bg-cover overflow-hidden">
 
                             <div v-if="book.id === loading"
                                  class="before:opacity-50 before: before:absolute before:bg-black before:w-full before:h-full before:left-0 before:bottom-0 animate-pulse"/>
@@ -132,6 +165,18 @@
 
                 </div>
 
+
+            </div>
+
+            <div class="flex justify-center w-full pt-10" v-if="books.length">
+
+                <div @click="refreshSearch"
+                     class="cursor-pointer rounded-full overflow-hidden p-2 transition-all border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl">
+
+                    <DicesIcon class="size-10"/>
+
+                </div>
+
             </div>
 
         </div>
@@ -147,31 +192,33 @@
 <script lang="ts" setup>
 
     import Book from './components/Book.vue'
-    import { LoaderPinwheel, PackageSearch, CircleX } from 'lucide-vue-next'
+    import { DicesIcon, LoaderPinwheel } from 'lucide-vue-next'
     import CreateStory from './components/CreateStory.vue'
-    import { Drawer, DrawerContent } from '../@/components/ui/drawer'
     import { nextTick, ref, watch } from 'vue'
     import { Input } from '../@/components/ui/input'
     import Toaster from '../@/components/ui/sonner/Sonner.vue'
-    import { BookIndexResource, bookSearch, booksList, fetchBookById } from './api.ts'
-    import { debounce, randomSearchTerm } from './utilities.ts'
+    import { BookId, BookIndexResource, booksList, fetchBookById } from './api.ts'
     import { AspectRatio } from '../@/components/ui/aspect-ratio'
     import { Skeleton } from '../@/components/ui/skeleton'
+    import Github from './icons/Github.vue'
+    import Twitter from './icons/Twitter.vue'
+    import Telegram from './icons/Telegram.vue'
+    import Manifest from './icons/Manifest.vue'
+    import { Drawer, DrawerContent } from '../@/components/ui/drawer'
+    import Manifesto from './components/Manifesto.vue'
 
     const activeBook = ref<{ visible: boolean, content: BookIndexResource | null }>({
         visible: false,
         content: null,
     })
 
-    const loading = ref<number>()
+    const loading = ref<BookId>()
     const searching = ref(false)
-    const searchTerm = ref()
     const tokens: AbortController[] = []
     const books = ref<Array<BookIndexResource>>([])
     const queryString = new URLSearchParams(window.location.search)
-    const randomSearchTermPlaceholder = ref<string>(randomSearchTerm())
 
-    async function viewBook(bookId: number) {
+    async function viewBook(bookId: BookId) {
 
         loading.value = bookId
 
@@ -185,7 +232,7 @@
 
             tokens.push(controller)
 
-            return fetch(source, { signal: controller.signal, cache: 'force-cache' })
+            return fetch(source, { signal: controller.signal, cache: 'default' })
                 .then(response => response.blob())
                 .then(blob => URL.createObjectURL(blob))
                 .then(resolve)
@@ -217,46 +264,20 @@
 
     }
 
-    const onSearch = debounce(200, async function (event: KeyboardEvent | MouseEvent) {
-
-        searchTerm.value = searchTerm.value || randomSearchTermPlaceholder.value.substring(
-            0, randomSearchTermPlaceholder.value.length - 3,
-        )
-
-        books.value = []
-        searching.value = true
-
-        while (tokens.length) {
-            tokens.pop()!.abort()
-        }
-
-        const controller = new AbortController()
-
-        tokens.push(controller)
-
-        books.value = await bookSearch(searchTerm.value, controller).catch(() => {
-            return books.value
-        })
-
-        searching.value = false
-        randomSearchTermPlaceholder.value = randomSearchTerm()
-
-    })
-
     /**
      * If there is a ?book=xx on the url launch it straightaway
      */
     if (queryString.has('book')) {
-        viewBook(+queryString.get('book')!)
+        viewBook(queryString.get('book') as BookId)
     }
 
     watch(activeBook.value, function ({ visible, content }) {
 
-        if (history.pushState) {
+        if (typeof history.pushState === 'function') {
 
             const currentUrl = `${ window.location.protocol }//${ window.location.host }${ window.location.pathname }`
 
-            if (visible) {
+            if (visible && content) {
 
                 const path = currentUrl + `?book=${ content.id }`
 
@@ -276,15 +297,40 @@
      * Load initial books list
      */
     booksList().then(response => {
-        books.value = response
+        if (response) {
+            books.value = response
+        }
     })
+
+    function refreshSearch() {
+
+        books.value = []
+
+        searching.value = true
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        })
+
+        booksList().then(response => {
+
+            if (response) {
+                books.value = response
+            }
+
+        }).finally(() => {
+            searching.value = false
+        })
+
+    }
 
 </script>
 
 <style>
 
-    .cover-placeholder {
-        background-image: url("./assets/cover-placeholder.jpg");
+    [vaul-drawer]:has(.book) {
+        @apply bg-[#242424] border-0;
     }
 
     .drawer .swiper-pagination-horizontal {

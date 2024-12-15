@@ -85,6 +85,7 @@
         --swiper-pagination-bottom: 35px;
 
         @apply bg-white p-2 rounded-full;
+
     }
 
 </style>

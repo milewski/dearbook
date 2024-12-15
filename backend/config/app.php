@@ -9,6 +9,8 @@ return [
         'assets' => env('ASSETS_DOMAIN'),
     ],
 
+    'worker_api_key' => env('WORKER_API_KEY'),
+
     'comfyui_internal_url' => env('COMFYUI_INTERNAL_URL'),
 
     'ollama' => [

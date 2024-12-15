@@ -1,0 +1,76 @@
+x-local-network: &local-network
+  networks:
+    - local-network
+
+x-php: &php
+  healthcheck:
+    disable: true
+  build:
+    context: docker/php
+    dockerfile: php.dockerfile
+    args:
+      ENVIRONMENT: development
+  restart: unless-stopped
+  working_dir: /srv
+  volumes:
+    - .:/srv
+
+x-nvidia: &nvidia
+  runtime: nvidia
+
+services:
+
+  queue:
+    <<: *php
+    command: php artisan queue:work --timeout=900
+    networks:
+      - local-network
+      - traefik-network
+
+  scheduler:
+    <<: [ *php, *local-network ]
+    command: supercronic /srv/docker/php/config/schedule.cron
+
+  redis-worker:
+    <<: *local-network
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-worker-data:/data
+
+  ollama:
+    <<: [ *nvidia, *local-network ]
+    networks:
+      - local-network
+      - traefik-network
+    image: ollama/ollama:0.5.1
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - .ollama:/root/.ollama
+
+  comfyui:
+    <<: [ *nvidia, *local-network ]
+    build:
+      dockerfile: comfyui.dockerfile
+      context: docker/comfyui
+    restart: unless-stopped
+    volumes:
+      - .comfy:/home/runner
+    environment:
+      CLI_ARGS: '--fp8_e4m3fn-unet --fp8_e4m3fn-text-enc --reserve-vram 1'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.comfyui.entryPoints=web-secure
+      - traefik.http.routers.comfyui.rule=Host(`$COMFYUI_DOMAIN`)
+      - traefik.http.routers.comfyui.tls=true
+
+volumes:
+  redis-worker-data:
+
+networks:
+  local-network:
+  traefik-network:
+    name: traefik-network
+    external: true

@@ -9,16 +9,12 @@ RUN yarn --freeze-lock
 
 COPY . .
 
-ARG VITE_REVERB_APP_KEY
-ARG VITE_REVERB_HOST
 ARG VITE_API_HOST
 
-RUN VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY \
-    VITE_REVERB_HOST=$VITE_REVERB_HOST \
-    VITE_API_HOST=$VITE_API_HOST \
+RUN VITE_API_HOST=$VITE_API_HOST \
     yarn build
 
-FROM caddy:2.8.4-alpine
+FROM caddy:2.9-alpine
 
 COPY --from=builder /srv/dist /srv
 COPY ./docker/Caddyfile /etc/caddy/Caddyfile

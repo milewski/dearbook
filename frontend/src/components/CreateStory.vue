@@ -4,9 +4,8 @@
 
         <DrawerTrigger as-child>
 
-            <Button size="lg"
-                    class="fixed z-20 px-8 py-6 top-8 right-8 rounded-full text-2xl shadow-none bg-[#230202] shadow-2xl">
-                Create!
+            <Button size="lg" class=" z-20 px-8 py-6 top-8 right-8 rounded-full text-2xl bg-[#230202] shadow-2xl">
+                Create Your Own Adventure!
             </Button>
 
         </DrawerTrigger>
@@ -106,7 +105,7 @@
 
                                 </FormItem>
 
-                                <Button type="submit" :disabled="formLoading"
+                                <Button type="submit" :disabled="formLoading || !(form.isFieldValid('prompt') && form.values.prompt)"
                                         class="bg-[#F18533] hover:bg-[#F18533] rounded-full">
 
                                     <div>Create!</div>
@@ -136,63 +135,75 @@
     import { Button } from '../../@/components/ui/button'
     import { FormControl, FormField, FormItem, FormMessage } from '../../@/components/ui/form'
     import { Textarea } from '../../@/components/ui/textarea'
-    import { LoaderPinwheel, Sparkles } from 'lucide-vue-next'
+    import { LoaderPinwheel } from 'lucide-vue-next'
     import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../../@/components/ui/drawer'
     import { toTypedSchema } from '@vee-validate/zod'
     import * as z from 'zod'
     import { useForm } from 'vee-validate'
-    import { ref, watch } from 'vue'
+    import { computed, ref, watch } from 'vue'
     import { useLocalStorage } from '@vueuse/core'
     import { Keyboard, Mousewheel, Pagination } from 'swiper/modules'
     import { Swiper, SwiperSlide } from 'swiper/vue'
     import { BookIndexResource, checkBatches, createBook } from '../api.ts'
     import { randomSearchTerm } from '../utilities.ts'
-    import { toast } from 'vue-sonner'
 
     const props = defineProps<{ viewBook: (bookId: number) => Promise<void>, loading: number | undefined }>()
 
-    const formSchema = toTypedSchema(z.object({ prompt: z.string().max(500).optional() }))
+    const formSchema = toTypedSchema(z.object({ prompt: z.string().max(500).min(10).optional() }))
     const form = useForm({ validationSchema: formSchema })
     const formLoading = ref(false)
-    const userBooks = ref<Array<BookIndexResource | { batch_id: string, type: 'placeholder' }>>([])
     const createDrawerState = ref(false)
 
     const storage = useLocalStorage<Record<string, boolean | BookIndexResource>>('generation', {})
     const randomBookTitle = ref()
 
+    const userBooks = computed<Array<BookIndexResource | { id: string, type: 'placeholder' }>>(function () {
+
+        return Object.keys(storage.value).reverse().map((key: string) => {
+
+            if (typeof storage.value[ key ] === 'boolean') {
+
+                return {
+                    id: key,
+                    type: 'placeholder',
+                }
+
+            } else {
+
+                return storage.value[ key ]
+
+            }
+
+        })
+
+    })
+
     watch(createDrawerState, () => {
         randomBookTitle.value = randomSearchTerm()
     })
 
-    function listenOnce(id: string) {
+    async function refresh() {
 
-        window.Echo.channel(id).listen('GenerationComplete', (book: BookIndexResource) => {
+        const currentInStorage = Object.keys(storage.value).filter(key => typeof storage.value[ key ] === 'boolean')
 
-            toast('Your story has been generated!', {
-                description: 'Click here to view it!',
-                icon: Sparkles,
-                important: true,
-                actionButtonStyle: { padding: '16px', borderRadius: '100px' },
-                action: {
-                    label: 'View!',
-                    onClick: () => props.viewBook(book.id),
-                },
-            })
+        if (currentInStorage.length) {
 
-            onBookReceived(book)
+            await checkBatches(currentInStorage)
+                .then((response: Record<string, BookIndexResource>) => {
 
-            window.Echo.channel(id).stopListening('GenerationComplete')
+                    for (const key in response) {
 
-        })
+                        storage.value[ key ] = response[ key ]
 
-    }
+                    }
 
-    function onBookReceived(book: BookIndexResource) {
+                })
+                .finally(() => setTimeout(refresh, 1000 * 10))
 
-        const placeholderIndex = userBooks.value.findIndex(placeholder => placeholder.batch_id === book.batch_id)
+        } else {
 
-        if (placeholderIndex !== -1) {
-            userBooks.value[ placeholderIndex ] = book
+            setTimeout(refresh, 1000 * 10)
+
         }
 
     }
@@ -204,14 +215,9 @@
         await createBook(values.prompt || randomBookTitle.value)
             .then(response => {
 
-                listenOnce(response.id)
-
-                storage.value[ response.id ] = false
-
-                userBooks.value.unshift({
-                    batch_id: response.id,
-                    type: 'placeholder',
-                })
+                if (response.id) {
+                    storage.value[ response.id ] = false
+                }
 
             })
             .finally(() => {
@@ -222,53 +228,6 @@
 
     })
 
-    if (Object.keys(storage.value).length) {
-
-        const currentInStorage = Object.keys(storage.value)
-
-        checkBatches(currentInStorage).then((response: Record<string, boolean | BookIndexResource>) => {
-
-            const keys = Object.keys(response)
-            const missing = currentInStorage.filter(current => !keys.includes(current))
-
-            for (const key in response) {
-
-                storage.value[ key ] = response[ key ]
-
-                if (typeof response[ key ] === 'boolean') {
-
-                    if (response[ key ]) {
-
-                        userBooks.value.unshift({
-                            batch_id: key,
-                            type: 'placeholder',
-                        })
-
-                        listenOnce(key)
-
-                    }
-
-                } else {
-
-                    userBooks.value.unshift(response[ key ])
-
-                }
-
-            }
-
-            for (const key of missing) {
-
-                userBooks.value.unshift({
-                    batch_id: key,
-                    type: 'placeholder',
-                })
-
-                listenOnce(key)
-
-            }
-
-        })
-
-    }
+    refresh()
 
 </script>

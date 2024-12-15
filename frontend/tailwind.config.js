@@ -1,5 +1,6 @@
 const animate = require("tailwindcss-animate")
 const {fontFamily} = require('tailwindcss/defaultTheme')
+const typography = require('@tailwindcss/typography')
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -14,6 +15,7 @@ module.exports = {
         './src/**/*.{ts,tsx,vue}',
         './@/**/*.{ts,tsx,vue}',
     ],
+
     theme: {
         container: {
             center: true,
@@ -93,5 +95,5 @@ module.exports = {
             },
         },
     },
-    plugins: [animate],
+    plugins: [typography, animate],
 }

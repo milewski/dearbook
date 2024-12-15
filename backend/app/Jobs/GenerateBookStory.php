@@ -8,6 +8,7 @@ use App\Services\BookService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
+use Symfony\Component\Uid\Ulid;
 use Throwable;
 
 class GenerateBookStory implements ShouldQueue
@@ -15,13 +16,11 @@ class GenerateBookStory implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        private readonly string $id,
+        private readonly Ulid $id,
         private readonly ?string $prompt = null,
     )
     {
-        if (config('app.low_vram_mode') === false) {
-            $this->onQueue('ollama');
-        }
+        $this->onQueue('ollama');
     }
 
     /**
@@ -31,7 +30,7 @@ class GenerateBookStory implements ShouldQueue
     public function handle(): void
     {
         $book = BookService::resolve()->createBook(
-            batchId: $this->id,
+            id: $this->id,
             userPrompt: $this->prompt,
         );
 

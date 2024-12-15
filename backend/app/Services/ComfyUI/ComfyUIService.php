@@ -29,8 +29,7 @@ class ComfyUIService
     {
         $tokens = Tokens::make()
             ->add_token(':title:', $book->title)
-            ->add_token(':tags:', $book->tags->implode(', '))
-            ->add_token(':subject:', $book->subject);
+            ->add_token(':synopsis:', $book->synopsis);
 
         foreach ($book->paragraphs as $index => $paragraph) {
             $tokens->add_token(sprintf(':paragraph-%s:', ++$index), $paragraph);
@@ -42,7 +41,7 @@ class ComfyUIService
 
         $workflowId = $this->prompt(
             prompt: $this->prepareWorkflow($workflow, $tokens),
-            clientId: $book->batch_id,
+            clientId: $book->id,
         );
 
         $book->workflow_id = $workflowId;
