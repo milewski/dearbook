@@ -31,12 +31,12 @@ services:
     <<: [ *php, *local-network ]
     command: supercronic /srv/docker/php/config/schedule.cron
 
-  redis:
+  redis-worker:
     <<: *local-network
     image: redis:7-alpine
     restart: unless-stopped
     volumes:
-      - redis-data:/data
+      - redis-worker-data:/data
 
   ollama:
     <<: [ *nvidia, *local-network ]
@@ -67,7 +67,7 @@ services:
       - traefik.http.routers.comfyui.tls=true
 
 volumes:
-  redis-data:
+  redis-worker-data:
 
 networks:
   local-network:

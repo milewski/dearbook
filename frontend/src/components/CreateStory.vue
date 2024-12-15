@@ -105,7 +105,7 @@
 
                                 </FormItem>
 
-                                <Button type="submit" :disabled="formLoading"
+                                <Button type="submit" :disabled="formLoading || !(form.isFieldValid('prompt') && form.values.prompt)"
                                         class="bg-[#F18533] hover:bg-[#F18533] rounded-full">
 
                                     <div>Create!</div>
@@ -149,7 +149,7 @@
 
     const props = defineProps<{ viewBook: (bookId: number) => Promise<void>, loading: number | undefined }>()
 
-    const formSchema = toTypedSchema(z.object({ prompt: z.string().max(500).optional() }))
+    const formSchema = toTypedSchema(z.object({ prompt: z.string().max(500).min(10).optional() }))
     const form = useForm({ validationSchema: formSchema })
     const formLoading = ref(false)
     const createDrawerState = ref(false)
