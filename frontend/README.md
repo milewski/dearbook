@@ -1,6 +1,6 @@
-# Frontend for: The Open Source AI Challenge
+# Frontend
 
-This frontend is built with Vue, TypeScript, and TailwindCSS for [The Open Source AI Challenge](https://dev.to/challenges/pgai).
+This frontend is built with Vue, TypeScript, and TailwindCSS.
 
 ### Prerequisites
 To ensure the frontend works correctly, please start the backend first.
