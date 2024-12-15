@@ -20,7 +20,7 @@ x-nvidia: &nvidia
 
 services:
 
-  horizon:
+  queue:
     <<: *php
     command: php artisan queue:work --timeout=900
     networks:
@@ -68,8 +68,6 @@ services:
 
 volumes:
   redis-data:
-  timescaledb-data:
-  open-webui:
 
 networks:
   local-network:
