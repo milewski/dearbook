@@ -2,13 +2,13 @@
 
 ---
 
-# Local Development Setup Guide
+# Setup Guide
 
 ### Step 1: Download / Clone the Project
 
 Clone this repository and navigate into it. If you are on Windows, I recommend using WSL2, or at least utilize Git Bash instead of CMD or PowerShell to execute the next commands along.
 
-### Step 3: Start the Containers
+### Step 2: Start the Containers
 
 - Build the images and start the containers with:
 
@@ -37,8 +37,9 @@ touch ./database/database.sqlite
 
 ./composer install
 ./php artisan key:generate
-./php artisan storage:link
 ./ollama pull llama3.2:3b
 ```
 
 > **Note**: The `./` at the beginning of each command is an alias to `docker compose exec php`, allowing you to run commands within the container without entering it.
+
+Done!

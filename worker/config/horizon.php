@@ -185,7 +185,7 @@ return [
             'queue' => [ 'ollama' ],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
-            'maxProcesses' => env('OLLAMA_QUEUE_WORKERS_COUNT'),
+            'maxProcesses' => env('QUEUE_WORKERS_COUNT'),
             'maxTime' => 0,
             'maxJobs' => 0,
             'memory' => 128,
