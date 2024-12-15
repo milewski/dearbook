@@ -1,4 +1,4 @@
-# Backend for: The Open Source AI Challenge
+# Backend
 
 https://dev.to/challenges/pgai
 
