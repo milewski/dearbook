@@ -20,19 +20,19 @@
 
     <div class="flex max-w-3xl justify-center items-center mt-9 mx-auto space-x-8 pb-10 flex-col-reverse lg:flex-row">
 
-        <div class="relative w-full px-8 sm:px-0 mt-4 lg:mt-0">
+<!--        <div class="relative w-full px-8 sm:px-0 mt-4 lg:mt-0">-->
 
-            <Input
-                type="text"
-                class="text-[#230202] text-opacity-70 bg-[#F18533] pl-12 transition-all placeholder:opacity-25 placeholder:text-[#230202] rounded-full text-md border-none focus-visible:ring-[#230202]"
-                readonly
-                default-value="11v33baa44gmpgdqi4jcawo1dmbghaahzodcpqnevpump"/>
+<!--            <Input-->
+<!--                type="text"-->
+<!--                class="text-[#230202] text-opacity-70 bg-[#F18533] pl-12 transition-all placeholder:opacity-25 placeholder:text-[#230202] rounded-full text-md border-none focus-visible:ring-[#230202]"-->
+<!--                readonly-->
+<!--                default-value=""/>-->
 
-            <div class="absolute h-full items-center flex text-center justify-center left-12 sm:left-4 top-0">
-                CA:
-            </div>
+<!--            <div class="absolute h-full items-center flex text-center justify-center left-12 sm:left-4 top-0">-->
+<!--                CA:-->
+<!--            </div>-->
 
-        </div>
+<!--        </div>-->
 
         <div class="flex space-x-4 text-[#230202]">
 
