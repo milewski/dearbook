@@ -9,7 +9,7 @@ class CreateBookRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'prompt' => 'max:500',
+            'prompt' => [ 'required', 'max:500', 'min:10' ],
         ];
     }
 }
