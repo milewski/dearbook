@@ -1,7 +1,5 @@
 # Backend
 
-https://dev.to/challenges/pgai
-
 The backend was built in PHP using the laravel framework, and it contains several components:
 
 - [Traefik](https://traefik.io/)
