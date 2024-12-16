@@ -1,5 +1,7 @@
 <template>
 
+    <WelcomeNotice/>
+
     <Toaster/>
 
     <Drawer
@@ -16,7 +18,6 @@
         </DrawerContent>
 
     </Drawer>
-
 
     <div class="flex max-w-3xl justify-center items-center mt-9 mx-auto space-x-8 pb-10 flex-col-reverse lg:flex-row">
 
@@ -218,6 +219,7 @@
     import Manifest from './icons/Manifest.vue'
     import { Drawer, DrawerContent } from '../@/components/ui/drawer'
     import Manifesto from './components/Manifesto.vue'
+    import WelcomeNotice from './components/WelcomeNotice.vue'
 
     const activeBook = ref<{ visible: boolean, content: BookIndexResource | null }>({
         visible: false,
