@@ -22,6 +22,6 @@ Route::get('/work/storyline', GetStorylineWorkController::class);
 Route::get('/work/assets', GetAssetsWorkController::class);
 
 Route::post('/work/{book}/storyline', UpdateStorylineController::class);
-Route::post('/work/assets', StoreAssetsController::class);
+Route::post('/work/{book}/assets', StoreAssetsController::class);
 
 Route::post('/work/{book}/failure', FailWorkController::class);

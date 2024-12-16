@@ -51,13 +51,8 @@ class BookService
         return $book->save();
     }
 
-    public function storeAssets(StoreAssetsRequest $request): bool
+    public function storeAssets(Book $book, StoreAssetsRequest $request): bool
     {
-        /**
-         * @var Book $book
-         */
-        $book = Book::find($request->input('id'));
-
         $book->assets = collect($request->allFiles())->mapWithKeys(fn (UploadedFile $file, string $name) => [
             $name => $file->store(options: [ 'disk' => 'public' ]),
         ]);
