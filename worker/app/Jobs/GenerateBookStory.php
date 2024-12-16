@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Jobs;
 
-use App\Data\Work;
+use App\Data\AssetsWork;
 use App\Services\BookService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -16,7 +16,7 @@ class GenerateBookStory implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        private readonly Work $work,
+        private readonly AssetsWork $work,
     )
     {
         $this->onQueue('ollama');

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Services\ComfyUI;
 
+use App\Data\AssetsWork;
 use App\Data\Storyline;
 use App\Data\FileDescriptor;
 use App\Data\Tokens;
@@ -15,8 +16,8 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use League\Flysystem\FilesystemException;
-use Str;
 use Throwable;
 
 class ComfyUIService
@@ -27,26 +28,20 @@ class ComfyUIService
      * @throws Throwable
      * @throws ConnectionException
      */
-    public function execute(string $workflow, Storyline $book): string
+    public function execute(string $workflow, AssetsWork $work): string
     {
         $tokens = Tokens::make()
-            ->add_token(':title:', $book->data->title)
-            ->add_token(':synopsis:', $book->data->synopsis);
+            ->add_token(':title:', $work->title)
+            ->add_token(':synopsis:', $work->synopsis);
 
-        foreach ($book->data->paragraphs as $index => $paragraph) {
-            $tokens->add_token(sprintf(':paragraph-%s:', ++$index), $paragraph);
-        }
-
-        foreach ($book->illustrations as $index => $illustration) {
+        foreach ($work->illustrations as $index => $illustration) {
             $tokens->add_token(sprintf(':illustration-%s:', ++$index), $illustration);
         }
 
-        $workflowId = $this->prompt(
+        return $this->prompt(
             prompt: $this->prepareWorkflow($workflow, $tokens),
             clientId: Str::uuid()->toString(),
         );
-
-        return $workflowId;
     }
 
     /**

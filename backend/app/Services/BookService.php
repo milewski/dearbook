@@ -5,11 +5,14 @@ declare(strict_types = 1);
 namespace App\Services;
 
 use App\Data\BookData;
-use App\Http\Requests\PostWorkRequest;
+use App\Enums\BookState;
+use App\Http\Requests\StoreAssetsRequest;
+use App\Http\Requests\UpdateStorylineRequest;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\UploadedFile;
@@ -33,30 +36,39 @@ class BookService
         Book::query()->where('id', $id)->update([ 'failed' => true ]);
     }
 
-    public function finish(PostWorkRequest $request): void
+    public function updateStoryline(UpdateStorylineRequest $request): bool
     {
         /**
          * @var Book $book
          */
         $book = Book::find($request->input('id'));
 
-        if ($request->has('title')) {
+        $book->title = $request->input('title');
+        $book->synopsis = $request->input('synopsis');
+        $book->paragraphs = $request->input('paragraphs');
+        $book->illustrations = $request->input('illustrations');
+        $book->state = BookState::PendingIllustrations;
+        $book->fetched_at = null;
 
-            $book->title = $request->input('title');
-            $book->synopsis = $request->input('synopsis');
-            $book->paragraphs = $request->input('paragraphs');
+        return $book->save();
 
-        }
+    }
 
-        if (filled($files = $request->allFiles())) {
+    public function storeAssets(StoreAssetsRequest $request): bool
+    {
+        /**
+         * @var Book $book
+         */
+        $book = Book::find($request->input('id'));
 
-            $book->assets = collect($files)->mapWithKeys(fn(UploadedFile $file, string $name) => [
-                $name => $file->store(options: [ 'disk' => 'public' ]),
-            ]);
+        $book->assets = collect($request->allFiles())->mapWithKeys(fn (UploadedFile $file, string $name) => [
+            $name => $file->store(options: [ 'disk' => 'public' ]),
+        ]);
 
-        }
+        $book->state = BookState::Completed;
+        $book->fetched_at = null;
 
-        $book->save();
+        return $book->save();
     }
 
     public function createPendingBook(string $prompt): Book
@@ -79,17 +91,35 @@ class BookService
             ->get();
     }
 
-    public function getPendingBook(): ?Book
+    public function getPendingStorylines(): ?Book
     {
         $book = Book::query()
-            ->whereNull('assets')
-            ->where('failed', false)
-            ->where('updated_at', '<=', now()->subMinutes(10))
+            ->where('state', BookState::PendingStoryLine)
+            ->where(fn (Builder $builder) => $builder
+                ->where('fetched_at', '<=', now()->subMinutes(10))
+                ->orWhere('fetched_at', null))
             ->orderBy('created_at')
             ->first();
 
         if ($book) {
-            $book->touch();
+            $book->touch('fetched_at');
+        }
+
+        return $book;
+    }
+
+    public function getPendingBook(): ?Book
+    {
+        $book = Book::query()
+            ->where('state', BookState::PendingIllustrations)
+            ->where(fn (Builder $builder) => $builder
+                ->where('fetched_at', '<=', now()->subMinutes(10))
+                ->orWhere('fetched_at', null))
+            ->orderBy('created_at')
+            ->first();
+
+        if ($book) {
+            $book->touch('fetched_at');
         }
 
         return $book;
@@ -250,7 +280,7 @@ class BookService
     private function describeIllustrationPrompt(array $paragraphs): \Illuminate\Support\Collection
     {
         $story = collect($paragraphs)
-            ->map(fn(string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
+            ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
         $schema = [

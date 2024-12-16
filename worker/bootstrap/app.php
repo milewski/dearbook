@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-use App\Jobs\FetchAndGenerateJob;
+use App\Jobs\ProcessComfyUIQueries;
 use App\Jobs\ProcessOllamaQueries;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -29,7 +29,11 @@ return Application::configure(basePath: dirname(__DIR__))
         }
 
         if (config('app.mode') === 'comfyui') {
-            $schedule->job(new FetchAndGenerateJob())->withoutOverlapping()->everyTenSeconds();
+
+            $schedule->job(new ProcessComfyUIQueries())
+                ->withoutOverlapping()
+                ->everyTenSeconds();
+
         }
 
     })

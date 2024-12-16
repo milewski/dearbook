@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Data\Storyline;
 use App\Data\StorylineWork;
-use App\Data\Work;
+use App\Data\AssetsWork;
 use App\Services\Traits\Resolvable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
@@ -31,11 +31,12 @@ class BackendService
      */
     public function updateBookStoryline(string $id, Storyline $payload): void
     {
-        $this->request()->post('/work/update', [
+        $this->request()->post('/work/storyline', [
             'id' => $id,
             'title' => $payload->data->title,
             'synopsis' => $payload->data->synopsis,
             'paragraphs' => $payload->data->paragraphs,
+            'illustrations' => $payload->illustrations,
         ]);
     }
 
@@ -50,15 +51,15 @@ class BackendService
     /**
      * @throws ConnectionException
      */
-    public function getWork(): ?Work
+    public function getAssetsWork(): ?AssetsWork
     {
-        $response = $this->request()->get('/work')->json();
+        $response = $this->request()->get('/work/assets')->json();
 
         if (blank($response)) {
             return null;
         }
 
-        return Work::from($response);
+        return AssetsWork::from($response);
     }
 
     /**
@@ -78,22 +79,11 @@ class BackendService
     /**
      * @throws ConnectionException
      */
-    public function finishWork(Work $work, Storyline $payload, Collection $assets): void
+    public function uploadAssets(AssetsWork $work, Collection $assets): void
     {
         $body = [
             [ 'name' => 'id', 'contents' => $work->id ],
-            [ 'name' => 'title', 'contents' => $payload->data->title ],
-            [ 'name' => 'synopsis', 'contents' => $payload->data->synopsis ],
         ];
-
-        foreach ($payload->data->paragraphs as $index => $paragraph) {
-
-            $body[] = [
-                'name' => "paragraphs[$index]",
-                'contents' => $paragraph,
-            ];
-
-        }
 
         foreach ($assets as $name => $path) {
 
@@ -104,8 +94,7 @@ class BackendService
 
         }
 
-        $this->request()->asMultipart()->post('/work/finish', $body);
-
+        $this->request()->asMultipart()->post('/work/assets', $body);
     }
 
     private function request(): PendingRequest

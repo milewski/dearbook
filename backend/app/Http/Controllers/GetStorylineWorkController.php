@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\BookService;
 use Illuminate\Http\Request;
 
-class GetWorkController extends Controller
+class GetStorylineWorkController extends Controller
 {
     public function __invoke(Request $request): array
     {
@@ -13,7 +13,7 @@ class GetWorkController extends Controller
             return [];
         }
 
-        if ($book = BookService::resolve()->getPendingBook()) {
+        if ($book = BookService::resolve()->getPendingStorylines()) {
 
             return [
                 'id' => $book->id,

@@ -15,25 +15,21 @@ use League\Flysystem\FilesystemException;
 use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 use Throwable;
 
-class FetchAndGenerateJob implements ShouldQueue, ShouldBeUnique
+class ProcessComfyUIQueries implements ShouldQueue, ShouldBeUnique
 {
     use Queueable;
 
     /**
      * @return void
      * @throws ConnectionException
-     * @throws FilesystemException
-     * @throws Throwable
      */
     public function handle(): void
     {
-        if ($work = BackendService::resolve()->getWork()) {
+        if ($work = BackendService::resolve()->getAssetsWork()) {
 
             try {
 
-                $data = BookService::resolve()->generateStoryline($work);
-
-                $workflowId = ComfyUIService::resolve()->execute('main.workflow.json', $data);
+                $workflowId = ComfyUIService::resolve()->execute('main.workflow.json', $work);
 
                 $assets = value(function () use ($workflowId) {
 
@@ -63,7 +59,7 @@ class FetchAndGenerateJob implements ShouldQueue, ShouldBeUnique
 
                 }
 
-                BackendService::resolve()->finishWork($work, $data, $assets);
+                BackendService::resolve()->uploadAssets($work, $assets);
 
             } catch (Throwable) {
 

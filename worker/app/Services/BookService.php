@@ -8,7 +8,7 @@ use App\Data\StorylineData;
 use App\Data\Storyline;
 use App\Data\ChildrenAwareData;
 use App\Data\StorylineWork;
-use App\Data\Work;
+use App\Data\AssetsWork;
 use App\Exceptions\InvalidDataGeneratedByOllama;
 use App\Exceptions\UnsafeForChildrenException;
 use App\Http\Requests\PostWorkRequest;

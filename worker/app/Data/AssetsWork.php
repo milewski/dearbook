@@ -6,11 +6,13 @@ namespace App\Data;
 
 use Spatie\LaravelData\Data;
 
-class Work extends Data
+class AssetsWork extends Data
 {
     public function __construct(
         public string $id,
-        public string $prompt,
+        public string $title,
+        public string $synopsis,
+        public array $illustrations,
     )
     {
     }
