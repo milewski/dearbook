@@ -31,7 +31,7 @@ class FetchAndGenerateJob implements ShouldQueue, ShouldBeUnique
 
             try {
 
-                $data = BookService::resolve()->createBook($work);
+                $data = BookService::resolve()->generateStoryline($work);
 
                 $workflowId = ComfyUIService::resolve()->execute('main.workflow.json', $data);
 

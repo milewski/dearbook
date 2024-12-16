@@ -4,7 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Services;
 
-use App\Data\BookPayload;
+use App\Data\Storyline;
+use App\Data\StorylineWork;
 use App\Data\Work;
 use App\Services\Traits\Resolvable;
 use Illuminate\Http\Client\ConnectionException;
@@ -16,6 +17,27 @@ use Illuminate\Support\Facades\Storage;
 class BackendService
 {
     use Resolvable;
+
+    public function reportFailure(string $id, string $message): void
+    {
+        $this->request()->post('/work/failure', [
+            'id' => $id,
+            'reason' => $message,
+        ]);
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function updateBookStoryline(string $id, Storyline $payload): void
+    {
+        $this->request()->post('/work/update', [
+            'id' => $id,
+            'title' => $payload->data->title,
+            'synopsis' => $payload->data->synopsis,
+            'paragraphs' => $payload->data->paragraphs,
+        ]);
+    }
 
     /**
      * @throws ConnectionException
@@ -42,7 +64,21 @@ class BackendService
     /**
      * @throws ConnectionException
      */
-    public function finishWork(Work $work, BookPayload $payload, Collection $assets): void
+    public function getStorylineWork(): ?StorylineWork
+    {
+        $response = $this->request()->get('/work/storyline')->json();
+
+        if (blank($response)) {
+            return null;
+        }
+
+        return StorylineWork::from($response);
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function finishWork(Work $work, Storyline $payload, Collection $assets): void
     {
         $body = [
             [ 'name' => 'id', 'contents' => $work->id ],

@@ -28,7 +28,7 @@ class GenerateBookStory implements ShouldQueue
      */
     public function handle(): void
     {
-        $book = BookService::resolve()->createBook($this->work);
+        $book = BookService::resolve()->generateStoryline($this->work);
 
         GenerateBookAssets::dispatch($book);
     }

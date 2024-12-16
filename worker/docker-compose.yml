@@ -16,7 +16,8 @@ x-php: &php
     - .:/srv
 
 x-nvidia: &nvidia
-  runtime: nvidia
+  restart: unless-stopped
+#  runtime: nvidia
 
 services:
 

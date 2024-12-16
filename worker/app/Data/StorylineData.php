@@ -6,7 +6,7 @@ namespace App\Data;
 
 use Spatie\LaravelData\Data;
 
-class BookData extends Data
+class StorylineData extends Data
 {
     public function __construct(
         public string $title,

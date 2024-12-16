@@ -4,9 +4,13 @@ declare(strict_types = 1);
 
 namespace App\Services;
 
-use App\Data\BookData;
-use App\Data\BookPayload;
+use App\Data\StorylineData;
+use App\Data\Storyline;
+use App\Data\ChildrenAwareData;
+use App\Data\StorylineWork;
 use App\Data\Work;
+use App\Exceptions\InvalidDataGeneratedByOllama;
+use App\Exceptions\UnsafeForChildrenException;
 use App\Http\Requests\PostWorkRequest;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
@@ -94,13 +98,15 @@ class BookService
      * @throws Exception
      * @throws ConnectionException
      */
-    public function createBook(Work $work): BookPayload
+    public function generateStoryline(StorylineWork $work): Storyline
     {
-        if ($this->isSafeForChildren($work->prompt) === false) {
-            throw new Exception('the prompt is not safe for children...');
+        $childrenAwareData = $this->isSafeForChildren($work->prompt);
+
+        if ($childrenAwareData->isSafe === false) {
+            throw new UnsafeForChildrenException($childrenAwareData->reason);
         }
 
-        return new BookPayload(
+        return new Storyline(
             data: $book = $this->generateBookMainStoryLine($work->prompt),
             illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
         );
@@ -111,26 +117,35 @@ class BookService
      * @throws Throwable
      * @throws ConnectionException
      */
-    private function isSafeForChildren(string $prompt): bool|int
+    private function isSafeForChildren(string $prompt): ChildrenAwareData
     {
         return retry($this->tries, function () use ($prompt) {
 
-            $response = $this->ollama->generateJson(
-                prompt: $this->askIfPromptIsSafeForChildren($prompt),
+            $response = $this->ollama->generateJsonSchema(
+                ...$this->askIfPromptIsSafeForChildren($prompt),
             );
 
-            if ($response->has('isSafe') === false) {
-                throw new Exception('invalid json payload received...');
-            }
-
-            return $response[ 'isSafe' ] === true;
+            return ChildrenAwareData::from($response);
 
         });
     }
 
-    private function askIfPromptIsSafeForChildren(string $prompt): string
+    private function askIfPromptIsSafeForChildren(string $prompt): array
     {
-        return <<<PROMPT
+        $schema = [
+            'type' => 'object',
+            'required' => [ 'title', 'synopsis', 'paragraphs' ],
+            'properties' => [
+                'isSafe' => [
+                    'type' => 'boolean',
+                ],
+                'reason' => [
+                    'type' => 'string',
+                ],
+            ],
+        ];
+
+        $prompt = <<<PROMPT
         Analyze the following user input prompt and determine if it is an appropriate and safe theme for a children's book.
         Consider themes, language, and any sensitive content to ensure suitability for young readers.
 
@@ -138,16 +153,10 @@ class BookService
         $prompt
         ----- end_of_user_input_content
 
-        Return only the following JSON response:
-
-        ```json
-        {
-          "isSafe": <boolean>
-        }
-        ```
-
-        Make sure the JSON response is valid and correctly structured.
+        Respond using JSON
         PROMPT;
+
+        return [ $prompt, $schema ];
     }
 
     /**
@@ -178,7 +187,7 @@ class BookService
      * @throws Exception
      * @throws ConnectionException
      */
-    private function generateBookMainStoryLine(?string $prompt): BookData
+    private function generateBookMainStoryLine(?string $prompt): StorylineData
     {
         return retry($this->tries, function () use ($prompt) {
 
@@ -189,10 +198,10 @@ class BookService
                 schema: $schema,
             );
 
-            $data = BookData::from($response);
+            $data = StorylineData::from($response);
 
             if ($data->isValid() === false) {
-                throw new Exception('generated data is not valid...');
+                throw new InvalidDataGeneratedByOllama();
             }
 
             return $data;
@@ -242,7 +251,7 @@ class BookService
     private function describeIllustrationPrompt(array $paragraphs): \Illuminate\Support\Collection
     {
         $story = collect($paragraphs)
-            ->map(fn(string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
+            ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
         $schema = [

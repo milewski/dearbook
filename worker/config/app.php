@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 return [
 
+    'mode' => env('MODE'),
+
     'domains' => [
         'api' => env('API_DOMAIN'),
         'assets' => env('ASSETS_DOMAIN'),

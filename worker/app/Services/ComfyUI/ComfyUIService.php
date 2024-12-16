@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Services\ComfyUI;
 
-use App\Data\BookPayload;
+use App\Data\Storyline;
 use App\Data\FileDescriptor;
 use App\Data\Tokens;
 use App\Jobs\CompressAssets;
@@ -27,7 +27,7 @@ class ComfyUIService
      * @throws Throwable
      * @throws ConnectionException
      */
-    public function execute(string $workflow, BookPayload $book): string
+    public function execute(string $workflow, Storyline $book): string
     {
         $tokens = Tokens::make()
             ->add_token(':title:', $book->data->title)

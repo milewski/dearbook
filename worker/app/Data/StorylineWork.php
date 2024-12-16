@@ -6,11 +6,11 @@ namespace App\Data;
 
 use Spatie\LaravelData\Data;
 
-class BookPayload extends Data
+class StorylineWork extends Data
 {
     public function __construct(
-        public BookData $data,
-        public array $illustrations,
+        public string $id,
+        public string $prompt,
     )
     {
     }
