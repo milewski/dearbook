@@ -96,10 +96,58 @@ class BookService
      */
     public function createBook(Work $work): BookPayload
     {
+        if ($this->isSafeForChildren($work->prompt) === false) {
+            throw new Exception('the prompt is not safe for children...');
+        }
+
         return new BookPayload(
             data: $book = $this->generateBookMainStoryLine($work->prompt),
             illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
         );
+    }
+
+    /**
+     * @throws Exception
+     * @throws Throwable
+     * @throws ConnectionException
+     */
+    private function isSafeForChildren(string $prompt): bool|int
+    {
+        return retry($this->tries, function () use ($prompt) {
+
+            $response = $this->ollama->generateJson(
+                prompt: $this->askIfPromptIsSafeForChildren($prompt),
+            );
+
+            if ($response->has('isSafe') === false) {
+                throw new Exception('invalid json payload received...');
+            }
+
+            return $response[ 'isSafe' ] === true;
+
+        });
+    }
+
+    private function askIfPromptIsSafeForChildren(string $prompt): string
+    {
+        return <<<PROMPT
+        Analyze the following user input prompt and determine if it is an appropriate and safe theme for a children's book.
+        Consider themes, language, and any sensitive content to ensure suitability for young readers.
+
+        ----- start_of_user_input_content
+        $prompt
+        ----- end_of_user_input_content
+
+        Return only the following JSON response:
+
+        ```json
+        {
+          "isSafe": <boolean>
+        }
+        ```
+
+        Make sure the JSON response is valid and correctly structured.
+        PROMPT;
     }
 
     /**
