@@ -72,25 +72,12 @@ class BookService
         return $book;
     }
 
-    /**
-     * @return Collection<int, Book
-     */
-    public function getFailedBooks(): Collection
-    {
-        return Book::query()
-            ->whereNull('assets')
-            ->where('updated_at', '<=', now()->subMinutes(10))
-            ->get();
-    }
-
     public function getPendingStorylines(): ?Book
     {
         $book = Book::query()
             ->where('state', BookState::PendingStoryLine)
-            ->where(fn (Builder $builder) => $builder
-                ->where('fetched_at', '<=', now()->subMinutes(10))
-                ->orWhere('fetched_at', null))
-            ->orderBy('created_at')
+            ->where('fetched_at', null)
+            ->orderByDesc('created_at')
             ->first();
 
         if ($book) {
@@ -104,10 +91,8 @@ class BookService
     {
         $book = Book::query()
             ->where('state', BookState::PendingIllustrations)
-            ->where(fn (Builder $builder) => $builder
-                ->where('fetched_at', '<=', now()->subMinutes(10))
-                ->orWhere('fetched_at', null))
-            ->orderBy('created_at')
+            ->where('fetched_at', null)
+            ->orderByDesc('created_at')
             ->first();
 
         if ($book) {
