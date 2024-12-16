@@ -14,10 +14,10 @@ return new class () extends Migration
     {
         Schema::table('books', function (Blueprint $table) {
 
-            $table->json('illustrations')->nullable();
+            $table->json('illustrations')->nullable()->after('paragraphs');
 
             $table->string('state')->nullable()->default(BookState::PendingStoryLine);
-            $table->string('fetched_at')->nullable();
+            $table->string('fetched_at')->nullable()->after('assets');
 
             $table->renameColumn('failure', 'reason');
 
