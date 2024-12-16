@@ -20,17 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         if (config('app.mode') === 'ollama') {
 
-            $schedule->job(ProcessOllamaQueries::class)
-                ->withoutOverlapping()
-                ->everyTenSeconds();
+            $schedule->job(ProcessOllamaQueries::class)->everySecond();
 
         }
 
         if (config('app.mode') === 'comfyui') {
 
-            $schedule->job(new ProcessComfyUIQueries())
-                ->withoutOverlapping()
-                ->everyTenSeconds();
+            $schedule->job(ProcessComfyUIQueries::class)->everySecond();
 
         }
 
