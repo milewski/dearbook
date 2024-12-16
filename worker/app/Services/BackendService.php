@@ -20,6 +20,14 @@ class BackendService
     /**
      * @throws ConnectionException
      */
+    public function failGeneration(string $id): void
+    {
+        $this->request()->post('/work/fail', [ 'id' => $id ]);
+    }
+
+    /**
+     * @throws ConnectionException
+     */
     public function getWork(): ?Work
     {
         $response = $this->request()->get('/work')->json();

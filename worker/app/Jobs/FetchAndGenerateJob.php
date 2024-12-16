@@ -29,39 +29,47 @@ class FetchAndGenerateJob implements ShouldQueue, ShouldBeUnique
     {
         if ($work = BackendService::resolve()->getWork()) {
 
-            $data = BookService::resolve()->createBook($work);
-            $workflowId = ComfyUIService::resolve()->execute('main.workflow.json', $data);
+            try {
 
-            $assets = value(function () use ($workflowId) {
+                $data = BookService::resolve()->createBook($work);
 
-                while (true) {
+                $workflowId = ComfyUIService::resolve()->execute('main.workflow.json', $data);
 
-                    $response = ComfyUIService::resolve()->fetchOutputs($workflowId);
+                $assets = value(function () use ($workflowId) {
 
-                    if ($response instanceof Collection) {
-                        return $response;
+                    while (true) {
+
+                        $response = ComfyUIService::resolve()->fetchOutputs($workflowId);
+
+                        if ($response instanceof Collection) {
+                            return $response;
+                        }
+
+                        if ($response === false) {
+                            return false;
+                        }
+
+                        sleep(5);
+
                     }
 
-                    if ($response === false) {
-                        return false;
-                    }
+                });
 
-                    sleep(5);
+                foreach ($assets as $_ => $asset) {
+
+                    ImageOptimizer::optimize(
+                        Storage::disk('public')->path($asset),
+                    );
 
                 }
 
-            });
+                BackendService::resolve()->finishWork($work, $data, $assets);
 
-            foreach ($assets as $_ => $asset) {
+            } catch (Throwable) {
 
-                ImageOptimizer::optimize(
-                    Storage::disk('public')->path($asset),
-                );
+                BackendService::resolve()->failGeneration($work->id);
 
             }
-
-            BackendService::resolve()->finishWork($work, $data, $assets);
-
         }
     }
 }
