@@ -19,7 +19,7 @@ return new class () extends Migration
             $table->string('state')->nullable()->default(BookState::PendingStoryLine);
             $table->string('fetched_at')->nullable()->after('assets');
 
-            $table->renameColumn('failure', 'reason');
+            $table->string('reason')->nullable()->after('failed');
 
         });
 
