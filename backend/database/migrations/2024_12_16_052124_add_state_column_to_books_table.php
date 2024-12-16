@@ -12,17 +12,17 @@ return new class extends Migration {
     {
         Schema::table('books', function (Blueprint $table) {
             $table->string('illustrations')->nullable();
-            $table->string('state')->nullable()->default(BookState::New);
+            $table->string('state')->nullable()->default(BookState::PendingStoryLine);
             $table->string('fetched_at')->nullable();
         });
 
         Book::query()->whereNotNull('assets')->update([ 'state' => BookState::Completed ]);
-        Book::query()->whereNull('assets')->update([ 'state' => BookState::New ]);
+        Book::query()->whereNull('assets')->update([ 'state' => BookState::PendingStoryLine ]);
 
         Book::query()->where('failed', true)->update([ 'state' => BookState::Failed ]);
 
         Schema::table('books', function (Blueprint $table) {
-            $table->string('state')->default(BookState::New)->change();
+            $table->string('state')->default(BookState::PendingStoryLine)->change();
         });
     }
 

@@ -6,7 +6,6 @@ namespace App\Enums;
 
 enum BookState: string
 {
-    case New = 'new';
     case PendingStoryLine = 'pending_storyline';
     case PendingIllustrations = 'pending_illustrations';
     case Completed = 'completed';
