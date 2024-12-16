@@ -124,7 +124,7 @@ class ComfyUIService
         $response = $this->request()->get('/view', $fileDescription->toArray());
         $body = $response->body();
 
-        Storage::disk('public')->write($path = sprintf('%s.png', md5($body)), $body);
+        Storage::disk('local')->write($path = sprintf('%s.png', md5($body)), $body);
 
         return $path;
     }
