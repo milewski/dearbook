@@ -266,7 +266,6 @@
         await Promise.all([
             preloadImage(book.backdrop).then(blob => book.backdrop = blob),
             preloadImage(book.cover).then(blob => book.cover = blob),
-            ...book.paragraphs.map(paragraph => preloadImage(paragraph.illustration).then(blob => paragraph.illustration = blob)),
         ])
 
         loading.value = undefined
@@ -275,6 +274,10 @@
         await nextTick(() => {
             activeBook.value.visible = true
         })
+
+        await Promise.all(
+            book.paragraphs.map(paragraph => preloadImage(paragraph.illustration).then(blob => paragraph.illustration = blob)),
+        )
 
     }
 
