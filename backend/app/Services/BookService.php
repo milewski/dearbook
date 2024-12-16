@@ -133,7 +133,7 @@ class BookService
         return cache()->flexible('books', [ 5, 10 ], function () {
 
             return Book::query()
-                ->whereNotNull('assets')
+                ->where('state', BookState::Completed)
                 ->inRandomOrder()
                 ->simplePaginate(12);
 
@@ -144,7 +144,7 @@ class BookService
     {
         return Book::query()
             ->whereIn('id', $ids)
-            ->whereNotNull('assets')
+            ->where('state', BookState::Completed)
             ->oldest()
             ->limit(10)
             ->get();
