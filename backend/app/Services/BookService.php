@@ -32,24 +32,15 @@ class BookService
     {
     }
 
-    public function markBookAsFailed(WorkFailureRequest $request): void
+    public function markBookAsFailed(Book $book, WorkFailureRequest $request): void
     {
-        /**
-         * @var Book $book
-         */
-        $book = Book::find($request->id);
         $book->failed = true;
         $book->failure = $request->reason;
         $book->save();
     }
 
-    public function updateStoryline(UpdateStorylineRequest $request): bool
+    public function updateStoryline(Book $book, UpdateStorylineRequest $request): bool
     {
-        /**
-         * @var Book $book
-         */
-        $book = Book::find($request->input('id'));
-
         $book->title = $request->input('title');
         $book->synopsis = $request->input('synopsis');
         $book->paragraphs = $request->input('paragraphs');

@@ -5,11 +5,8 @@ declare(strict_types = 1);
 namespace App\Services\ComfyUI;
 
 use App\Data\AssetsWork;
-use App\Data\Storyline;
 use App\Data\FileDescriptor;
 use App\Data\Tokens;
-use App\Jobs\CompressAssets;
-use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
@@ -95,8 +92,8 @@ class ComfyUIService
         $assets = $response
             ->collect("$id.outputs")
             ->flatten(2)
-            ->map(fn(array $output) => FileDescriptor::from($output))
-            ->mapWithKeys(fn(FileDescriptor $file) => [
+            ->map(fn (array $output) => FileDescriptor::from($output))
+            ->mapWithKeys(fn (FileDescriptor $file) => [
                 $file->name() => $this->downloadImage($file),
             ]);
 

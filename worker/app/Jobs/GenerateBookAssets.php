@@ -6,7 +6,6 @@ namespace App\Jobs;
 
 use App\Models\Book;
 use App\Services\ComfyUI\ComfyUIService;
-use App\Services\OllamaService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;

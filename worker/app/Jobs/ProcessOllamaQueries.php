@@ -1,21 +1,17 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Jobs;
 
 use App\Services\BackendService;
 use App\Services\BookService;
-use App\Services\ComfyUI\ComfyUIService;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
-use League\Flysystem\FilesystemException;
-use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 use Throwable;
 
-class ProcessOllamaQueries implements ShouldQueue, ShouldBeUnique
+class ProcessOllamaQueries implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Resources;
 
@@ -22,7 +22,7 @@ class BookDetailResource extends JsonResource
             'synopsis' => $this->resource->synopsis,
             'cover' => Storage::disk('public')->url($this->resource->assets->get('cover')),
             'backdrop' => Storage::disk('public')->url($this->resource->assets->get('backdrop')),
-            'paragraphs' => $this->resource->paragraphs->map(fn(string $paragraph, int $index) => [
+            'paragraphs' => $this->resource->paragraphs->map(fn (string $paragraph, int $index) => [
                 'illustration' => Storage::disk('public')->url($this->resource->assets->get(sprintf('illustration-%d', ++$index))),
                 'text' => $paragraph,
             ]),

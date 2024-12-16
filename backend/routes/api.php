@@ -21,7 +21,7 @@ Route::post('/check/batches', CheckBatchesController::class);
 Route::get('/work/storyline', GetStorylineWorkController::class);
 Route::get('/work/assets', GetAssetsWorkController::class);
 
-Route::post('/work/storyline', UpdateStorylineController::class);
+Route::post('/work/{book}/storyline', UpdateStorylineController::class);
 Route::post('/work/assets', StoreAssetsController::class);
 
-Route::post('/work/failure', FailWorkController::class);
+Route::post('/work/{book}/failure', FailWorkController::class);

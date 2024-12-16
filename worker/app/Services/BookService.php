@@ -4,11 +4,10 @@ declare(strict_types = 1);
 
 namespace App\Services;
 
-use App\Data\StorylineData;
-use App\Data\Storyline;
 use App\Data\ChildrenAwareData;
+use App\Data\Storyline;
+use App\Data\StorylineData;
 use App\Data\StorylineWork;
-use App\Data\AssetsWork;
 use App\Exceptions\InvalidDataGeneratedByOllama;
 use App\Exceptions\UnsafeForChildrenException;
 use App\Http\Requests\PostWorkRequest;
@@ -265,6 +264,7 @@ class BookService
         ];
 
         return collect($paragraphs)->map(function (string $paragraph) use ($story, $schema) {
+
             $prompt = <<<PROMPT
             Generate a creative image prompt for a generative AI tool to create an illustration for the following paragraph in the children's book. You will receive the full story context for reference, but respond with one image prompt at a time, focusing on the provided paragraph.
 
@@ -293,6 +293,7 @@ class BookService
                 $prompt,
                 $schema,
             ];
+
         });
     }
 }
