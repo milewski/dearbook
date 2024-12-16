@@ -95,7 +95,7 @@ class BackendService
 
     private function request(): PendingRequest
     {
-        return Http::timeout(60 * 5)
+        return Http::timeout(30)
             ->baseUrl(config('app.backend.url'))
             ->withHeader('x-api-key', config('app.backend.worker_api_key'))
             ->throw()

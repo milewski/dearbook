@@ -19,15 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (Schedule $schedule) {
 
         if (config('app.mode') === 'ollama') {
-
             $schedule->job(ProcessOllamaQueries::class)->everySecond();
-
         }
 
         if (config('app.mode') === 'comfyui') {
-
             $schedule->job(ProcessComfyUIQueries::class)->everySecond();
-
         }
 
     })

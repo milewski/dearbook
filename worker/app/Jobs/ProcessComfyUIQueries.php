@@ -6,6 +6,7 @@ namespace App\Jobs;
 
 use App\Services\BackendService;
 use App\Services\ComfyUI\ComfyUIService;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -32,21 +33,25 @@ class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
 
                 $assets = value(function () use ($workflowId) {
 
-                    while (true) {
+                    retry(
+                        times: 5,
+                        callback: function () use ($workflowId) {
 
-                        $response = ComfyUIService::resolve()->fetchOutputs($workflowId);
+                            $response = ComfyUIService::resolve()->fetchOutputs($workflowId);
 
-                        if ($response instanceof Collection) {
-                            return $response;
-                        }
+                            if ($response instanceof Collection) {
+                                return $response;
+                            }
 
-                        if ($response === false) {
-                            return false;
-                        }
+                            if ($response === false) {
+                                return false;
+                            }
 
-                        sleep(5);
+                            throw new Exception('waiting');
 
-                    }
+                        },
+                        sleepMilliseconds: 5000,
+                    );
 
                 });
 

@@ -24,7 +24,7 @@ class BookService
 {
     use Resolvable;
 
-    private int $tries = 5;
+    private int $tries = 2;
 
     public function __construct(
         private readonly OllamaService $ollama,

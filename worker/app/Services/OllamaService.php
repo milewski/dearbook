@@ -102,7 +102,7 @@ class OllamaService
 
     private function request(): PendingRequest
     {
-        return Http::timeout(60 * 5)
+        return Http::timeout(60 * 1)
             ->baseUrl(sprintf('%s/api', config('app.ollama.url')))
             ->asJson()
             ->throw();

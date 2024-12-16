@@ -143,7 +143,7 @@ class ComfyUIService
 
     private function request(): PendingRequest
     {
-        return Http::timeout(60 * 5)
+        return Http::timeout(60 * 1)
             ->baseUrl(config('app.comfyui_internal_url'))
             ->asJson()
             ->throw();
