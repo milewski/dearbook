@@ -5,6 +5,7 @@ declare(strict_types = 1);
 use App\Http\Controllers\BooksController;
 use App\Http\Controllers\CheckBatchesController;
 use App\Http\Controllers\CreateBookController;
+use App\Http\Controllers\FailWorkController;
 use App\Http\Controllers\GetWorkController;
 use App\Http\Controllers\PostWorkController;
 use App\Http\Controllers\ViewBookController;
@@ -17,3 +18,4 @@ Route::post('/check/batches', CheckBatchesController::class);
 
 Route::get('/work', GetWorkController::class);
 Route::post('/work/finish', PostWorkController::class);
+Route::post('/work/fail', FailWorkController::class);

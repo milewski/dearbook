@@ -28,6 +28,11 @@ class BookService
     {
     }
 
+    public function markBookAsFailed(string $id): void
+    {
+        Book::query()->where('id', $id)->update([ 'failed' => true ]);
+    }
+
     public function finish(PostWorkRequest $request): void
     {
         /**
@@ -35,13 +40,21 @@ class BookService
          */
         $book = Book::find($request->input('id'));
 
-        $book->title = $request->input('title');
-        $book->synopsis = $request->input('synopsis');
-        $book->paragraphs = $request->input('paragraphs');
+        if ($request->has('title')) {
 
-        $book->assets = collect($request->allFiles())->mapWithKeys(fn(UploadedFile $file, string $name) => [
-            $name => $file->store(options: [ 'disk' => 'public' ]),
-        ]);
+            $book->title = $request->input('title');
+            $book->synopsis = $request->input('synopsis');
+            $book->paragraphs = $request->input('paragraphs');
+
+        }
+
+        if (filled($files = $request->allFiles())) {
+
+            $book->assets = collect($files)->mapWithKeys(fn(UploadedFile $file, string $name) => [
+                $name => $file->store(options: [ 'disk' => 'public' ]),
+            ]);
+
+        }
 
         $book->save();
     }
@@ -70,6 +83,7 @@ class BookService
     {
         $book = Book::query()
             ->whereNull('assets')
+            ->where('failed', false)
             ->where('updated_at', '<=', now()->subMinutes(10))
             ->orderBy('created_at')
             ->first();
