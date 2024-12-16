@@ -79,9 +79,7 @@ class BackendService
      */
     public function uploadAssets(AssetsWork $work, Collection $assets): void
     {
-        $body = [
-            [ 'name' => 'id', 'contents' => $work->id ],
-        ];
+        $body = [];
 
         foreach ($assets as $name => $path) {
 
@@ -92,7 +90,7 @@ class BackendService
 
         }
 
-        $this->request()->asMultipart()->post('/work/assets', $body);
+        $this->request()->asMultipart()->post("/work/$work->id/assets", $body);
     }
 
     private function request(): PendingRequest
