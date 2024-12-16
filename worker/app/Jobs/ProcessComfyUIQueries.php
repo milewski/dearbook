@@ -61,9 +61,9 @@ class ProcessComfyUIQueries implements ShouldQueue, ShouldBeUnique
 
                 BackendService::resolve()->uploadAssets($work, $assets);
 
-            } catch (Throwable) {
+            } catch (Throwable $error) {
 
-                BackendService::resolve()->failGeneration($work->id);
+                BackendService::resolve()->reportFailure($work->id, $error->getMessage());
 
             }
         }

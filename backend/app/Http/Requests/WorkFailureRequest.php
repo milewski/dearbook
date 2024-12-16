@@ -8,13 +8,17 @@ use App\Models\Book;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreAssetsRequest extends FormRequest
+/**
+ * @property string $id
+ * @property string $reason
+ */
+class WorkFailureRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
             'id' => Rule::exists(Book::class),
-            'assets.*' => [ 'required', 'array', 'image' ],
+            'reason' => [ 'required' ],
         ];
     }
 }

@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Models;
 
 use App\Enums\BookState;
-use App\Enums\State;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,6 +22,7 @@ class Book extends Model
             'assets' => 'collection',
             'illustrations' => 'collection',
             'paragraphs' => 'collection',
+            'failed' => 'boolean',
         ];
     }
 }

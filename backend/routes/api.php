@@ -18,11 +18,10 @@ Route::get('/book/{book}', ViewBookController::class);
 Route::post('/book/create', CreateBookController::class);
 Route::post('/check/batches', CheckBatchesController::class);
 
-
 Route::get('/work/storyline', GetStorylineWorkController::class);
 Route::get('/work/assets', GetAssetsWorkController::class);
 
 Route::post('/work/storyline', UpdateStorylineController::class);
 Route::post('/work/assets', StoreAssetsController::class);
 
-Route::post('/work/fail', FailWorkController::class);
+Route::post('/work/failure', FailWorkController::class);

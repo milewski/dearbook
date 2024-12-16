@@ -8,6 +8,7 @@ use App\Data\BookData;
 use App\Enums\BookState;
 use App\Http\Requests\StoreAssetsRequest;
 use App\Http\Requests\UpdateStorylineRequest;
+use App\Http\Requests\WorkFailureRequest;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
@@ -31,9 +32,15 @@ class BookService
     {
     }
 
-    public function markBookAsFailed(string $id): void
+    public function markBookAsFailed(WorkFailureRequest $request): void
     {
-        Book::query()->where('id', $id)->update([ 'failed' => true ]);
+        /**
+         * @var Book $book
+         */
+        $book = Book::find($request->id);
+        $book->failed = true;
+        $book->failure = $request->reason;
+        $book->save();
     }
 
     public function updateStoryline(UpdateStorylineRequest $request): bool
@@ -51,7 +58,6 @@ class BookService
         $book->fetched_at = null;
 
         return $book->save();
-
     }
 
     public function storeAssets(StoreAssetsRequest $request): bool
@@ -139,10 +145,12 @@ class BookService
     public function getRandomBooks(): Paginator
     {
         return cache()->flexible('books', [ 5, 10 ], function () {
+
             return Book::query()
                 ->whereNotNull('assets')
                 ->inRandomOrder()
                 ->simplePaginate(12);
+
         });
     }
 
@@ -294,6 +302,7 @@ class BookService
         ];
 
         return collect($paragraphs)->map(function (string $paragraph) use ($story, $schema) {
+
             $prompt = <<<PROMPT
             Generate a creative image prompt for a generative AI tool to create an illustration for the following paragraph in the children's book. You will receive the full story context for reference, but respond with one image prompt at a time, focusing on the provided paragraph.
 
@@ -322,6 +331,7 @@ class BookService
                 $prompt,
                 $schema,
             ];
+
         });
     }
 }
