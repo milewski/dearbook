@@ -34,8 +34,8 @@ class BookService
 
     public function markBookAsFailed(Book $book, WorkFailureRequest $request): void
     {
-        $book->failed = true;
-        $book->failure = $request->reason;
+        $book->reason = $request->reason;
+        $book->state = BookState::Failed;
         $book->save();
     }
 

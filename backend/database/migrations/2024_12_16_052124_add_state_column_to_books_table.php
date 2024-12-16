@@ -19,6 +19,8 @@ return new class () extends Migration
             $table->string('state')->nullable()->default(BookState::PendingStoryLine);
             $table->string('fetched_at')->nullable();
 
+            $table->renameColumn('failure', 'reason');
+
         });
 
         Book::query()->whereNotNull('assets')->update([ 'state' => BookState::Completed ]);
@@ -28,6 +30,7 @@ return new class () extends Migration
 
         Schema::table('books', function (Blueprint $table) {
             $table->string('state')->default(BookState::PendingStoryLine)->change();
+            $table->dropColumn('failed');
         });
     }
 
