@@ -14,7 +14,8 @@ return new class () extends Migration
     {
         Schema::table('books', function (Blueprint $table) {
 
-            $table->string('illustrations')->nullable();
+            $table->json('illustrations')->nullable();
+
             $table->string('state')->nullable()->default(BookState::PendingStoryLine);
             $table->string('fetched_at')->nullable();
 
