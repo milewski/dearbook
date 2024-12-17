@@ -4,8 +4,13 @@ declare(strict_types = 1);
 
 namespace App\Services;
 
-use App\Data\BookData;
-use App\Http\Requests\PostWorkRequest;
+use App\Data\ChildrenAwareData;
+use App\Data\Storyline;
+use App\Data\StorylineData;
+use App\Enums\BookState;
+use App\Exceptions\InvalidDataGeneratedByOllama;
+use App\Exceptions\UnsafeForChildrenException;
+use App\Http\Requests\StoreAssetsRequest;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
@@ -28,35 +33,111 @@ class BookService
     {
     }
 
-    public function markBookAsFailed(string $id): void
+    /**
+     * @throws Throwable
+     * @throws Exception
+     * @throws ConnectionException
+     */
+    public function generateStoryline(Book $book): Storyline
     {
-        Book::query()->where('id', $id)->update([ 'failed' => true ]);
+        $childrenAwareData = $this->isSafeForChildren($book->user_prompt);
+
+        if ($childrenAwareData->isSafe === false) {
+            throw new UnsafeForChildrenException($childrenAwareData->reason);
+        }
+
+        return retry(3, function () use ($book) {
+            return new Storyline(
+                data: $book = $this->generateBookMainStoryLine($book->user_prompt),
+                illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
+            );
+        });
     }
 
-    public function finish(PostWorkRequest $request): void
+    /**
+     * @throws Exception
+     * @throws Throwable
+     * @throws ConnectionException
+     */
+    private function isSafeForChildren(string $prompt): ChildrenAwareData
     {
-        /**
-         * @var Book $book
-         */
-        $book = Book::find($request->input('id'));
+        return ChildrenAwareData::from(
+            $this->ollama->generateJsonSchema(
+                ...$this->askIfPromptIsSafeForChildren($prompt),
+            ),
+        );
+    }
 
-        if ($request->has('title')) {
+    private function askIfPromptIsSafeForChildren(string $prompt): array
+    {
+        $schema = [
+            'type' => 'object',
+            'required' => [ 'isSafe', 'reason' ],
+            'properties' => [
+                'isSafe' => [
+                    'type' => 'boolean',
+                ],
+                'reason' => [
+                    'type' => 'string',
+                ],
+            ],
+        ];
 
-            $book->title = $request->input('title');
-            $book->synopsis = $request->input('synopsis');
-            $book->paragraphs = $request->input('paragraphs');
+        $prompt = <<<PROMPT
+        Analyze the following user input prompt and flag it as unsafe if it contains any language related to pornography, sex, or drugs.
 
-        }
+        ----- start_of_user_input_content
+        $prompt
+        ----- end_of_user_input_content
 
-        if (filled($files = $request->allFiles())) {
+        Respond using JSON
+        PROMPT;
 
-            $book->assets = collect($files)->mapWithKeys(fn(UploadedFile $file, string $name) => [
-                $name => $file->store(options: [ 'disk' => 'public' ]),
+        return [ $prompt, $schema ];
+    }
+
+    public function retryUncompletedBooks(): void
+    {
+        Book::query()
+            ->whereIn('state', [
+                BookState::PendingStoryLine->value,
+                BookState::PendingIllustrations->value,
+            ])
+            ->where('fetched_at', '<', now()->subMinutes(30))
+            ->update([
+                'fetched_at' => null,
             ]);
+    }
 
-        }
-
+    public function markBookAsFailed(Book $book, string $reason): void
+    {
+        $book->reason = $reason;
+        $book->state = BookState::Failed;
         $book->save();
+    }
+
+    public function updateStoryline(Book $book, Storyline $storyline): bool
+    {
+        $book->title = $storyline->data->title;
+        $book->synopsis = $storyline->data->synopsis;
+        $book->paragraphs = $storyline->data->paragraphs;
+        $book->illustrations = $storyline->illustrations;
+        $book->state = BookState::PendingIllustrations;
+        $book->fetched_at = null;
+
+        return $book->save();
+    }
+
+    public function storeAssets(Book $book, StoreAssetsRequest $request): bool
+    {
+        $book->assets = collect($request->allFiles())->mapWithKeys(fn(UploadedFile $file, string $name) => [
+            $name => $file->store(options: [ 'disk' => 'public' ]),
+        ]);
+
+        $book->state = BookState::Completed;
+        $book->fetched_at = null;
+
+        return $book->save();
     }
 
     public function createPendingBook(string $prompt): Book
@@ -68,28 +149,32 @@ class BookService
         return $book;
     }
 
-    /**
-     * @return Collection<int, Book
-     */
-    public function getFailedBooks(): Collection
+    public function getPendingStorylines(): ?Book
     {
-        return Book::query()
-            ->whereNull('assets')
-            ->where('updated_at', '<=', now()->subMinutes(10))
-            ->get();
+        $book = Book::query()
+            ->where('state', BookState::PendingStoryLine)
+            ->where('fetched_at', null)
+            ->orderBy('created_at')
+            ->first();
+
+        if ($book) {
+            $book->touch('fetched_at');
+        }
+
+        return $book;
     }
 
     public function getPendingBook(): ?Book
     {
         $book = Book::query()
-            ->whereNull('assets')
-            ->where('failed', false)
-            ->where('updated_at', '<=', now()->subMinutes(10))
-            ->orderBy('created_at')
+            ->where('state', BookState::PendingIllustrations)
+            ->where('fetched_at', null)
+            ->orderByDesc('created_at')
+            ->lockForUpdate()
             ->first();
 
         if ($book) {
-            $book->touch();
+            $book->touch('fetched_at');
         }
 
         return $book;
@@ -109,10 +194,12 @@ class BookService
     public function getRandomBooks(): Paginator
     {
         return cache()->flexible('books', [ 5, 10 ], function () {
+
             return Book::query()
-                ->whereNotNull('assets')
+                ->where('state', BookState::Completed)
                 ->inRandomOrder()
                 ->simplePaginate(12);
+
         });
     }
 
@@ -120,25 +207,10 @@ class BookService
     {
         return Book::query()
             ->whereIn('id', $ids)
-            ->whereNotNull('assets')
+            ->where('state', BookState::Completed)
             ->oldest()
             ->limit(10)
             ->get();
-    }
-
-    /**
-     * @throws Throwable
-     * @throws Exception
-     * @throws ConnectionException
-     */
-    public function createBook(Ulid $id, string $userPrompt): Book
-    {
-        return $this->createBookModel(
-            id: $id,
-            userPrompt: $userPrompt,
-            data: $book = $this->generateBookMainStoryLine($userPrompt),
-            illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
-        );
     }
 
     /**
@@ -148,20 +220,15 @@ class BookService
      */
     private function generateIllustrationDirectionFromParagraphs(array $paragraphs): array
     {
-        return retry($this->tries, function () use ($paragraphs) {
+        $illustrations = OllamaService::resolve()
+            ->pool($this->describeIllustrationPrompt($paragraphs))
+            ->map(fn(\Illuminate\Support\Collection $response) => $response->get('illustration'));
 
-            $illustrations = $this->describeIllustrationPrompt($paragraphs)
-                ->map(function (array $response) {
-                    return OllamaService::resolve()->generateJsonSchema(...$response)->get('illustration');
-                });
+        if (count($illustrations) !== count($paragraphs)) {
+            throw new Exception('Generated illustration prompt is not valid...');
+        }
 
-            if (count($illustrations) !== count($paragraphs)) {
-                throw new Exception('Generated illustration prompt is not valid...');
-            }
-
-            return $illustrations->toArray();
-
-        });
+        return $illustrations->toArray();
     }
 
     /**
@@ -169,43 +236,19 @@ class BookService
      * @throws Exception
      * @throws ConnectionException
      */
-    private function generateBookMainStoryLine(?string $prompt): BookData
+    private function generateBookMainStoryLine(?string $prompt): StorylineData
     {
-        return retry($this->tries, function () use ($prompt) {
+        $data = StorylineData::from(
+            $this->ollama->generateJsonSchema(
+                ...$this->generateStoryFromPrompt($prompt),
+            ),
+        );
 
-            [ $prompt, $schema ] = $this->generateStoryFromPrompt($prompt);
+        if ($data->isValid() === false) {
+            throw new InvalidDataGeneratedByOllama();
+        }
 
-            $response = $this->ollama->generateJsonSchema(
-                prompt: $prompt,
-                schema: $schema,
-            );
-
-            $data = BookData::from($response);
-
-            if ($data->isValid() === false) {
-                throw new Exception('generated data is not valid...');
-            }
-
-            return $data;
-
-        });
-    }
-
-    private function createBookModel(Ulid $id, string $userPrompt, BookData $data, array $illustrations): Book
-    {
-        $book = new Book();
-
-        $book->id = $id;
-        $book->user_prompt = $userPrompt;
-        $book->title = $data->title;
-        $book->synopsis = $data->synopsis;
-        $book->paragraphs = $data->paragraphs;
-        $book->illustrations = $illustrations;
-        $book->updated_at = now()->addMinutes(10);
-
-        $book->save();
-
-        return $book;
+        return $data;
     }
 
     private function generateStoryFromPrompt(string $prompt): array
@@ -264,6 +307,7 @@ class BookService
         ];
 
         return collect($paragraphs)->map(function (string $paragraph) use ($story, $schema) {
+
             $prompt = <<<PROMPT
             Generate a creative image prompt for a generative AI tool to create an illustration for the following paragraph in the children's book. You will receive the full story context for reference, but respond with one image prompt at a time, focusing on the provided paragraph.
 
@@ -292,6 +336,7 @@ class BookService
                 $prompt,
                 $schema,
             ];
+
         });
     }
 }

@@ -16,13 +16,14 @@ x-php: &php
     - .:/srv
 
 x-nvidia: &nvidia
-  runtime: nvidia
+  restart: unless-stopped
+#  runtime: nvidia
 
 services:
 
   queue:
     <<: *php
-    command: php artisan queue:work --timeout=900
+    command: php artisan queue:work --timeout=720 --tries=1 --memory=1024 --max-jobs=128
     networks:
       - local-network
       - traefik-network

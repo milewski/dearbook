@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Http\Controllers;
 
 use App\Services\BookService;
 use Illuminate\Http\Request;
 
-class GetWorkController extends Controller
+class GetAssetsWorkController extends Controller
 {
     public function __invoke(Request $request): array
     {
@@ -17,7 +19,9 @@ class GetWorkController extends Controller
 
             return [
                 'id' => $book->id,
-                'prompt' => $book->user_prompt,
+                'title' => $book->title,
+                'synopsis' => $book->synopsis,
+                'illustrations' => $book->illustrations,
             ];
 
         }

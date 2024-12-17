@@ -4,8 +4,9 @@ declare(strict_types = 1);
 
 namespace App\Services;
 
-use App\Data\BookPayload;
-use App\Data\Work;
+use App\Data\AssetsWork;
+use App\Data\Storyline;
+use App\Data\StorylineWork;
 use App\Services\Traits\Resolvable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
@@ -16,6 +17,26 @@ use Illuminate\Support\Facades\Storage;
 class BackendService
 {
     use Resolvable;
+
+    public function reportFailure(string $id, string $message): void
+    {
+        $this->request()->post("/work/$id/failure", [
+            'reason' => $message,
+        ]);
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function updateBookStoryline(string $id, Storyline $payload): void
+    {
+        $this->request()->post("/work/$id/storyline", [
+            'title' => $payload->data->title,
+            'synopsis' => $payload->data->synopsis,
+            'paragraphs' => $payload->data->paragraphs,
+            'illustrations' => $payload->illustrations,
+        ]);
+    }
 
     /**
      * @throws ConnectionException
@@ -28,36 +49,37 @@ class BackendService
     /**
      * @throws ConnectionException
      */
-    public function getWork(): ?Work
+    public function getAssetsWork(): ?AssetsWork
     {
-        $response = $this->request()->get('/work')->json();
+        $response = $this->request()->get('/work/assets')->json();
 
         if (blank($response)) {
             return null;
         }
 
-        return Work::from($response);
+        return AssetsWork::from($response);
     }
 
     /**
      * @throws ConnectionException
      */
-    public function finishWork(Work $work, BookPayload $payload, Collection $assets): void
+    public function getStorylineWork(): ?StorylineWork
     {
-        $body = [
-            [ 'name' => 'id', 'contents' => $work->id ],
-            [ 'name' => 'title', 'contents' => $payload->data->title ],
-            [ 'name' => 'synopsis', 'contents' => $payload->data->synopsis ],
-        ];
+        $response = $this->request()->get('/work/storyline')->json();
 
-        foreach ($payload->data->paragraphs as $index => $paragraph) {
-
-            $body[] = [
-                'name' => "paragraphs[$index]",
-                'contents' => $paragraph,
-            ];
-
+        if (blank($response)) {
+            return null;
         }
+
+        return StorylineWork::from($response);
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function uploadAssets(AssetsWork $work, Collection $assets): void
+    {
+        $body = [];
 
         foreach ($assets as $name => $path) {
 
@@ -68,15 +90,16 @@ class BackendService
 
         }
 
-        $this->request()->asMultipart()->post('/work/finish', $body);
-
+        $this->request()->asMultipart()->post("/work/$work->id/assets", $body);
     }
 
     private function request(): PendingRequest
     {
-        return Http::timeout(60 * 5)
+        return Http::timeout(30)
+            ->retry(2)
             ->baseUrl(config('app.backend.url'))
             ->withHeader('x-api-key', config('app.backend.worker_api_key'))
+            ->throw()
             ->acceptJson();
     }
 }

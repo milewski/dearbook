@@ -15,6 +15,9 @@ x-php: &php
   volumes:
     - .:/srv
 
+x-nvidia: &nvidia
+  runtime: nvidia
+
 services:
 
   traefik:
@@ -55,7 +58,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.php.entryPoints=web-secure
-      - traefik.http.routers.php.rule=Host(`$API_DOMAIN`) || Host(`$ASSETS_DOMAIN`)
+      - traefik.http.routers.php.rule=Host(`$API_DOMAIN`) || Host(`$ASSETS_DOMAIN`) || Host(`$TELESCOPE_DOMAIN`)
       - traefik.http.routers.php.tls=true
 
   scheduler:
@@ -82,6 +85,16 @@ services:
       - timescaledb-data:/home/postgres/pgdata/data
     ports:
       - ${DB_PORT}:5432
+
+  ollama:
+    <<: [ *nvidia, *local-network ]
+    networks:
+      - local-network
+      - traefik-network
+    image: ollama/ollama:0.5.1
+    restart: unless-stopped
+    volumes:
+      - .ollama:/root/.ollama
 
 volumes:
   redis-data:

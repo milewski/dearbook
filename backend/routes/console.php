@@ -4,10 +4,7 @@ declare(strict_types = 1);
 
 use App\Models\Book;
 use App\Services\ComfyUI\ComfyUIService;
-use App\Services\OllamaService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 
 Artisan::command('test', function () {
 

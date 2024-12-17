@@ -6,7 +6,7 @@ namespace App\Data;
 
 use Spatie\LaravelData\Data;
 
-class Work extends Data
+class StorylineWork extends Data
 {
     public function __construct(
         public string $id,

@@ -20,7 +20,7 @@ class CheckBatchesController extends Controller
             'ids.*' => [ 'required', 'string', 'ulid' ],
         ]);
 
-        return BookService::resolve()->findManyByBatchIds($ids[ 'ids' ])->mapWithKeys(fn(Book $book) => [
+        return BookService::resolve()->findManyByBatchIds($ids[ 'ids' ])->mapWithKeys(fn (Book $book) => [
             $book->id => new BookIndexResource($book),
         ]);
     }

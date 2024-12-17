@@ -6,7 +6,7 @@ namespace App\Data;
 
 use Spatie\LaravelData\Data;
 
-class BookData extends Data
+class StorylineData extends Data
 {
     public function __construct(
         public string $title,
@@ -19,6 +19,6 @@ class BookData extends Data
 
     public function isValid(): bool
     {
-        return count($this->paragraphs) === 10;
+        return count($this->paragraphs) === 10 && filled($this->title) && filled($this->synopsis);
     }
 }
