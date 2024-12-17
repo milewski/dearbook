@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use League\Flysystem\FilesystemException;
+use RuntimeException;
 use Throwable;
 
 class ComfyUIService
@@ -67,39 +68,51 @@ class ComfyUIService
     }
 
     /**
-     * @throws FilesystemException
+     * @throws Throwable
      * @throws ConnectionException
+     * @throws FilesystemException
      */
-    public function fetchOutputs(string $id): Collection|bool
+    public function fetchOutputs(string $id): Collection|false
     {
-        $response = $this->request()->get("/history/$id");
-        $isCompleted = $response->json("$id.status.completed");
+        return retry(
+            times: [
+                ...array_fill(0, 4, 30 * 1000), // 2 minutes
+                ...array_fill(0, 6, 10 * 1000), // 3 minutes
+                ...array_fill(0, 24, 5 * 1000), // 5 minutes
+            ],
+            callback: function () use ($id) {
 
-        /**
-         * Workflow has not completed yet
-         */
-        if ($isCompleted === null) {
-            return true;
-        }
+                $response = $this->request()->get("/history/$id");
+                $completed = $response->json("$id.status.completed");
 
-        /**
-         * Workflow failed...so invalidate the workflow and regenerate it again...
-         */
-        if ($isCompleted === false) {
-            return false;
-        }
+                // workflow has not completed yet
+                if (is_null($completed)) {
+                    throw new RuntimeException('fetch outputs timeout after 5 minutes');
+                }
 
-        $assets = $response
-            ->collect("$id.outputs")
-            ->flatten(2)
-            ->map(fn (array $output) => FileDescriptor::from($output))
-            ->mapWithKeys(fn (FileDescriptor $file) => [
-                $file->name() => $this->downloadImage($file),
-            ]);
+                $assets = false;
 
-        $this->deleteWorkflow($id);
+                if ($completed) {
 
-        return $assets;
+                    $assets = $response
+                        ->collect("$id.outputs")
+                        ->flatten(2)
+                        ->map(
+                            fn (array $output) => FileDescriptor::from($output),
+                        )
+                        ->mapWithKeys(
+                            fn (FileDescriptor $file) => [
+                                $file->name() => $this->downloadImage($file),
+                            ],
+                        );
+
+                }
+
+                // regardless of whether the workflow is successful or not, delete it.
+                return tap($assets, fn () => $this->deleteWorkflow($id));
+
+            },
+        );
     }
 
     /**
@@ -143,7 +156,8 @@ class ComfyUIService
 
     private function request(): PendingRequest
     {
-        return Http::timeout(60 * 1)
+        return Http::timeout(30)
+            ->retry(2)
             ->baseUrl(config('app.comfyui_internal_url'))
             ->asJson()
             ->throw();

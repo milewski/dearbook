@@ -11,7 +11,6 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 use Throwable;
@@ -23,39 +22,21 @@ class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
     /**
      * @throws ConnectionException
      */
-    public function handle(): void
+    public function handle(BackendService $backendService, ComfyUIService $comfyUIService): void
     {
-        if ($work = BackendService::resolve()->getAssetsWork()) {
+        if ($work = $backendService->getAssetsWork()) {
 
             try {
 
-                $workflowId = ComfyUIService::resolve()->execute('main.workflow.json', $work);
-
-                $assets = value(function () use ($workflowId) {
-
-                    while (true) {
-
-                        $response = ComfyUIService::resolve()->fetchOutputs($workflowId);
-
-                        if ($response instanceof Collection) {
-                            return $response;
-                        }
-
-                        if ($response === false) {
-                            return false;
-                        }
-
-                        sleep(5);
-
-                    }
-
-                });
+                $assets = $comfyUIService->fetchOutputs(
+                    $comfyUIService->execute('main.workflow.json', $work),
+                );
 
                 if ($assets === false) {
                     throw new Exception('Failed to generate images...');
                 }
 
-                foreach ($assets as $_ => $asset) {
+                foreach ($assets as $asset) {
 
                     ImageOptimizer::optimize(
                         Storage::disk('public')->path($asset),
@@ -63,11 +44,11 @@ class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
 
                 }
 
-                BackendService::resolve()->uploadAssets($work, $assets);
+                $backendService->uploadAssets($work, $assets);
 
             } catch (Throwable $error) {
 
-                BackendService::resolve()->reportFailure($work->id, $error->getMessage());
+                $backendService->reportFailure($work->id, $error->getMessage());
 
             }
 

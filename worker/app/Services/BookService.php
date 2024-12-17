@@ -10,86 +10,20 @@ use App\Data\StorylineData;
 use App\Data\StorylineWork;
 use App\Exceptions\InvalidDataGeneratedByOllama;
 use App\Exceptions\UnsafeForChildrenException;
-use App\Http\Requests\PostWorkRequest;
-use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
-use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Throwable;
 
 class BookService
 {
     use Resolvable;
 
-    private int $tries = 2;
-
     public function __construct(
         private readonly OllamaService $ollama,
     )
     {
-    }
-
-    public function finish(PostWorkRequest $request): void
-    {
-        /**
-         * @var Book $book
-         */
-        $book = Book::find($request->input('id'));
-
-        $book->title = $request->input('title');
-        $book->synopsis = $request->input('synopsis');
-        $book->assets = collect($request->files)->map(function (UploadedFile $file) {
-            return $file->store();
-        });
-
-        $book->save();
-    }
-
-    public function createPendingBook(string $prompt): Book
-    {
-        $book = new Book();
-        $book->user_prompt = $prompt;
-        $book->save();
-
-        return $book;
-    }
-
-    public function getPendingBook(): ?Book
-    {
-        return Book::query()
-            ->whereNull('assets')
-            ->orderBy('created_at')
-            ->first();
-    }
-
-    /**
-     * @return Collection<int, Book
-     */
-    public function getByWorkflowId(): Collection
-    {
-        return Book::query()
-            ->whereNotNull('workflow_id')
-            ->whereNull('assets')
-            ->get();
-    }
-
-    public function getRandomBooks(): Paginator
-    {
-        return Book::query()
-            ->whereNotNull('assets')
-            ->inRandomOrder()
-            ->simplePaginate(12);
-    }
-
-    public function findManyByBatchIds(array $ids): Collection
-    {
-        return Book::query()
-            ->whereIn('id', $ids)
-            ->oldest()
-            ->get();
     }
 
     /**
@@ -118,15 +52,11 @@ class BookService
      */
     private function isSafeForChildren(string $prompt): ChildrenAwareData
     {
-        return retry($this->tries, function () use ($prompt) {
-
-            $response = $this->ollama->generateJsonSchema(
+        return ChildrenAwareData::from(
+            $this->ollama->generateJsonSchema(
                 ...$this->askIfPromptIsSafeForChildren($prompt),
-            );
-
-            return ChildrenAwareData::from($response);
-
-        });
+            ),
+        );
     }
 
     private function askIfPromptIsSafeForChildren(string $prompt): array
@@ -165,20 +95,17 @@ class BookService
      */
     private function generateIllustrationDirectionFromParagraphs(array $paragraphs): array
     {
-        return retry($this->tries, function () use ($paragraphs) {
+        $illustrations = OllamaService::resolve()->pool(
+            $this->describeIllustrationPrompt($paragraphs),
+        )->map(
+            fn (Collection $response) => $response->get('illustration'),
+        );
 
-            $illustrations = $this->describeIllustrationPrompt($paragraphs)
-                ->map(function (array $response) {
-                    return OllamaService::resolve()->generateJsonSchema(...$response)->get('illustration');
-                });
+        if (count($illustrations) !== count($paragraphs)) {
+            throw new Exception('Generated illustration prompt is not valid...');
+        }
 
-            if (count($illustrations) !== count($paragraphs)) {
-                throw new Exception('Generated illustration prompt is not valid...');
-            }
-
-            return $illustrations->toArray();
-
-        });
+        return $illustrations->toArray();
     }
 
     /**
@@ -188,24 +115,17 @@ class BookService
      */
     private function generateBookMainStoryLine(?string $prompt): StorylineData
     {
-        return retry($this->tries, function () use ($prompt) {
+        $data = StorylineData::from(
+            $this->ollama->generateJsonSchema(
+                ...$this->generateStoryFromPrompt($prompt),
+            ),
+        );
 
-            [ $prompt, $schema ] = $this->generateStoryFromPrompt($prompt);
+        if ($data->isValid() === false) {
+            throw new InvalidDataGeneratedByOllama();
+        }
 
-            $response = $this->ollama->generateJsonSchema(
-                prompt: $prompt,
-                schema: $schema,
-            );
-
-            $data = StorylineData::from($response);
-
-            if ($data->isValid() === false) {
-                throw new InvalidDataGeneratedByOllama();
-            }
-
-            return $data;
-
-        });
+        return $data;
     }
 
     private function generateStoryFromPrompt(string $prompt): array
@@ -247,23 +167,23 @@ class BookService
         return [ $prompt, $schema ];
     }
 
-    private function describeIllustrationPrompt(array $paragraphs): \Illuminate\Support\Collection
+    private function describeIllustrationPrompt(array $paragraphs): Collection
     {
         $story = collect($paragraphs)
             ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
-        $schema = [
-            'type' => 'object',
-            'required' => [ 'illustration' ],
-            'properties' => [
-                'illustration' => [
-                    'type' => 'string',
-                ],
-            ],
-        ];
+        return collect($paragraphs)->map(function (string $paragraph) use ($story) {
 
-        return collect($paragraphs)->map(function (string $paragraph) use ($story, $schema) {
+            $schema = [
+                'type' => 'object',
+                'required' => [ 'illustration' ],
+                'properties' => [
+                    'illustration' => [
+                        'type' => 'string',
+                    ],
+                ],
+            ];
 
             $prompt = <<<PROMPT
             Generate a creative image prompt for a generative AI tool to create an illustration for the following paragraph in the children's book. You will receive the full story context for reference, but respond with one image prompt at a time, focusing on the provided paragraph.
@@ -289,10 +209,7 @@ class BookService
             Respond in JSON format for the paragraph provided.
             PROMPT;
 
-            return [
-                $prompt,
-                $schema,
-            ];
+            return [ $prompt, $schema ];
 
         });
     }
