@@ -23,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         }
 
         if (config('app.mode') === 'comfyui') {
-            $schedule->job(ProcessComfyUIQueries::class)->everySecond();
+            $schedule->job(ProcessComfyUIQueries::class)->everyTenSeconds();
         }
 
     })

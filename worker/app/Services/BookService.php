@@ -39,10 +39,12 @@ class BookService
             throw new UnsafeForChildrenException($childrenAwareData->reason);
         }
 
-        return new Storyline(
-            data: $book = $this->generateBookMainStoryLine($work->prompt),
-            illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
-        );
+        return retry(3, function () use ($work) {
+            return new Storyline(
+                data: $book = $this->generateBookMainStoryLine($work->prompt),
+                illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
+            );
+        });
     }
 
     /**
@@ -63,7 +65,7 @@ class BookService
     {
         $schema = [
             'type' => 'object',
-            'required' => [ 'title', 'synopsis', 'paragraphs' ],
+            'required' => [ 'isSafe', 'reason' ],
             'properties' => [
                 'isSafe' => [
                     'type' => 'boolean',
@@ -75,8 +77,7 @@ class BookService
         ];
 
         $prompt = <<<PROMPT
-        Analyze the following user input prompt and determine if it is an appropriate and safe theme for a children's book.
-        Consider themes, language, and any sensitive content to ensure suitability for young readers.
+        Analyze the following user input prompt and flag it as unsafe if it contains any language related to pornography, sex, or drugs.
 
         ----- start_of_user_input_content
         $prompt
@@ -95,11 +96,9 @@ class BookService
      */
     private function generateIllustrationDirectionFromParagraphs(array $paragraphs): array
     {
-        $illustrations = OllamaService::resolve()->pool(
-            $this->describeIllustrationPrompt($paragraphs),
-        )->map(
-            fn (Collection $response) => $response->get('illustration'),
-        );
+        $illustrations = OllamaService::resolve()
+            ->pool($this->describeIllustrationPrompt($paragraphs))
+            ->map(fn(Collection $response) => $response->get('illustration'));
 
         if (count($illustrations) !== count($paragraphs)) {
             throw new Exception('Generated illustration prompt is not valid...');
@@ -170,7 +169,7 @@ class BookService
     private function describeIllustrationPrompt(array $paragraphs): Collection
     {
         $story = collect($paragraphs)
-            ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
+            ->map(fn(string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
         return collect($paragraphs)->map(function (string $paragraph) use ($story) {

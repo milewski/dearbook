@@ -76,9 +76,9 @@ class ComfyUIService
     {
         return retry(
             times: [
-                ...array_fill(0, 4, 30 * 1000), // 2 minutes
-                ...array_fill(0, 6, 10 * 1000), // 3 minutes
-                ...array_fill(0, 24, 5 * 1000), // 5 minutes
+                ...array_fill(0, 15, 1000), // 15 seconds
+                ...array_fill(0, 90, 500),  // 1 minute
+                ...array_fill(0, 48, 5 * 1000), // 5 minutes
             ],
             callback: function () use ($id) {
 
@@ -98,10 +98,10 @@ class ComfyUIService
                         ->collect("$id.outputs")
                         ->flatten(2)
                         ->map(
-                            fn (array $output) => FileDescriptor::from($output),
+                            fn(array $output) => FileDescriptor::from($output),
                         )
                         ->mapWithKeys(
-                            fn (FileDescriptor $file) => [
+                            fn(FileDescriptor $file) => [
                                 $file->name() => $this->downloadImage($file),
                             ],
                         );
@@ -109,7 +109,7 @@ class ComfyUIService
                 }
 
                 // regardless of whether the workflow is successful or not, delete it.
-                return tap($assets, fn () => $this->deleteWorkflow($id));
+                return tap($assets, fn() => $this->deleteWorkflow($id));
 
             },
         );
