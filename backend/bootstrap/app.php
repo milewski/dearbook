@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function () {
 
             Route::middleware('api')
-//                ->domain(config('app.domains.api'))
+                ->domain(config('app.domains.api'))
                 ->group(base_path('routes/api.php'));
 
         },
