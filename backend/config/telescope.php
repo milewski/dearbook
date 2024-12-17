@@ -44,7 +44,7 @@ return [
     |
      */
 
-    'path' => env('TELESCOPE_PATH', '/telescope'),
+    'path' => env('TELESCOPE_PATH', '/'),
 
     /*
     |--------------------------------------------------------------------------
@@ -115,6 +115,7 @@ return [
         'livewire*',
         'nova-api*',
         'pulse*',
+        'check/batches*'
     ],
 
     'ignore_commands' => [],

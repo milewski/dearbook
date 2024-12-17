@@ -4,11 +4,13 @@ declare(strict_types = 1);
 
 namespace App\Services;
 
-use App\Data\BookData;
+use App\Data\ChildrenAwareData;
+use App\Data\Storyline;
+use App\Data\StorylineData;
 use App\Enums\BookState;
+use App\Exceptions\InvalidDataGeneratedByOllama;
+use App\Exceptions\UnsafeForChildrenException;
 use App\Http\Requests\StoreAssetsRequest;
-use App\Http\Requests\UpdateStorylineRequest;
-use App\Http\Requests\WorkFailureRequest;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
@@ -31,6 +33,69 @@ class BookService
     {
     }
 
+    /**
+     * @throws Throwable
+     * @throws Exception
+     * @throws ConnectionException
+     */
+    public function generateStoryline(Book $book): Storyline
+    {
+        $childrenAwareData = $this->isSafeForChildren($book->user_prompt);
+
+        if ($childrenAwareData->isSafe === false) {
+            throw new UnsafeForChildrenException($childrenAwareData->reason);
+        }
+
+        return retry(3, function () use ($book) {
+            return new Storyline(
+                data: $book = $this->generateBookMainStoryLine($book->user_prompt),
+                illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
+            );
+        });
+    }
+
+    /**
+     * @throws Exception
+     * @throws Throwable
+     * @throws ConnectionException
+     */
+    private function isSafeForChildren(string $prompt): ChildrenAwareData
+    {
+        return ChildrenAwareData::from(
+            $this->ollama->generateJsonSchema(
+                ...$this->askIfPromptIsSafeForChildren($prompt),
+            ),
+        );
+    }
+
+    private function askIfPromptIsSafeForChildren(string $prompt): array
+    {
+        $schema = [
+            'type' => 'object',
+            'required' => [ 'isSafe', 'reason' ],
+            'properties' => [
+                'isSafe' => [
+                    'type' => 'boolean',
+                ],
+                'reason' => [
+                    'type' => 'string',
+                ],
+            ],
+        ];
+
+        $prompt = <<<PROMPT
+        Analyze the following user input prompt and flag it as unsafe if it contains any language related to pornography, sex, or drugs.
+
+        ----- start_of_user_input_content
+        $prompt
+        ----- end_of_user_input_content
+
+        Respond using JSON
+        PROMPT;
+
+        return [ $prompt, $schema ];
+    }
+
     public function retryUncompletedBooks(): void
     {
         Book::query()
@@ -44,19 +109,19 @@ class BookService
             ]);
     }
 
-    public function markBookAsFailed(Book $book, WorkFailureRequest $request): void
+    public function markBookAsFailed(Book $book, string $reason): void
     {
-        $book->reason = $request->reason;
+        $book->reason = $reason;
         $book->state = BookState::Failed;
         $book->save();
     }
 
-    public function updateStoryline(Book $book, UpdateStorylineRequest $request): bool
+    public function updateStoryline(Book $book, Storyline $storyline): bool
     {
-        $book->title = $request->input('title');
-        $book->synopsis = $request->input('synopsis');
-        $book->paragraphs = $request->input('paragraphs');
-        $book->illustrations = $request->input('illustrations');
+        $book->title = $storyline->data->title;
+        $book->synopsis = $storyline->data->synopsis;
+        $book->paragraphs = $storyline->data->paragraphs;
+        $book->illustrations = $storyline->illustrations;
         $book->state = BookState::PendingIllustrations;
         $book->fetched_at = null;
 
@@ -65,7 +130,7 @@ class BookService
 
     public function storeAssets(Book $book, StoreAssetsRequest $request): bool
     {
-        $book->assets = collect($request->allFiles())->mapWithKeys(fn (UploadedFile $file, string $name) => [
+        $book->assets = collect($request->allFiles())->mapWithKeys(fn(UploadedFile $file, string $name) => [
             $name => $file->store(options: [ 'disk' => 'public' ]),
         ]);
 
@@ -89,7 +154,7 @@ class BookService
         $book = Book::query()
             ->where('state', BookState::PendingStoryLine)
             ->where('fetched_at', null)
-            ->orderByDesc('created_at')
+            ->orderBy('created_at')
             ->first();
 
         if ($book) {
@@ -148,41 +213,21 @@ class BookService
     }
 
     /**
-     * @throws Throwable
-     * @throws Exception
-     * @throws ConnectionException
-     */
-    public function createBook(Ulid $id, string $userPrompt): Book
-    {
-        return $this->createBookModel(
-            id: $id,
-            userPrompt: $userPrompt,
-            data: $book = $this->generateBookMainStoryLine($userPrompt),
-            illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
-        );
-    }
-
-    /**
      * @throws Exception
      * @throws Throwable
      * @throws ConnectionException
      */
     private function generateIllustrationDirectionFromParagraphs(array $paragraphs): array
     {
-        return retry($this->tries, function () use ($paragraphs) {
+        $illustrations = OllamaService::resolve()
+            ->pool($this->describeIllustrationPrompt($paragraphs))
+            ->map(fn(\Illuminate\Support\Collection $response) => $response->get('illustration'));
 
-            $illustrations = $this->describeIllustrationPrompt($paragraphs)
-                ->map(function (array $response) {
-                    return OllamaService::resolve()->generateJsonSchema(...$response)->get('illustration');
-                });
+        if (count($illustrations) !== count($paragraphs)) {
+            throw new Exception('Generated illustration prompt is not valid...');
+        }
 
-            if (count($illustrations) !== count($paragraphs)) {
-                throw new Exception('Generated illustration prompt is not valid...');
-            }
-
-            return $illustrations->toArray();
-
-        });
+        return $illustrations->toArray();
     }
 
     /**
@@ -190,43 +235,19 @@ class BookService
      * @throws Exception
      * @throws ConnectionException
      */
-    private function generateBookMainStoryLine(?string $prompt): BookData
+    private function generateBookMainStoryLine(?string $prompt): StorylineData
     {
-        return retry($this->tries, function () use ($prompt) {
+        $data = StorylineData::from(
+            $this->ollama->generateJsonSchema(
+                ...$this->generateStoryFromPrompt($prompt),
+            ),
+        );
 
-            [$prompt, $schema] = $this->generateStoryFromPrompt($prompt);
+        if ($data->isValid() === false) {
+            throw new InvalidDataGeneratedByOllama();
+        }
 
-            $response = $this->ollama->generateJsonSchema(
-                prompt: $prompt,
-                schema: $schema,
-            );
-
-            $data = BookData::from($response);
-
-            if ($data->isValid() === false) {
-                throw new Exception('generated data is not valid...');
-            }
-
-            return $data;
-
-        });
-    }
-
-    private function createBookModel(Ulid $id, string $userPrompt, BookData $data, array $illustrations): Book
-    {
-        $book = new Book();
-
-        $book->id = $id;
-        $book->user_prompt = $userPrompt;
-        $book->title = $data->title;
-        $book->synopsis = $data->synopsis;
-        $book->paragraphs = $data->paragraphs;
-        $book->illustrations = $illustrations;
-        $book->updated_at = now()->addMinutes(10);
-
-        $book->save();
-
-        return $book;
+        return $data;
     }
 
     private function generateStoryFromPrompt(string $prompt): array
@@ -271,7 +292,7 @@ class BookService
     private function describeIllustrationPrompt(array $paragraphs): \Illuminate\Support\Collection
     {
         $story = collect($paragraphs)
-            ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
+            ->map(fn(string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
         $schema = [

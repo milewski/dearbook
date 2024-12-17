@@ -2,6 +2,7 @@
 
 declare(strict_types = 1);
 
+use App\Jobs\ProcessOllamaQueries;
 use App\Services\BookService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -31,9 +32,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $schedule->command('telescope:prune --hours=6')->daily();
 
-        $schedule->call(function (BookService $bookService) {
-            $bookService->retryUncompletedBooks();
-        })->everyMinute();
+        $schedule->call(fn(BookService $bookService) => $bookService->retryUncompletedBooks())
+            ->everyMinute();
 
     })
     ->create();
