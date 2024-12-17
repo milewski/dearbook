@@ -33,16 +33,16 @@ RUN mkdir -p /opt/phpstorm-coverage \
     && chown -R 1000:1000 /opt/phpstorm-coverage
 
 # Copy the config files to the right places
-RUN mv /usr/local/etc/php/php.ini-development /usr/local/etc/php/conf.d/php.ini-development
+RUN mv /usr/local/etc/php/php.ini-development /usr/local/etc/php/conf.d/00-php.ini
 
-COPY ./config/php-config.development.ini /usr/local/etc/php/conf.d/php-config.development.ini
+COPY ./config/php-config.development.ini /usr/local/etc/php/conf.d/01-php.ini
 
 FROM base AS production
 
 # Copy the config files to the right places
-RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/conf.d/php.ini-production
+RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/conf.d/00-php.ini
 
-COPY ./config/php-config.production.ini /usr/local/etc/php/conf.d/php-config.production.ini
+COPY ./config/php-config.production.ini /usr/local/etc/php/conf.d/01-php.ini
 
 COPY . /srv
 
