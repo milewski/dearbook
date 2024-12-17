@@ -33,27 +33,27 @@ class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
 
                 $assets = value(function () use ($workflowId) {
 
-                    retry(
-                        times: 5,
-                        callback: function () use ($workflowId) {
+                    while (true) {
 
-                            $response = ComfyUIService::resolve()->fetchOutputs($workflowId);
+                        $response = ComfyUIService::resolve()->fetchOutputs($workflowId);
 
-                            if ($response instanceof Collection) {
-                                return $response;
-                            }
+                        if ($response instanceof Collection) {
+                            return $response;
+                        }
 
-                            if ($response === false) {
-                                return false;
-                            }
+                        if ($response === false) {
+                            return false;
+                        }
 
-                            throw new Exception('waiting');
+                        sleep(5);
 
-                        },
-                        sleepMilliseconds: 5000,
-                    );
+                    }
 
                 });
+
+                if ($assets === false) {
+                    throw new Exception('Failed to generate images...');
+                }
 
                 foreach ($assets as $_ => $asset) {
 
