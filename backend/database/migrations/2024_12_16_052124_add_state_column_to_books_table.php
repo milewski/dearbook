@@ -29,8 +29,10 @@ return new class () extends Migration
         Book::query()->where('failed', true)->update([ 'state' => BookState::Failed ]);
 
         Schema::table('books', function (Blueprint $table) {
+
             $table->string('state')->default(BookState::PendingStoryLine)->change();
             $table->dropColumn('failed');
+
         });
     }
 

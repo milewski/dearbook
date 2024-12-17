@@ -13,7 +13,6 @@ use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\UploadedFile;
@@ -30,6 +29,19 @@ class BookService
         private readonly OllamaService $ollama,
     )
     {
+    }
+
+    public function retryUncompletedBooks(): void
+    {
+        Book::query()
+            ->whereIn('state', [
+                BookState::PendingStoryLine->value,
+                BookState::PendingIllustrations->value,
+            ])
+            ->where('fetched_at', '<', now()->subMinutes(30))
+            ->update([
+                'fetched_at' => null,
+            ]);
     }
 
     public function markBookAsFailed(Book $book, WorkFailureRequest $request): void
@@ -182,7 +194,7 @@ class BookService
     {
         return retry($this->tries, function () use ($prompt) {
 
-            [ $prompt, $schema ] = $this->generateStoryFromPrompt($prompt);
+            [$prompt, $schema] = $this->generateStoryFromPrompt($prompt);
 
             $response = $this->ollama->generateJsonSchema(
                 prompt: $prompt,
