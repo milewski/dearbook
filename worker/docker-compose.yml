@@ -23,7 +23,7 @@ services:
 
   queue:
     <<: *php
-    command: php artisan queue:work --timeout=720 --tries=1
+    command: php artisan queue:work --timeout=720 --tries=1 --memory=1024
     networks:
       - local-network
       - traefik-network
