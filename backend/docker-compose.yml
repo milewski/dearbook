@@ -55,7 +55,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.php.entryPoints=web-secure
-      - traefik.http.routers.php.rule=Host(`$API_DOMAIN`) || Host(`$ASSETS_DOMAIN`)
+      - traefik.http.routers.php.rule=Host(`$API_DOMAIN`) || Host(`$ASSETS_DOMAIN`) || Host(`$TELESCOPE_DOMAIN`)
       - traefik.http.routers.php.tls=true
 
   scheduler:

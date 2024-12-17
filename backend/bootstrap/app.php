@@ -28,6 +28,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
     ->withSchedule(function (Schedule $schedule) {
-        $schedule->job(new FetchWorkflowOutput())->everyTenSeconds();
+        $schedule->command('telescope:prune --hours=6')->daily();
     })
     ->create();
