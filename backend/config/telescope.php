@@ -115,7 +115,7 @@ return [
         'livewire*',
         'nova-api*',
         'pulse*',
-        'check/batches*'
+        'check/batches*',
     ],
 
     'ignore_commands' => [],

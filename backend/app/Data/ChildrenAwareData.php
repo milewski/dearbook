@@ -13,6 +13,5 @@ class ChildrenAwareData extends Data
         public string $reason,
     )
     {
-
     }
 }

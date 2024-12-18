@@ -63,7 +63,7 @@ services:
 
   scheduler:
     <<: [ *php, *local-network ]
-    command: supercronic /srv/docker/php/config/schedule.cron
+    command: php artisan schedule:work
 
   redis:
     <<: *local-network

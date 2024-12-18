@@ -15,10 +15,10 @@ use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\UploadedFile;
-use Symfony\Component\Uid\Ulid;
+use Illuminate\Support\Collection;
 use Throwable;
 
 class BookService
@@ -47,10 +47,12 @@ class BookService
         }
 
         return retry(3, function () use ($book) {
+
             return new Storyline(
                 data: $book = $this->generateBookMainStoryLine($book->user_prompt),
                 illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
             );
+
         });
     }
 
@@ -130,7 +132,7 @@ class BookService
 
     public function storeAssets(Book $book, StoreAssetsRequest $request): bool
     {
-        $book->assets = collect($request->allFiles())->mapWithKeys(fn(UploadedFile $file, string $name) => [
+        $book->assets = collect($request->allFiles())->mapWithKeys(fn (UploadedFile $file, string $name) => [
             $name => $file->store(options: [ 'disk' => 'public' ]),
         ]);
 
@@ -145,21 +147,6 @@ class BookService
         $book = new Book();
         $book->user_prompt = $prompt;
         $book->save();
-
-        return $book;
-    }
-
-    public function getPendingStorylines(): ?Book
-    {
-        $book = Book::query()
-            ->where('state', BookState::PendingStoryLine)
-            ->where('fetched_at', null)
-            ->orderBy('created_at')
-            ->first();
-
-        if ($book) {
-            $book->touch('fetched_at');
-        }
 
         return $book;
     }
@@ -180,17 +167,6 @@ class BookService
         return $book;
     }
 
-    /**
-     * @return Collection<int, Book
-     */
-    public function getByWorkflowId(): Collection
-    {
-        return Book::query()
-            ->whereNotNull('workflow_id')
-            ->whereNull('assets')
-            ->get();
-    }
-
     public function getRandomBooks(): Paginator
     {
         return cache()->flexible('books', [ 5, 10 ], function () {
@@ -203,7 +179,7 @@ class BookService
         });
     }
 
-    public function findManyByBatchIds(array $ids): Collection
+    public function findManyByBatchIds(array $ids): EloquentCollection
     {
         return Book::query()
             ->whereIn('id', $ids)
@@ -222,7 +198,7 @@ class BookService
     {
         $illustrations = OllamaService::resolve()
             ->pool($this->describeIllustrationPrompt($paragraphs))
-            ->map(fn(\Illuminate\Support\Collection $response) => $response->get('illustration'));
+            ->map(fn (Collection $response) => $response->get('illustration'));
 
         if (count($illustrations) !== count($paragraphs)) {
             throw new Exception('Generated illustration prompt is not valid...');
@@ -290,10 +266,10 @@ class BookService
         return [ $prompt, $schema ];
     }
 
-    private function describeIllustrationPrompt(array $paragraphs): \Illuminate\Support\Collection
+    private function describeIllustrationPrompt(array $paragraphs): Collection
     {
         $story = collect($paragraphs)
-            ->map(fn(string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
+            ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
         $schema = [
