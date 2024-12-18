@@ -44,20 +44,46 @@
 
                         <SwiperSlide v-for="book in userBooks" class="space-y-2 cursor-pointer">
 
-                            <div v-if="book.type === 'placeholder'">
+                            <div v-if="book.type === 'placeholder'" class="animate-pulse">
 
-                                <img class="rounded-2xl opacity-25 animate-pulse cursor-progress"
+                                <img class="rounded-2xl opacity-50 cursor-progress"
                                      src="../assets/placeholder.png"
                                      alt="">
+
+                                <div class="absolute top-0 bottom-0 m-auto w-full flex flex-col justify-center items-center">
+
+                                    <LoaderPinwheel :size="50" class="text-white animate-spin"/>
+
+                                    <div>
+                                        Generating...
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div v-if="book.type === 'failed'" class="bg-red-500/25 rounded-2xl">
+
+                                <img class="rounded-2xl opacity-25 cursor-progress"
+                                     src="../assets/placeholder.png"
+                                     alt="">
+
+                                <LoaderPinwheel
+                                    :size="50"
+                                    class="absolute text-white top-0 bottom-0 m-auto w-full justify-center items-center mr-2"/>
 
                             </div>
 
                             <div v-else @click="viewBook(book.id)">
 
-                                <div class="relative">
+                                <div class="relative group">
 
-                                    <div v-if="book.id === loading"
-                                         class="before:opacity-50 before:rounded-2xl before:absolute before:bg-black before:w-full before:h-full before:left-0 before:bottom-0 animate-pulse"/>
+                                    <div class="group-hover:before:opacity-25 before:opacity-0 before:rounded-2xl before:transition-all before:absolute before:bg-black before:w-full before:h-full before:left-0 before:bottom-0"/>
+
+                                    <EyeIcon
+                                        v-if="book.id !== loading"
+                                        :size="50"
+                                        class="scale-75 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all absolute text-white top-0 bottom-0 m-auto w-full justify-center items-center"/>
 
                                     <LoaderPinwheel
                                         v-if="book.id === loading"
@@ -136,7 +162,7 @@
     import { Button } from '../../@/components/ui/button'
     import { FormControl, FormField, FormItem, FormMessage } from '../../@/components/ui/form'
     import { Textarea } from '../../@/components/ui/textarea'
-    import { LoaderPinwheel } from 'lucide-vue-next'
+    import { LoaderPinwheel, EyeIcon } from 'lucide-vue-next'
     import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../../@/components/ui/drawer'
     import { toTypedSchema } from '@vee-validate/zod'
     import * as z from 'zod'
@@ -145,7 +171,7 @@
     import { useLocalStorage } from '@vueuse/core'
     import { Keyboard, Mousewheel, Pagination } from 'swiper/modules'
     import { Swiper, SwiperSlide } from 'swiper/vue'
-    import { BookIndexResource, checkBatches, createBook } from '../api.ts'
+    import { BookIndexResource, checkBatches, createBook, myBooks } from '../api.ts'
     import { randomSearchTerm } from '../utilities.ts'
 
     const props = defineProps<{ viewBook: (bookId: number) => Promise<void>, loading: number | undefined }>()
@@ -162,11 +188,13 @@
     const getProvider = () => {
 
         if ('phantom' in window) {
+
             const provider = window.phantom?.solana
 
             if (provider?.isPhantom) {
                 return provider
             }
+
         }
 
         window.open('https://phantom.app/', '_blank')
@@ -183,8 +211,44 @@
         try {
 
             const resp = await provider.connect()
-console.log(resp.publicKey)
+
             wallet.value = resp.publicKey.toBase58()
+
+            await myBooks(wallet.value!)
+                .then(response => {
+
+                    for (const key in response) {
+
+                        if (typeof response[ key ] === 'object') {
+
+                            userBooks.value.push(response[ key ])
+
+                        }
+
+                        if (response[ key ] === true) {
+
+                            userBooks.value.push({
+                                id: key,
+                                type: 'placeholder',
+                            })
+
+                        }
+
+                        if (typeof response[ key ] === 'string') {
+
+                            userBooks.value.push({
+                                id: key,
+                                reason: response[ key ],
+                                type: 'failed',
+                            })
+
+                        }
+
+                    }
+
+                })
+                .finally(() => setTimeout(refresh, 1000 * 10))
+
             createDrawerState.value = true
 
         } catch (err) {
@@ -193,26 +257,31 @@ console.log(resp.publicKey)
 
     }
 
-    const userBooks = computed<Array<BookIndexResource | { id: string, type: 'placeholder' }>>(function () {
+    // const userBooks = computed<Array<BookIndexResource | { id: string, type: 'placeholder' }>>(function () {
+    //
+    //     return Object.keys(storage.value).reverse().map((key: string) => {
+    //
+    //         if (typeof storage.value[ key ] === 'boolean') {
+    //
+    //             return {
+    //                 id: key,
+    //                 type: 'placeholder',
+    //             }
+    //
+    //         } else {
+    //
+    //             return storage.value[ key ]
+    //
+    //         }
+    //
+    //     })
+    //
+    // })
 
-        return Object.keys(storage.value).reverse().map((key: string) => {
-
-            if (typeof storage.value[ key ] === 'boolean') {
-
-                return {
-                    id: key,
-                    type: 'placeholder',
-                }
-
-            } else {
-
-                return storage.value[ key ]
-
-            }
-
-        })
-
-    })
+    const userBooks = ref<Array<BookIndexResource | { id: string, type: 'placeholder' } | {
+        id: string,
+        type: 'failed'
+    }>>([])
 
     watch(createDrawerState, () => {
         randomBookTitle.value = randomSearchTerm()

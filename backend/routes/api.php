@@ -16,7 +16,8 @@ Route::get('/books', BooksController::class);
 Route::get('/book/{book}', ViewBookController::class);
 Route::post('/book/create', CreateBookController::class);
 Route::post('/check/batches', CheckBatchesController::class);
-Route::post('/my/books', MyBooksController::class);
+
+Route::get('/my/books', MyBooksController::class);
 
 Route::get('/work/assets', GetAssetsWorkController::class);
 Route::post('/work/{book}/assets', StoreAssetsController::class);

@@ -66,14 +66,18 @@ export async function booksList(): Promise<BookIndexResource[]> {
 
 }
 
-export async function checkBatches(ids: string[], wallet: string): Promise<Record<string, BookIndexResource>> {
+export async function checkBatches(ids: string[]): Promise<Record<string, BookIndexResource>> {
 
     return fetch(`https://${ API_HOST }/check/batches`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ ids, wallet }),
+        body: JSON.stringify({ ids }),
     }).then(response => response.json())
 
 }
 
+export async function myBooks(wallet: string): Promise<Record<string, BookIndexResource | true | string>> {
 
+    return fetch(`https://${ API_HOST }/my/books?wallet=${ wallet }`, { headers }).then(response => response.json())
+
+}
