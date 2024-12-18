@@ -25,8 +25,10 @@ services:
     image: traefik:v3.2
     restart: unless-stopped
     networks:
-      - local-network
-      - traefik-network
+      local-network:
+      traefik-network:
+        aliases:
+          - ${ASSETS_DOMAIN}
     command: >-
       --entryPoints.web.address=:80
       --entryPoints.web.http.redirections.entrypoint.to=web-secure
@@ -104,6 +106,31 @@ services:
     restart: unless-stopped
     volumes:
       - .ollama:/root/.ollama
+
+  minio:
+    image: bitnami/minio:2024
+    environment:
+      - MINIO_ROOT_USER=$AWS_ACCESS_KEY_ID
+      - MINIO_ROOT_PASSWORD=$AWS_SECRET_ACCESS_KEY
+      - MINIO_DEFAULT_BUCKETS=$AWS_BUCKET:public
+    networks:
+      - local-network
+      - traefik-network
+    volumes:
+      - minio-data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minio.service=minio
+      - traefik.http.routers.minio.entryPoints=web-secure
+      - traefik.http.routers.minio.rule=Host(`$ASSETS_DOMAIN`)
+      - traefik.http.routers.minio.tls=true
+      - traefik.http.services.minio.loadBalancer.server.port=9000
+
+      - traefik.http.routers.minio-console.service=minio-console
+      - traefik.http.routers.minio-console.entryPoints=web-secure
+      - traefik.http.routers.minio-console.rule=Host(`$MINIO_DOMAIN`)
+      - traefik.http.routers.minio-console.tls=true
+      - traefik.http.services.minio-console.loadBalancer.server.port=9001
 
 volumes:
   redis-data:

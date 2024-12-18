@@ -19,7 +19,7 @@ class BookIndexResource extends JsonResource
         return [
             'id' => $this->resource->id,
             'title' => $this->resource->title,
-            'cover' => Storage::disk()->url($this->resource->assets->get('cover')),
+            'cover' => Storage::disk('public')->url($this->resource->assets->get('cover')),
         ];
     }
 }
