@@ -14,7 +14,7 @@ class UpdateAssetsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'assets' => ['required', 'array'],
+            'assets' => [ 'required', 'array' ],
         ];
     }
 }

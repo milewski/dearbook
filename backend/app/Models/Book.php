@@ -7,8 +7,10 @@ namespace App\Models;
 use App\Enums\BookState;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 /**
+ * @property Collection<array-key, string> $assets
  * @mixin IdeHelperBook
  */
 class Book extends Model

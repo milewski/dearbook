@@ -18,7 +18,6 @@ use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Throwable;
 
