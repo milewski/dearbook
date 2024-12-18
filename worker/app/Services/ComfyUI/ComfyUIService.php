@@ -85,7 +85,9 @@ class ComfyUIService
                 $response = $this->request()->get("/history/$id");
                 $completed = $response->json("$id.status.completed");
 
-                // workflow has not completed yet
+                /**
+                 * Workflow has not completed yet
+                 */
                 if (is_null($completed)) {
                     throw new RuntimeException('fetch outputs timeout after 5 minutes');
                 }
@@ -97,18 +99,16 @@ class ComfyUIService
                     $assets = $response
                         ->collect("$id.outputs")
                         ->flatten(2)
-                        ->map(
-                            fn (array $output) => FileDescriptor::from($output),
-                        )
-                        ->mapWithKeys(
-                            fn (FileDescriptor $file) => [
-                                $file->name() => $this->downloadImage($file),
-                            ],
-                        );
+                        ->map(fn (array $output) => FileDescriptor::from($output))
+                        ->mapWithKeys(fn (FileDescriptor $file) => [
+                            $file->name() => $this->downloadImage($file),
+                        ]);
 
                 }
 
-                // regardless of whether the workflow is successful or not, delete it.
+                /**
+                 * Regardless of whether the workflow is successful or not, delete it.
+                 */
                 return tap($assets, fn () => $this->deleteWorkflow($id));
 
             },
