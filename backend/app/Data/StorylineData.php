@@ -14,7 +14,6 @@ class StorylineData extends Data
         public array $paragraphs,
     )
     {
-
     }
 
     public function isValid(): bool

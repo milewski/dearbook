@@ -4,27 +4,12 @@ declare(strict_types = 1);
 
 return [
 
-    'mode' => env('MODE'),
-
-    'domains' => [
-        'api' => env('API_DOMAIN'),
-        'assets' => env('ASSETS_DOMAIN'),
-    ],
-
     'comfyui_internal_url' => env('COMFYUI_INTERNAL_URL'),
 
     'backend' => [
         'url' => env('BACKEND_URL'),
         'worker_api_key' => env('WORKER_API_KEY'),
     ],
-
-    'ollama' => [
-        'url' => env('OLLAMA_INTERNAL_URL'),
-        'model' => env('OLLAMA_MODEL'),
-        'embedding' => env('OLLAMA_EMBEDDING_MODEL'),
-    ],
-
-    'low_vram_mode' => env('LOW_VRAM_MODE', true),
 
     /*
     |--------------------------------------------------------------------------

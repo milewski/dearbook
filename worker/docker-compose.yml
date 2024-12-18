@@ -16,8 +16,7 @@ x-php: &php
     - .:/srv
 
 x-nvidia: &nvidia
-  restart: unless-stopped
-#  runtime: nvidia
+  runtime: nvidia
 
 services:
 
@@ -30,7 +29,7 @@ services:
 
   scheduler:
     <<: [ *php, *local-network ]
-    command: supercronic /srv/docker/php/config/schedule.cron
+    command: php artisan schedule:work
 
   redis-worker:
     <<: *local-network
@@ -38,18 +37,6 @@ services:
     restart: unless-stopped
     volumes:
       - redis-worker-data:/data
-
-  ollama:
-    <<: [ *nvidia, *local-network ]
-    networks:
-      - local-network
-      - traefik-network
-    image: ollama/ollama:0.5.1
-    restart: unless-stopped
-    ports:
-      - "11434:11434"
-    volumes:
-      - .ollama:/root/.ollama
 
   comfyui:
     <<: [ *nvidia, *local-network ]
