@@ -7,17 +7,38 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateBookRequest;
 use App\Jobs\ProcessOllamaQueries;
 use App\Services\BookService;
+use Illuminate\Support\Facades\RateLimiter;
 
 class CreateBookController extends Controller
 {
     public function __invoke(CreateBookRequest $request, BookService $service): array
     {
-        $book = $service->createPendingBook($request->input('prompt'));
+        $user = $request->fingerprint();
+        $book = null;
 
-        ProcessOllamaQueries::dispatch($book);
+        $executed = RateLimiter::attempt(
+            key: "create-book:$user",
+            maxAttempts: 3,
+            callback: function () use (&$book, $service, $request) {
+
+                ProcessOllamaQueries::dispatch(
+                    $book = $service->createPendingBook($request),
+                );
+
+            },
+            decaySeconds: 60 * 60 * 24,
+        );
+
+        if ($executed) {
+
+            return [
+                'id' => $book->id,
+            ];
+
+        }
 
         return [
-            'id' => $book->id,
+            'limited' => true,
         ];
     }
 }

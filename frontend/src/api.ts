@@ -81,3 +81,13 @@ export async function myBooks(wallet: string): Promise<Record<string, BookIndexR
     return fetch(`https://${ API_HOST }/my/books?wallet=${ wallet }`, { headers }).then(response => response.json())
 
 }
+
+export async function deleteBook(id: string, wallet: string): Promise<void> {
+
+    await fetch(`https://${ API_HOST }/book/${ id }/delete`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ wallet }),
+    })
+
+}

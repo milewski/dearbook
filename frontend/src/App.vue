@@ -40,6 +40,11 @@
                     class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
             </Manifesto>
 
+            <a href="https://dexscreener.com/solana/4sqm5vwisz3a4g2zagvv1ltg3csqmxxbb2qfuucu9jtv" target="_blank">
+                <DexScreener
+                    class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
+            </a>
+
             <a href="https://x.com/DearBookToken" target="_blank">
                 <Twitter
                     class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
@@ -217,6 +222,7 @@
     import Manifest from './icons/Manifest.vue'
     import { Drawer, DrawerContent } from '../@/components/ui/drawer'
     import Manifesto from './components/Manifesto.vue'
+    import DexScreener from './icons/DexScreener.vue'
 
     const activeBook = ref<{ visible: boolean, content: BookIndexResource | null }>({
         visible: false,

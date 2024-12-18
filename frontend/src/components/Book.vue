@@ -30,6 +30,10 @@
                 <Slide1 :key="index" :image="illustration" :text="text" :page="index + 1"/>
             </SwiperSlide>
 
+            <SwiperSlide>
+                <LastPage/>
+            </SwiperSlide>
+
         </Swiper>
 
     </div>
@@ -50,6 +54,7 @@
     import 'swiper/css/keyboard'
     import 'swiper/css/effect-creative'
     import { BookDetailResource } from '../api.ts'
+    import LastPage from './LastPage.vue'
 
     const emit = defineEmits([ 'close' ])
 
