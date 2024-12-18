@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use League\Flysystem\FilesystemException;
 use RuntimeException;
+use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 use Throwable;
 
 class ComfyUIService
@@ -73,16 +74,19 @@ class ComfyUIService
 
     private function fakeImages(): Collection
     {
+        $disk = Storage::disk('local');
         $filename = 'fake-comfyui.png';
 
-        if (Storage::disk('local')->exists($filename)) {
+        if ($disk->exists($filename)) {
 
-            return Collection::range(0, 10)->mapWithKeys(function () use ($filename) {
+            $image = $this->optimizeImage($disk->get($filename));
+
+            return Collection::range(0, 10)->mapWithKeys(function () use ($image) {
 
                 $name = md5(Str::uuid()->toString());
                 $path = "$name.png";
 
-                Storage::put($path, Storage::disk('local')->get($filename));
+                Storage::put($path, $image);
 
                 return [
                     $name => $path,
@@ -93,7 +97,7 @@ class ComfyUIService
         }
 
         throw new RuntimeException(
-            'Fake image does not exist, path: ' . Storage::disk('local')->path($filename),
+            'Fake image does not exist, path: ' . $disk->path($filename),
         );
     }
 
@@ -154,7 +158,9 @@ class ComfyUIService
      */
     private function storeImage(FileDescriptor $fileDescription): string
     {
-        $body = $this->request()->get('/view', $fileDescription->toArray())->body();
+        $body = $this->optimizeImage(
+            $this->request()->get('/view', $fileDescription->toArray())->body(),
+        );
 
         Storage::put(
             $path = sprintf('%s.png', md5($body)),
@@ -162,6 +168,17 @@ class ComfyUIService
         );
 
         return $path;
+    }
+
+    private function optimizeImage(string $binary): string
+    {
+        $path = sprintf('%s.png', md5($binary));
+        $disk = Storage::disk('local');
+
+        $disk->put($path, $binary);
+        ImageOptimizer::optimize($disk->path($path));
+
+        return tap($disk->get($path), fn () => $disk->delete($path));
     }
 
     private function prepareWorkflow(string $workflow, Tokens $tokens): Collection
