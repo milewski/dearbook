@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 return [
 
+    'comfyui_debug' => env('COMFYUI_DEBUG', false),
     'comfyui_internal_url' => env('COMFYUI_INTERNAL_URL'),
 
     'backend' => [

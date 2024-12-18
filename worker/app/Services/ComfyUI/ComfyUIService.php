@@ -28,6 +28,10 @@ class ComfyUIService
      */
     public function execute(string $workflow, AssetsWork $work): string
     {
+        if (config('app.comfyui_debug')) {
+            return Str::random();
+        }
+
         $tokens = Tokens::make()
             ->add(':title:', $work->title)
             ->add(':synopsis:', $work->synopsis);
@@ -67,6 +71,32 @@ class ComfyUIService
         return $response->successful();
     }
 
+    private function fakeImages(): Collection
+    {
+        $filename = 'fake-comfyui.png';
+
+        if (Storage::disk('local')->exists($filename)) {
+
+            return Collection::range(0, 10)->mapWithKeys(function () use ($filename) {
+
+                $name = md5(Str::uuid()->toString());
+                $path = "$name.png";
+
+                Storage::put($path, Storage::disk('local')->get($filename));
+
+                return [
+                    $name => $path,
+                ];
+
+            });
+
+        }
+
+        throw new RuntimeException(
+            'Fake image does not exist, path: ' . Storage::disk('local')->path($filename),
+        );
+    }
+
     /**
      * @throws Throwable
      * @throws ConnectionException
@@ -74,6 +104,10 @@ class ComfyUIService
      */
     public function fetchOutputs(string $id): Collection|false
     {
+        if (config('app.comfyui_debug')) {
+            return $this->fakeImages();
+        }
+
         return retry(
             times: [
                 ...array_fill(0, 15, 1000), // 15 seconds
@@ -101,7 +135,7 @@ class ComfyUIService
                         ->flatten(2)
                         ->map(fn (array $output) => FileDescriptor::from($output))
                         ->mapWithKeys(fn (FileDescriptor $file) => [
-                            $file->name() => $this->downloadImage($file),
+                            $file->name() => $this->storeImage($file),
                         ]);
 
                 }
@@ -117,14 +151,15 @@ class ComfyUIService
 
     /**
      * @throws ConnectionException
-     * @throws FilesystemException
      */
-    public function downloadImage(FileDescriptor $fileDescription): string
+    private function storeImage(FileDescriptor $fileDescription): string
     {
-        $response = $this->request()->get('/view', $fileDescription->toArray());
-        $body = $response->body();
+        $body = $this->request()->get('/view', $fileDescription->toArray())->body();
 
-        Storage::disk('local')->write($path = sprintf('%s.png', md5($body)), $body);
+        Storage::put(
+            $path = sprintf('%s.png', md5($body)),
+            $body,
+        );
 
         return $path;
     }
