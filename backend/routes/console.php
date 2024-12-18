@@ -32,4 +32,5 @@ Artisan::command('book:assets:s3', function () {
             });
 
         });
+
 });
