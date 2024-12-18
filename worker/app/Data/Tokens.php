@@ -19,7 +19,7 @@ class Tokens
         return new static();
     }
 
-    public function add_token(string $token, string $value): self
+    public function add(string $token, string $value): self
     {
         $this->tokens->put($token, $value);
 

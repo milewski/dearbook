@@ -29,11 +29,11 @@ class ComfyUIService
     public function execute(string $workflow, AssetsWork $work): string
     {
         $tokens = Tokens::make()
-            ->add_token(':title:', $work->title)
-            ->add_token(':synopsis:', $work->synopsis);
+            ->add(':title:', $work->title)
+            ->add(':synopsis:', $work->synopsis);
 
         foreach ($work->illustrations as $index => $illustration) {
-            $tokens->add_token(sprintf(':illustration-%s:', ++$index), $illustration);
+            $tokens->add(sprintf(':illustration-%s:', ++$index), $illustration);
         }
 
         return $this->prompt(
@@ -98,10 +98,10 @@ class ComfyUIService
                         ->collect("$id.outputs")
                         ->flatten(2)
                         ->map(
-                            fn(array $output) => FileDescriptor::from($output),
+                            fn (array $output) => FileDescriptor::from($output),
                         )
                         ->mapWithKeys(
-                            fn(FileDescriptor $file) => [
+                            fn (FileDescriptor $file) => [
                                 $file->name() => $this->downloadImage($file),
                             ],
                         );
@@ -109,7 +109,7 @@ class ComfyUIService
                 }
 
                 // regardless of whether the workflow is successful or not, delete it.
-                return tap($assets, fn() => $this->deleteWorkflow($id));
+                return tap($assets, fn () => $this->deleteWorkflow($id));
 
             },
         );
