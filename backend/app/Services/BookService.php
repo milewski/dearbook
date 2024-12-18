@@ -10,8 +10,8 @@ use App\Data\StorylineData;
 use App\Enums\BookState;
 use App\Exceptions\InvalidDataGeneratedByOllama;
 use App\Exceptions\UnsafeForChildrenException;
+use App\Http\Requests\UpdateAssetsRequest;
 use App\Http\Requests\CreateBookRequest;
-use App\Http\Requests\StoreAssetsRequest;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
@@ -139,12 +139,9 @@ class BookService
         return $book->save();
     }
 
-    public function storeAssets(Book $book, StoreAssetsRequest $request): bool
+    public function updateAssets(Book $book, UpdateAssetsRequest $request): bool
     {
-        $book->assets = collect($request->allFiles())->mapWithKeys(fn (UploadedFile $file, string $name) => [
-            $name => $file->store(options: [ 'disk' => 'public' ]),
-        ]);
-
+        $book->assets = $request->assets;
         $book->state = BookState::Completed;
         $book->fetched_at = null;
 

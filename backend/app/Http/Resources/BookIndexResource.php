@@ -10,16 +10,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * @property Book $resource
+ * @mixin Book
  */
 class BookIndexResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->resource->id,
-            'title' => $this->resource->title,
-            'cover' => Storage::disk('public')->url($this->resource->assets->get('cover')),
+            'id' => $this->id,
+            'title' => $this->title,
+            'cover' => Storage::disk()->url($this->assets->get('cover')),
         ];
     }
 }
