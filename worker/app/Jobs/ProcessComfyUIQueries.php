@@ -34,7 +34,7 @@ class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
                     throw new Exception('Failed to generate images...');
                 }
 
-                $backendService->uploadAssets($work, $assets);
+                $backendService->updateAssets($work, $assets);
 
             } catch (Throwable $error) {
 
