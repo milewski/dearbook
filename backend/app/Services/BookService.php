@@ -272,17 +272,17 @@ class BookService
             ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
-        $schema = [
-            'type' => 'object',
-            'required' => [ 'illustration' ],
-            'properties' => [
-                'illustration' => [
-                    'type' => 'string',
-                ],
-            ],
-        ];
+        return collect($paragraphs)->map(function (string $paragraph) use ($story) {
 
-        return collect($paragraphs)->map(function (string $paragraph) use ($story, $schema) {
+            $schema = [
+                'type' => 'object',
+                'required' => [ 'illustration' ],
+                'properties' => [
+                    'illustration' => [
+                        'type' => 'string',
+                    ],
+                ],
+            ];
 
             $prompt = <<<PROMPT
             Generate a creative image prompt for a generative AI tool to create an illustration for the following paragraph in the children's book. You will receive the full story context for reference, but respond with one image prompt at a time, focusing on the provided paragraph.
