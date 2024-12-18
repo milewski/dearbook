@@ -2,13 +2,13 @@
 
     <Drawer direction="bottom" :open="createDrawerState" @update:open="createDrawerState = $event">
 
-        <DrawerTrigger as-child>
+        <div @click="login">
 
             <Button size="lg" class=" z-20 px-8 py-6 top-8 right-8 rounded-full text-2xl bg-[#230202] shadow-2xl">
                 Generate your AI story now!
             </Button>
 
-        </DrawerTrigger>
+        </div>
 
         <DrawerContent>
 
@@ -105,7 +105,8 @@
 
                                 </FormItem>
 
-                                <Button type="submit" :disabled="formLoading || !(form.isFieldValid('prompt') && form.values.prompt)"
+                                <Button type="submit"
+                                        :disabled="formLoading || !(form.isFieldValid('prompt') && form.values.prompt)"
                                         class="bg-[#F18533] hover:bg-[#F18533] rounded-full">
 
                                     <div>Create!</div>
@@ -153,9 +154,44 @@
     const form = useForm({ validationSchema: formSchema })
     const formLoading = ref(false)
     const createDrawerState = ref(false)
+    const wallet = ref(null)
 
     const storage = useLocalStorage<Record<string, boolean | BookIndexResource>>('generation', {})
     const randomBookTitle = ref()
+
+    const getProvider = () => {
+
+        if ('phantom' in window) {
+            const provider = window.phantom?.solana
+
+            if (provider?.isPhantom) {
+                return provider
+            }
+        }
+
+        window.open('https://phantom.app/', '_blank')
+
+    }
+
+    const isPhantomInstalled = window.phantom?.solana?.isPhantom
+
+    async function login() {
+
+        const provider = getProvider()
+        provider.disconnect()
+
+        try {
+
+            const resp = await provider.connect()
+console.log(resp.publicKey)
+            wallet.value = resp.publicKey.toBase58()
+            createDrawerState.value = true
+
+        } catch (err) {
+            // { code: 4001, message: 'User rejected the request.' }
+        }
+
+    }
 
     const userBooks = computed<Array<BookIndexResource | { id: string, type: 'placeholder' }>>(function () {
 
@@ -212,7 +248,7 @@
 
         formLoading.value = true
 
-        await createBook(values.prompt || randomBookTitle.value)
+        await createBook(values.prompt || randomBookTitle.value, wallet.value)
             .then(response => {
 
                 if (response.id) {

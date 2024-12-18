@@ -1,7 +1,5 @@
 <template>
 
-    <WelcomeNotice/>
-
     <Toaster/>
 
     <Drawer
@@ -219,7 +217,6 @@
     import Manifest from './icons/Manifest.vue'
     import { Drawer, DrawerContent } from '../@/components/ui/drawer'
     import Manifesto from './components/Manifesto.vue'
-    import WelcomeNotice from './components/WelcomeNotice.vue'
 
     const activeBook = ref<{ visible: boolean, content: BookIndexResource | null }>({
         visible: false,
