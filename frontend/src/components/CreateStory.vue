@@ -12,51 +12,7 @@
 
         <DrawerContent>
 
-            <div v-if="!isPhantomInstalled" class="flex flex-col justify-center items-center mx-auto w-full px-8 max-w-4xl">
-
-                <DrawerHeader class="my-8">
-
-                    <DrawerTitle class="text-4xl text-center  flex flex-col justify-center items-center space-y-4">
-
-                        <Phantom class="w-80 h-20"/>
-                        <div>Have you installed Phantom?</div>
-
-                    </DrawerTitle>
-
-                    <DrawerDescription class="text-center">
-                        Select from your preferred options below:
-                    </DrawerDescription>
-
-                </DrawerHeader>
-
-                <div class="flex flex-col space-y-2 mb-20">
-
-                    <a href="https://chromewebstore.google.com/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa"
-                       target="_blank"
-                       class="bg-gray-200 hover:bg-gray-300 transition rounded-full py-2 px-4 flex space-x-2">
-                        <Chrome class="size-6"/>
-                        <div>Install Chrome extension</div>
-                    </a>
-
-                    <a href="https://chromewebstore.google.com/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa"
-                       target="_blank"
-                       class="bg-gray-200 hover:bg-gray-300 transition rounded-full py-2 px-4 flex space-x-2">
-                        <Brave class="size-6"/>
-                        <div>Install Brave extension</div>
-                    </a>
-
-                    <a href="https://addons.mozilla.org/en-US/firefox/addon/phantom-app"
-                       target="_blank"
-                       class="bg-gray-200 hover:bg-gray-300 transition rounded-full py-2 px-4 flex space-x-2">
-                        <Firefox class="size-6"/>
-                        <div>Install Firefox extension</div>
-                    </a>
-
-                </div>
-
-            </div>
-
-            <div v-else class="flex flex-col justify-center items-center mx-auto w-full px-8 max-w-4xl">
+            <div class="flex flex-col justify-center items-center mx-auto w-full px-8 max-w-4xl">
 
                 <DrawerHeader class="my-8">
 
@@ -71,16 +27,9 @@
 
                 </DrawerHeader>
 
-                <Button
-                    v-if="!wallet"
-                    @click="login"
-                    class="bg-[#F18533] hover:bg-[#F98533] transition py-2 px-4 flex space-x-2 rounded-full mb-20">
-                    Connect your phantom wallet to start creating!
-                </Button>
-
             </div>
 
-            <div class="mx-auto w-full px-8 max-w-4xl" v-if="wallet && userBooks.length > 0">
+            <div class="mx-auto w-full px-8 max-w-4xl" v-if="fakeWallet && userBooks.length > 0">
 
                 <div class="rounded-2xl bg-gray-100 p-1">
 
@@ -101,7 +50,8 @@
                                      src="../assets/placeholder.png"
                                      alt="">
 
-                                <div class="absolute top-0 bottom-0 m-auto w-full flex flex-col justify-center items-center">
+                                <div
+                                    class="absolute top-0 bottom-0 m-auto w-full flex flex-col justify-center items-center">
 
                                     <LoaderPinwheel :size="50" class="text-white animate-spin"/>
 
@@ -177,7 +127,7 @@
 
             </div>
 
-            <div class="mx-auto w-full max-w-4xl pb-8 px-4" v-if="wallet">
+            <div class="mx-auto w-full max-w-4xl pb-8 px-4" v-if="fakeWallet">
 
                 <DrawerFooter>
 
@@ -207,8 +157,7 @@
                                         :disabled="formLoading || !(form.isFieldValid('prompt') && form.values.prompt)"
                                         class="bg-[#F18533] hover:bg-[#F18533] rounded-full">
 
-                                    <div v-if="wallet">Create!</div>
-                                    <div v-else>Connect Wallet and Create!</div>
+                                    <div>Create!</div>
 
                                     <LoaderPinwheel v-if="formLoading" class="animate-spin"/>
 
@@ -240,17 +189,13 @@
     import { toTypedSchema } from '@vee-validate/zod'
     import * as z from 'zod'
     import { useForm } from 'vee-validate'
-    import { computed, ref, watch } from 'vue'
+    import { ref, watch } from 'vue'
     import { useLocalStorage } from '@vueuse/core'
     import { Keyboard, Mousewheel, Pagination } from 'swiper/modules'
     import { Swiper, SwiperSlide } from 'swiper/vue'
-    import { BookIndexResource, checkBatches, createBook, deleteBook, myBooks } from '../api.ts'
+    import { BookIndexResource, createBook, deleteBook, myBooks } from '../api.ts'
     import { randomSearchTerm } from '../utilities.ts'
     import { HoverCard, HoverCardContent, HoverCardTrigger } from '../../@/components/ui/hover-card'
-    import Phantom from '../icons/Phantom.vue'
-    import Chrome from '../icons/Chrome.vue'
-    import Brave from '../icons/Brave.vue'
-    import Firefox from '../icons/Firefox.vue'
 
     const props = defineProps<{ viewBook: (bookId: number) => Promise<void>, loading: number | undefined }>()
 
@@ -258,102 +203,82 @@
     const form = useForm({ validationSchema: formSchema })
     const formLoading = ref(false)
     const createDrawerState = ref(false)
-    const wallet = ref(null)
-
-    const storage = useLocalStorage<Record<string, boolean | BookIndexResource>>('generation', {})
     const randomBookTitle = ref()
 
-    const getProvider = () => {
+    const fakeWallet = useLocalStorage<Record<string, boolean | BookIndexResource>>('fake_wallet', makeFakeWallet(12))
 
-        if ('phantom' in window) {
+    function makeFakeWallet(length: number): string {
+        let result = ''
 
-            const provider = window.phantom?.solana
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        const charactersLength = characters.length
 
-            if (provider?.isPhantom) {
-                return provider
-            }
+        let counter = 0
 
+        while (counter < length) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength))
+            counter += 1
         }
 
+        return result
     }
-
-    const isPhantomInstalled = window.phantom?.solana?.isPhantom
 
     async function deleteMyBook(id: string) {
 
         userBooks.value = userBooks.value.filter(book => book.id !== id)
 
-        await deleteBook(id, wallet.value!).catch(console.error)
+        await deleteBook(id, fakeWallet.value!).catch(console.error)
 
     }
 
-    async function login() {
+    async function refresh() {
 
-        const provider = getProvider()
+        const placeholders = userBooks.value.filter(book => book.type === 'placeholder')
 
-        if (provider) {
+        if (placeholders.length || userBooks.value.length === 0) {
 
-            provider.on('connect', publicKey => {
-                wallet.value = publicKey
-            })
+            await myBooks(fakeWallet.value)
+                .then((response: Record<string, BookIndexResource>) => {
 
-            provider.on('disconnect', () => {
-                wallet.value = null
-            })
+                    userBooks.value = []
 
-            provider.on('accountChanged', async publicKey => {
+                    for (const key in response) {
 
-                wallet.value = publicKey
+                        if (typeof response[ key ] === 'object') {
 
-                if (!publicKey) {
-                    await provider.connect()
-                }
+                            userBooks.value.push(response[ key ])
 
-            })
+                        }
 
-        }
+                        if (response[ key ] === true) {
 
-        try {
+                            userBooks.value.push({
+                                id: key,
+                                type: 'placeholder',
+                            })
 
-            await provider.connect()
+                        }
 
-            await myBooks(wallet.value!).then(response => {
+                        if (typeof response[ key ] === 'string') {
 
-                for (const key in response) {
+                            userBooks.value.push({
+                                id: key,
+                                reason: response[ key ],
+                                type: 'failed',
+                            })
 
-                    if (typeof response[ key ] === 'object') {
-
-                        userBooks.value.push(response[ key ])
-
-                    }
-
-                    if (response[ key ] === true) {
-
-                        userBooks.value.push({
-                            id: key,
-                            type: 'placeholder',
-                        })
+                        }
 
                     }
 
-                    if (typeof response[ key ] === 'string') {
+                })
+                .catch(console.log)
+                .finally(() => setTimeout(refresh, 1000 * 10))
 
-                        userBooks.value.push({
-                            id: key,
-                            reason: response[ key ],
-                            type: 'failed',
-                        })
+        } else {
 
-                    }
+            setTimeout(refresh, 1000 * 10)
 
-                }
-
-            })
-
-            createDrawerState.value = true
-
-        } catch (error) {
-            // { code: 4001, message: 'User rejected the request.' }
         }
 
     }
@@ -372,7 +297,7 @@
 
         formLoading.value = true
 
-        await createBook(values.prompt || randomBookTitle.value, wallet.value!)
+        await createBook(values.prompt, fakeWallet.value!)
             .then(response => {
 
                 if (response.id) {
@@ -392,5 +317,7 @@
             })
 
     })
+
+    refresh()
 
 </script>

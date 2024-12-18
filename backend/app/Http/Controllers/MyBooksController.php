@@ -9,10 +9,11 @@ use App\Http\Requests\MyBookRequest;
 use App\Http\Resources\BookIndexResource;
 use App\Models\Book;
 use App\Services\BookService;
+use Illuminate\Support\Collection;
 
 class MyBooksController extends Controller
 {
-    public function __invoke(MyBookRequest $request)
+    public function __invoke(MyBookRequest $request): Collection
     {
         return BookService::resolve()->allByWallet($request->wallet)->mapWithKeys(fn (Book $book) => [
             $book->id => match ($book->state) {

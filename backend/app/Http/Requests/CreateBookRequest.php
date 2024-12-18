@@ -13,7 +13,7 @@ class CreateBookRequest extends FormRequest
     {
         return [
             'prompt' => [ 'required', 'max:500', 'min:10' ],
-            'wallet' => [ 'required', 'string', new Wallet() ],
+            'wallet' => [ 'required', 'string' ],
         ];
     }
 }

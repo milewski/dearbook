@@ -38,6 +38,7 @@ class BookService
     {
         return Book::query()
             ->where('wallet', $wallet)
+            ->orderByDesc('created_at')
             ->get();
     }
 

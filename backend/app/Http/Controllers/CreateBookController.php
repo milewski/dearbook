@@ -14,19 +14,10 @@ class CreateBookController extends Controller
 {
     public function __invoke(CreateBookRequest $request, BookService $service): array
     {
-        $user = $request->fingerprint();
-        $book = RateLimiter::attempt(
-            key: "create-book:$user",
-            maxAttempts: 3,
-            callback: fn () => tap(
-                value: $service->createPendingBook($request),
-                callback: fn (Book $book) => ProcessOllamaQueries::dispatch($book),
-            ),
-            decaySeconds: 60 * 60 * 24,
-        );
+        $book = $service->createPendingBook($request);
 
-        return $book
-            ? [ 'id' => $book->id ]
-            : [ 'limited' => true ];
+        ProcessOllamaQueries::dispatch($book);
+
+        return [ 'id' => $book->id ];
     }
 }

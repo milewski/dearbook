@@ -16,7 +16,7 @@
 
                     Turn your ideas into books at <br>
 
-                    <a href="https://dearbook.xyz" target="_blank" class="text-[#F18533] font-sans">
+                    <a href="https://dearbook.fun" target="_blank" class="text-[#F18533] font-sans">
                         https://dearbook.fun
                     </a>
 

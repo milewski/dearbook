@@ -12,7 +12,7 @@ class DeleteBookRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'wallet' => [ 'required', 'string', new Wallet() ],
+            'wallet' => [ 'required', 'string' ],
         ];
     }
 }
