@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "attestto/solana-php-sdk": "dev-master",
         "laravel/framework": "^11.9",
         "laravel/horizon": "^5.29",
         "laravel/telescope": "^5.2",
@@ -74,6 +75,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

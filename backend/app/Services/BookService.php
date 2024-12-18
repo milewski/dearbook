@@ -10,6 +10,7 @@ use App\Data\StorylineData;
 use App\Enums\BookState;
 use App\Exceptions\InvalidDataGeneratedByOllama;
 use App\Exceptions\UnsafeForChildrenException;
+use App\Http\Requests\CreateBookRequest;
 use App\Http\Requests\StoreAssetsRequest;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
@@ -31,6 +32,13 @@ class BookService
         private readonly OllamaService $ollama,
     )
     {
+    }
+
+    public function allByWallet(string $wallet): Collection
+    {
+        return Book::query()
+            ->where('wallet', $wallet)
+            ->get();
     }
 
     /**
@@ -142,10 +150,12 @@ class BookService
         return $book->save();
     }
 
-    public function createPendingBook(string $prompt): Book
+    public function createPendingBook(CreateBookRequest $request): Book
     {
         $book = new Book();
-        $book->user_prompt = $prompt;
+        $book->user_prompt = $request->prompt;
+        $book->wallet = $request->wallet;
+
         $book->save();
 
         return $book;
