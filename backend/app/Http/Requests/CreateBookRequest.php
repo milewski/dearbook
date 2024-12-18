@@ -4,10 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Http\Requests;
 
-use Attestto\SolanaPhpSdk\PublicKey;
-use Closure;
+use App\Rules\Wallet;
 use Illuminate\Foundation\Http\FormRequest;
-use Throwable;
 
 class CreateBookRequest extends FormRequest
 {
@@ -15,33 +13,7 @@ class CreateBookRequest extends FormRequest
     {
         return [
             'prompt' => [ 'required', 'max:500', 'min:10' ],
-            'wallet' => [
-                'required', function (string $attribute, mixed $value, Closure $fail) {
-
-                    if (is_string($value) && filled($value)) {
-
-                        try {
-
-                            $toPublicKey = new PublicKey($value);
-
-                            if (PublicKey::isOnCurve($toPublicKey) === false) {
-                                $fail("invalid wallet.");
-                            }
-
-                        } catch (Throwable) {
-
-                            $fail("invalid wallet.");
-
-                        }
-
-                    } else {
-
-                        $fail("invalid wallet.");
-
-                    }
-
-                },
-            ],
+            'wallet' => [ 'required', 'string', new Wallet() ],
         ];
     }
 }
