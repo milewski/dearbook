@@ -17,13 +17,14 @@
 
     </Drawer>
 
-    <div class="flex max-w-3xl justify-center items-center mt-9 mx-auto space-x-8 pb-10 flex-col-reverse lg:flex-row">
+    <div class="flex max-w-4xl justify-center items-center mt-9 mx-auto space-x-8 pb-10 flex-col-reverse lg:flex-row">
 
-        <div class="relative w-full px-8 sm:px-0 mt-4 lg:mt-0">
+        <div class="relative w-auto lg:w-full px-8 sm:px-0 mt-4 lg:mt-0 justify-items-center">
 
             <Input
                 type="text"
-                class="text-[#230202] text-opacity-70 bg-[#F18533] pl-12 transition-all placeholder:opacity-25 placeholder:text-[#230202] rounded-full text-md border-none focus-visible:ring-[#230202]"
+                @focus="$event.target.select()"
+                class="text-[#230202] text-opacity-70 bg-[#F18533] pl-12 w-auto sm:w-full transition-all placeholder:opacity-25 placeholder:text-[#230202] rounded-full text-md border-none focus-visible:ring-[#230202]"
                 readonly
                 default-value="zPf8M7V2YznAvLzsnauyBb3gefYpYbrMotzifXJpump"/>
 
@@ -33,7 +34,7 @@
 
         </div>
 
-        <div class="flex space-x-4 text-[#230202]">
+        <div class="flex justify-center items-center space-x-4 text-[#230202]">
 
             <Manifesto>
                 <Manifest
@@ -60,6 +61,10 @@
                     class="cursor-pointer size-10 transition-all rounded-full border-4 border-transparent hover:scale-[1.08] hover:border-[white] hover:bg-white hover:shadow-2xl"/>
             </a>
 
+            <a href="https://raydium.io/swap/?inputMint=sol&outputMint=zPf8M7V2YznAvLzsnauyBb3gefYpYbrMotzifXJpump" target="_blank" class="font-sans text-sm h-10 bg-[#230202] px-3 items-center flex rounded-full text-white whitespace-nowrap transition-all will-change-transform  hover:scale-[1.08] hover:bg-gray-900 hover:shadow-2xl">
+                   Buy $DEARBOOK
+            </a>
+
         </div>
 
     </div>
@@ -69,7 +74,7 @@
         <img src="./assets/logo.png" class="w-44" alt="">
 
         <h1 class="text-5xl sm:text-6xl text-center font-serif max-w-[750px] text-[#230202] *:hidden *:sm:block">
-            The first AI-Powered Children's Book Generator <br> on Solana
+            The first AI-Powered Children's Book Creator <br> on Solana
         </h1>
 
         <CreateStory :view-book="viewBook" :loading="loading"/>
