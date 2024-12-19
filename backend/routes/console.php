@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Artisan;
 
 Artisan::command('book:assets:s3', function () {
 
+    config([
+        'filesystems.disks.s3.read-only' => false,
+    ]);
+
     $s3 = Storage::disk('s3');
     $public = Storage::disk('public');
 
