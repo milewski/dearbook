@@ -22,14 +22,27 @@ Artisan::command('book:assets:s3', function () {
 
             $books->each(function (Book $book) use ($s3, $public) {
 
-                foreach ($book->assets as $asset) {
+                $assets = collect();
+
+                foreach ($book->assets as $name => $asset) {
 
                     if ($public->fileExists($asset)) {
 
-                        $s3->put($asset, $public->get($asset));
+                        $path = sprintf('books/%s/images/%s', $book->id, $asset);
+
+                        $s3->put($path, $public->get($asset));
                         $public->delete($asset);
 
+                        $assets->put($name, $asset);
+
                     }
+
+                }
+
+                if ($assets->isNotEmpty()) {
+
+                    $book->assets = $assets;
+                    $book->save();
 
                 }
 
