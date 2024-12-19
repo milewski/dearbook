@@ -12,7 +12,7 @@
 
         <DrawerContent>
 
-            <div class="mx-auto w-full px-8 max-w-4xl">
+            <div class="flex flex-col justify-center items-center mx-auto w-full px-8 max-w-4xl">
 
                 <DrawerHeader class="my-8">
 
@@ -29,7 +29,7 @@
 
             </div>
 
-            <div class="mx-auto w-full px-8 max-w-4xl" v-if="userBooks.length > 0">
+            <div class="mx-auto w-full px-8 max-w-4xl" v-if="fakeWallet && userBooks.length > 0">
 
                 <div class="rounded-2xl bg-gray-100 p-1">
 
@@ -44,20 +44,68 @@
 
                         <SwiperSlide v-for="book in userBooks" class="space-y-2 cursor-pointer">
 
-                            <div v-if="book.type === 'placeholder'">
+                            <div v-if="book.type === 'placeholder'" class="animate-pulse">
 
-                                <img class="rounded-2xl opacity-25 animate-pulse cursor-progress"
+                                <img class="rounded-2xl opacity-50 cursor-progress"
                                      src="../assets/placeholder.png"
                                      alt="">
 
+                                <div
+                                    class="absolute top-0 bottom-0 m-auto w-full flex flex-col justify-center items-center">
+
+                                    <LoaderPinwheel :size="50" class="text-white animate-spin"/>
+
+                                    <div>
+                                        Generating...
+                                    </div>
+
+                                </div>
+
                             </div>
 
-                            <div v-else @click="viewBook(book.id)">
+                            <div v-if="book.type === 'failed'" class="bg-red-500/90 rounded-2xl">
 
-                                <div class="relative">
+                                <img class="rounded-2xl opacity-25 cursor-progress"
+                                     src="../assets/placeholder.png"
+                                     alt="">
 
-                                    <div v-if="book.id === loading"
-                                         class="before:opacity-50 before:rounded-2xl before:absolute before:bg-black before:w-full before:h-full before:left-0 before:bottom-0 animate-pulse"/>
+                                <div class="absolute w-full flex top-0 bottom-0 m-auto justify-center items-center ">
+
+                                    <HoverCard :open-delay="0">
+
+                                        <HoverCardTrigger as-child>
+
+                                            <ClockAlertIcon :size="50" class="text-white"/>
+
+                                        </HoverCardTrigger>
+
+                                        <HoverCardContent class="text-center prose-sm space-y-4">
+
+                                            <div>{{ book.reason }}</div>
+
+                                            <Button class="w-full" variant="destructive" @click="deleteMyBook(book.id)">
+                                                Ok
+                                            </Button>
+
+                                        </HoverCardContent>
+
+                                    </HoverCard>
+
+                                </div>
+
+                            </div>
+
+                            <div v-if="!!book.cover" @click="viewBook(book.id)">
+
+                                <div class="relative group">
+
+                                    <div :class="{ 'before:opacity-25': book.id === loading }"
+                                         class="group-hover:before:opacity-25 before:opacity-0 before:rounded-2xl before:transition-all before:absolute before:bg-black before:w-full before:h-full before:left-0 before:bottom-0"/>
+
+                                    <EyeIcon
+                                        v-if="book.id !== loading"
+                                        :size="50"
+                                        class="scale-75 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all absolute text-white top-0 bottom-0 m-auto w-full justify-center items-center"/>
 
                                     <LoaderPinwheel
                                         v-if="book.id === loading"
@@ -79,7 +127,7 @@
 
             </div>
 
-            <div class="mx-auto w-full max-w-4xl pb-8 px-4">
+            <div class="mx-auto w-full max-w-4xl pb-8 px-4" v-if="fakeWallet">
 
                 <DrawerFooter>
 
@@ -105,7 +153,8 @@
 
                                 </FormItem>
 
-                                <Button type="submit" :disabled="formLoading || !(form.isFieldValid('prompt') && form.values.prompt)"
+                                <Button type="submit"
+                                        :disabled="formLoading || !(form.isFieldValid('prompt') && form.values.prompt)"
                                         class="bg-[#F18533] hover:bg-[#F18533] rounded-full">
 
                                     <div>Create!</div>
@@ -135,17 +184,18 @@
     import { Button } from '../../@/components/ui/button'
     import { FormControl, FormField, FormItem, FormMessage } from '../../@/components/ui/form'
     import { Textarea } from '../../@/components/ui/textarea'
-    import { LoaderPinwheel } from 'lucide-vue-next'
+    import { LoaderPinwheel, EyeIcon, ClockAlertIcon } from 'lucide-vue-next'
     import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../../@/components/ui/drawer'
     import { toTypedSchema } from '@vee-validate/zod'
     import * as z from 'zod'
     import { useForm } from 'vee-validate'
-    import { computed, ref, watch } from 'vue'
+    import { ref, watch } from 'vue'
     import { useLocalStorage } from '@vueuse/core'
     import { Keyboard, Mousewheel, Pagination } from 'swiper/modules'
     import { Swiper, SwiperSlide } from 'swiper/vue'
-    import { BookIndexResource, checkBatches, createBook } from '../api.ts'
+    import { BookIndexResource, createBook, deleteBook, myBooks } from '../api.ts'
     import { randomSearchTerm } from '../utilities.ts'
+    import { HoverCard, HoverCardContent, HoverCardTrigger } from '../../@/components/ui/hover-card'
 
     const props = defineProps<{ viewBook: (bookId: number) => Promise<void>, loading: number | undefined }>()
 
@@ -153,51 +203,76 @@
     const form = useForm({ validationSchema: formSchema })
     const formLoading = ref(false)
     const createDrawerState = ref(false)
-
-    const storage = useLocalStorage<Record<string, boolean | BookIndexResource>>('generation', {})
     const randomBookTitle = ref()
 
-    const userBooks = computed<Array<BookIndexResource | { id: string, type: 'placeholder' }>>(function () {
+    const fakeWallet = useLocalStorage<Record<string, boolean | BookIndexResource>>('fake_wallet', makeFakeWallet(12))
 
-        return Object.keys(storage.value).reverse().map((key: string) => {
+    function makeFakeWallet(length: number): string {
+        let result = ''
 
-            if (typeof storage.value[ key ] === 'boolean') {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        const charactersLength = characters.length
 
-                return {
-                    id: key,
-                    type: 'placeholder',
-                }
+        let counter = 0
 
-            } else {
+        while (counter < length) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength))
+            counter += 1
+        }
 
-                return storage.value[ key ]
+        return result
+    }
 
-            }
+    async function deleteMyBook(id: string) {
 
-        })
+        userBooks.value = userBooks.value.filter(book => book.id !== id)
 
-    })
+        await deleteBook(id, fakeWallet.value!).catch(console.error)
 
-    watch(createDrawerState, () => {
-        randomBookTitle.value = randomSearchTerm()
-    })
+    }
 
     async function refresh() {
 
-        const currentInStorage = Object.keys(storage.value).filter(key => typeof storage.value[ key ] === 'boolean')
+        const placeholders = userBooks.value.filter(book => book.type === 'placeholder')
 
-        if (currentInStorage.length) {
+        if (placeholders.length || userBooks.value.length === 0) {
 
-            await checkBatches(currentInStorage)
+            await myBooks(fakeWallet.value)
                 .then((response: Record<string, BookIndexResource>) => {
+
+                    userBooks.value = []
 
                     for (const key in response) {
 
-                        storage.value[ key ] = response[ key ]
+                        if (typeof response[ key ] === 'object') {
+
+                            userBooks.value.push(response[ key ])
+
+                        }
+
+                        if (response[ key ] === true) {
+
+                            userBooks.value.push({
+                                id: key,
+                                type: 'placeholder',
+                            })
+
+                        }
+
+                        if (typeof response[ key ] === 'string') {
+
+                            userBooks.value.push({
+                                id: key,
+                                reason: response[ key ],
+                                type: 'failed',
+                            })
+
+                        }
 
                     }
 
                 })
+                .catch(console.log)
                 .finally(() => setTimeout(refresh, 1000 * 10))
 
         } else {
@@ -208,15 +283,30 @@
 
     }
 
+    const userBooks = ref<Array<BookIndexResource | { id: string, type: 'placeholder' } | {
+        id: string,
+        reason: string,
+        type: 'failed'
+    }>>([])
+
+    watch(createDrawerState, () => {
+        randomBookTitle.value = randomSearchTerm()
+    })
+
     const onSubmit = form.handleSubmit(async values => {
 
         formLoading.value = true
 
-        await createBook(values.prompt || randomBookTitle.value)
+        await createBook(values.prompt, fakeWallet.value!)
             .then(response => {
 
                 if (response.id) {
-                    storage.value[ response.id ] = false
+
+                    userBooks.value.unshift({
+                        id: response.id,
+                        type: 'placeholder',
+                    })
+
                 }
 
             })

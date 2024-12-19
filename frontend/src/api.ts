@@ -48,21 +48,21 @@ export async function bookSearch(term: string, controller: AbortController): Pro
 
 }
 
+export async function createBook(prompt: string, wallet: string): Promise<{ id: string }> {
+
+    return fetch(`https://${ API_HOST }/book/create`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ prompt, wallet }),
+    }).then(response => response.json())
+
+}
+
 export async function booksList(): Promise<BookIndexResource[]> {
 
     return fetch(`https://${ API_HOST }/books`, { headers })
         .then(response => response.json())
         .then((response: BooksResponse) => response.data)
-
-}
-
-export async function createBook(prompt: string | undefined): Promise<{ id: string }> {
-
-    return fetch(`https://${ API_HOST }/book/create`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ prompt }),
-    }).then(response => response.json())
 
 }
 
@@ -76,4 +76,18 @@ export async function checkBatches(ids: string[]): Promise<Record<string, BookIn
 
 }
 
+export async function myBooks(wallet: string): Promise<Record<string, BookIndexResource | true | string>> {
 
+    return fetch(`https://${ API_HOST }/my/books?wallet=${ wallet }`, { headers }).then(response => response.json())
+
+}
+
+export async function deleteBook(id: string, wallet: string): Promise<void> {
+
+    await fetch(`https://${ API_HOST }/book/${ id }/delete`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ wallet }),
+    })
+
+}

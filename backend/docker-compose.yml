@@ -16,7 +16,8 @@ x-php: &php
     - .:/srv
 
 x-nvidia: &nvidia
-  runtime: nvidia
+  restart: unless-stopped
+#  runtime: nvidia
 
 services:
 
@@ -64,6 +65,14 @@ services:
   scheduler:
     <<: [ *php, *local-network ]
     command: php artisan schedule:work
+
+  queue:
+    <<: [ *php, *local-network ]
+    depends_on:
+      - redis
+      - timescaledb
+      - ollama
+    command: php artisan queue:work --timeout=720 --memory=1024 --max-jobs=128
 
   redis:
     <<: *local-network

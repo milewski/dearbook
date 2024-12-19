@@ -7,13 +7,14 @@
     <div class="flex justify-center p-4 h-screen items-center">
 
         <div class="relative before:rounded-2xl before:opacity-75 before:absolute before:from-black before:bg-gradient-to-t before:w-full before:h-5/6 before:left-0 before:bottom-0 mb-[10vh] sm:mb-0">
-            <img class="rounded-2xl" :src="backdrop" alt="">
 
-            <div class="absolute flex justify-center items-center flex-column text-white p-4 rounded-2xl bottom-0 top-0  w-full">
+            <img class="rounded-2xl w-[80vw]" :src="backdrop" alt="">
 
-                <img class="rounded-xl h-80 mr-4 shadow-2xl border-4 hidden sm:block" :src="cover" alt="">
+            <div class="absolute flex justify-center items-center flex-column text-white p-4 rounded-2xl bottom-5 w-full">
 
-                <div class="px-4 sm:w-7/12 text-center sm:text-left absolute sm:relative">
+                <img class="rounded-xl h-80 mr-4 shadow-2xl border-4 hidden lg:block" :src="cover" alt="">
+
+                <div class="hidden lg:block px-4 lg:w-7/12 text-center lg:text-left absolute lg:relative">
 
                     <h1 class="text-2xl sm:text-4xl font-bold">
                         {{ title }}
@@ -24,6 +25,18 @@
                     </p>
 
                 </div>
+
+            </div>
+
+            <div class="block lg:hidden text-white mt-4 px-4 lg:w-7/12 text-center lg:text-left absolute lg:relative">
+
+                <h1 class="text-3xl sm:text-4xl font-bold">
+                    {{ title }}
+                </h1>
+
+                <p class="mt-2">
+                    {{ synopsis }}
+                </p>
 
             </div>
 
