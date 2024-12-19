@@ -13,6 +13,7 @@ class FileDescriptor extends Data
         public string $filename,
         public string $subfolder,
         public string $type,
+        public int $preview = 80,
     )
     {
 
