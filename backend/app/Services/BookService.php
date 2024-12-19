@@ -271,6 +271,9 @@ class BookService
 
         Each story should be unique in its plot, tone, and characters.
 
+        It is crucial to generate the storyline in the same language as the user's input.
+        For example, if the user provides a prompt in Chinese, the system should create the story, synopsis, and title in Chinese as well.
+
         Respond using JSON
         PROMPT;
 

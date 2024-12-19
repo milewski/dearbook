@@ -39,7 +39,10 @@ services:
       - redis-worker-data:/data
 
   comfyui:
-    <<: [ *nvidia, *local-network ]
+    <<: [ *nvidia ]
+    networks:
+      - traefik-network
+      - local-network
     build:
       dockerfile: comfyui.dockerfile
       context: docker/comfyui
