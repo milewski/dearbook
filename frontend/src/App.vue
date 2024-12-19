@@ -68,8 +68,8 @@
 
         <img src="./assets/logo.png" class="w-44" alt="">
 
-        <h1 class="text-5xl sm:text-6xl text-center font-serif max-w-[750px] text-[#230202] ">
-            The first AI-Powered Children's Book Generator Memecoin
+        <h1 class="text-5xl sm:text-6xl text-center font-serif max-w-[750px] text-[#230202] *:hidden *:sm:block">
+            The first AI-Powered Children's Book Generator <br> on Solana
         </h1>
 
         <CreateStory :view-book="viewBook" :loading="loading"/>
