@@ -27,7 +27,7 @@ class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
             try {
 
                 $assets = $comfyUIService->fetchOutputs(
-                    $comfyUIService->execute('main.workflow.json', $work),
+                    $comfyUIService->execute('main.workflow.json', $work), $work,
                 );
 
                 if ($assets === false) {
@@ -38,7 +38,7 @@ class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
 
             } catch (Throwable $error) {
 
-                $backendService->reportFailure($work->id, $error->getMessage());
+                $backendService->reportFailure($work->id, (string) $error->getMessage());
 
             }
 

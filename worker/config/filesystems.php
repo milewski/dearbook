@@ -2,6 +2,8 @@
 
 declare(strict_types = 1);
 
+use League\Flysystem\Visibility;
+
 return [
 
     /*
@@ -57,6 +59,7 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => true,
+            'visibility' => Visibility::PUBLIC,
         ],
 
     ],

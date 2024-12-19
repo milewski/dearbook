@@ -72,19 +72,19 @@ class ComfyUIService
         return $response->successful();
     }
 
-    private function fakeImages(): Collection
+    private function fakeImages(AssetsWork $work): Collection
     {
         $disk = Storage::disk('local');
         $filename = 'fake-comfyui.png';
 
         if ($disk->exists($filename)) {
 
-            $image = $this->optimizeImage($disk->get($filename));
+            $image = $this->optimizeImage($disk->get($filename), $work);
 
-            return Collection::range(0, 10)->mapWithKeys(function () use ($image) {
+            return Collection::range(0, 10)->mapWithKeys(function () use ($image, $work) {
 
                 $name = md5(Str::uuid()->toString());
-                $path = "$name.png";
+                $path = $this->imagePath($image, $work);
 
                 Storage::put($path, $image);
 
@@ -106,10 +106,10 @@ class ComfyUIService
      * @throws ConnectionException
      * @throws FilesystemException
      */
-    public function fetchOutputs(string $id): Collection|false
+    public function fetchOutputs(string $id, AssetsWork $work): Collection|false
     {
         if (config('app.comfyui_debug')) {
-            return $this->fakeImages();
+            return $this->fakeImages($work);
         }
 
         return retry(
@@ -118,7 +118,7 @@ class ComfyUIService
                 ...array_fill(0, 90, 500),  // 1 minute
                 ...array_fill(0, 48, 5 * 1000), // 5 minutes
             ],
-            callback: function () use ($id) {
+            callback: function () use ($id, $work) {
 
                 $response = $this->request()->get("/history/$id");
                 $completed = $response->json("$id.status.completed");
@@ -139,7 +139,7 @@ class ComfyUIService
                         ->flatten(2)
                         ->map(fn (array $output) => FileDescriptor::from($output))
                         ->mapWithKeys(fn (FileDescriptor $file) => [
-                            $file->name() => $this->storeImage($file),
+                            $file->name() => $this->storeImage($file, $work),
                         ]);
 
                 }
@@ -156,29 +156,34 @@ class ComfyUIService
     /**
      * @throws ConnectionException
      */
-    private function storeImage(FileDescriptor $fileDescription): string
+    private function storeImage(FileDescriptor $fileDescription, AssetsWork $work): string
     {
         $body = $this->optimizeImage(
-            $this->request()->get('/view', $fileDescription->toArray())->body(),
+            $this->request()->get('/view', $fileDescription->toArray())->body(), $work,
         );
 
         Storage::put(
-            $path = sprintf('%s.png', md5($body)),
+            $path = $this->imagePath($body, $work),
             $body,
         );
 
         return $path;
     }
 
-    private function optimizeImage(string $binary): string
+    private function optimizeImage(string $binary, AssetsWork $work): string
     {
-        $path = sprintf('%s.png', md5($binary));
+        $path = $this->imagePath($binary, $work);
         $disk = Storage::disk('local');
 
         $disk->put($path, $binary);
         ImageOptimizer::optimize($disk->path($path));
 
         return tap($disk->get($path), fn () => $disk->delete($path));
+    }
+
+    private function imagePath(string $binary, AssetsWork $work): string
+    {
+        return sprintf('books/%s/images/%s.png', $work->id, md5($binary));
     }
 
     private function prepareWorkflow(string $workflow, Tokens $tokens): Collection
