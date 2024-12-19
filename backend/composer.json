@@ -13,6 +13,8 @@
         "laravel/framework": "^11.9",
         "laravel/telescope": "^5.2",
         "laravel/tinker": "^2.9",
+        "league/flysystem-aws-s3-v3": "^3.29",
+        "league/flysystem-read-only": "^3.28",
         "spatie/laravel-data": "^4.11",
         "spatie/laravel-image-optimizer": "^1.8"
     },

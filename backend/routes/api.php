@@ -9,7 +9,7 @@ use App\Http\Controllers\DeleteBookController;
 use App\Http\Controllers\FailWorkController;
 use App\Http\Controllers\GetAssetsWorkController;
 use App\Http\Controllers\MyBooksController;
-use App\Http\Controllers\StoreAssetsController;
+use App\Http\Controllers\UpdateAssetsController;
 use App\Http\Controllers\ViewBookController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,5 +22,5 @@ Route::get('/my/books', MyBooksController::class);
 Route::post('/book/{book}/delete', DeleteBookController::class);
 
 Route::get('/work/assets', GetAssetsWorkController::class);
-Route::post('/work/{book}/assets', StoreAssetsController::class);
+Route::post('/work/{book}/assets', UpdateAssetsController::class);
 Route::post('/work/{book}/failure', FailWorkController::class);

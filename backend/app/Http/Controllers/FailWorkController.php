@@ -16,7 +16,7 @@ class FailWorkController extends Controller
             return [];
         }
 
-        BookService::resolve()->markBookAsFailed($book, $request);
+        BookService::resolve()->markBookAsFailed($book, $request->reason);
 
         return [];
     }

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use League\Flysystem\FilesystemException;
 use RuntimeException;
+use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 use Throwable;
 
 class ComfyUIService
@@ -28,6 +29,10 @@ class ComfyUIService
      */
     public function execute(string $workflow, AssetsWork $work): string
     {
+        if (config('app.comfyui_debug')) {
+            return Str::random();
+        }
+
         $tokens = Tokens::make()
             ->add(':title:', $work->title)
             ->add(':synopsis:', $work->synopsis);
@@ -67,20 +72,53 @@ class ComfyUIService
         return $response->successful();
     }
 
+    private function fakeImages(AssetsWork $work): Collection
+    {
+        $disk = Storage::disk('local');
+        $filename = 'fake-comfyui.png';
+
+        if ($disk->exists($filename)) {
+
+            $image = $this->optimizeImage($disk->get($filename), $work);
+
+            return Collection::range(0, 10)->mapWithKeys(function () use ($image, $work) {
+
+                $name = md5(Str::uuid()->toString());
+                $path = $this->imagePath($image, $work);
+
+                Storage::put($path, $image);
+
+                return [
+                    $name => $path,
+                ];
+
+            });
+
+        }
+
+        throw new RuntimeException(
+            'Fake image does not exist, path: ' . $disk->path($filename),
+        );
+    }
+
     /**
      * @throws Throwable
      * @throws ConnectionException
      * @throws FilesystemException
      */
-    public function fetchOutputs(string $id): Collection|false
+    public function fetchOutputs(string $id, AssetsWork $work): Collection|false
     {
+        if (config('app.comfyui_debug')) {
+            return $this->fakeImages($work);
+        }
+
         return retry(
             times: [
                 ...array_fill(0, 15, 1000), // 15 seconds
                 ...array_fill(0, 90, 500),  // 1 minute
                 ...array_fill(0, 48, 5 * 1000), // 5 minutes
             ],
-            callback: function () use ($id) {
+            callback: function () use ($id, $work) {
 
                 $response = $this->request()->get("/history/$id");
                 $completed = $response->json("$id.status.completed");
@@ -101,7 +139,7 @@ class ComfyUIService
                         ->flatten(2)
                         ->map(fn (array $output) => FileDescriptor::from($output))
                         ->mapWithKeys(fn (FileDescriptor $file) => [
-                            $file->name() => $this->downloadImage($file),
+                            $file->name() => $this->storeImage($file, $work),
                         ]);
 
                 }
@@ -117,16 +155,35 @@ class ComfyUIService
 
     /**
      * @throws ConnectionException
-     * @throws FilesystemException
      */
-    public function downloadImage(FileDescriptor $fileDescription): string
+    private function storeImage(FileDescriptor $fileDescription, AssetsWork $work): string
     {
-        $response = $this->request()->get('/view', $fileDescription->toArray());
-        $body = $response->body();
+        $body = $this->optimizeImage(
+            $this->request()->get('/view', $fileDescription->toArray())->body(), $work,
+        );
 
-        Storage::disk('public')->write($path = sprintf('%s.png', md5($body)), $body);
+        Storage::put(
+            $path = $this->imagePath($body, $work),
+            $body,
+        );
 
         return $path;
+    }
+
+    private function optimizeImage(string $binary, AssetsWork $work): string
+    {
+        $path = $this->imagePath($binary, $work);
+        $disk = Storage::disk('local');
+
+        $disk->put($path, $binary);
+        ImageOptimizer::optimize($disk->path($path));
+
+        return tap($disk->get($path), fn () => $disk->delete($path));
+    }
+
+    private function imagePath(string $binary, AssetsWork $work): string
+    {
+        return sprintf('books/%s/images/%s.png', $work->id, md5($binary));
     }
 
     private function prepareWorkflow(string $workflow, Tokens $tokens): Collection

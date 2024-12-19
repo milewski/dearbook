@@ -10,7 +10,6 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 
 class BackendService
 {
@@ -43,20 +42,11 @@ class BackendService
     /**
      * @throws ConnectionException
      */
-    public function uploadAssets(AssetsWork $work, Collection $assets): void
+    public function updateAssets(AssetsWork $work, Collection $assets): void
     {
-        $body = [];
-
-        foreach ($assets as $name => $path) {
-
-            $body[] = [
-                'name' => $name,
-                'contents' => Storage::disk('public')->readStream($path),
-            ];
-
-        }
-
-        $this->request()->asMultipart()->post("/work/$work->id/assets", $body);
+        $this->request()->post("/work/$work->id/assets", [
+            'assets' => $assets->toArray(),
+        ]);
     }
 
     private function request(): PendingRequest

@@ -6,12 +6,15 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class MyBookRequest extends FormRequest
+/**
+ * @property array $assets
+ */
+class UpdateAssetsRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'wallet' => [ 'required', 'string' ],
+            'assets' => [ 'required', 'array' ],
         ];
     }
 }

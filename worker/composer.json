@@ -11,6 +11,7 @@
         "php": "^8.2",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "league/flysystem-aws-s3-v3": "^3.29",
         "spatie/laravel-data": "^4.11",
         "spatie/laravel-image-optimizer": "^1.8"
     },
@@ -48,8 +49,7 @@
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan ide-helper:generate",
-            "@php artisan ide-helper:meta",
-            "@php artisan ide-helper:model --write-mixin"
+            "@php artisan ide-helper:meta"
         ],
         "ecs": [
             "@php ./vendor/bin/ecs check"

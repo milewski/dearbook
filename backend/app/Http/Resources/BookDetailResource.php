@@ -4,26 +4,28 @@ declare(strict_types = 1);
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Traits\DynamicStorage;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 /**
- * @property Book $resource
+ * @mixin Book
  */
 class BookDetailResource extends JsonResource
 {
+    use DynamicStorage;
+
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->resource->id,
-            'title' => $this->resource->title,
-            'synopsis' => $this->resource->synopsis,
-            'cover' => Storage::disk('public')->url($this->resource->assets->get('cover')),
-            'backdrop' => Storage::disk('public')->url($this->resource->assets->get('backdrop')),
-            'paragraphs' => $this->resource->paragraphs->map(fn (string $paragraph, int $index) => [
-                'illustration' => Storage::disk('public')->url($this->resource->assets->get(sprintf('illustration-%d', ++$index))),
+            'id' => $this->id,
+            'title' => $this->title,
+            'synopsis' => $this->synopsis,
+            'cover' => $this->imageUrl($this->assets->get('cover')),
+            'backdrop' => $this->imageUrl($this->assets->get('backdrop')),
+            'paragraphs' => $this->paragraphs->map(fn (string $paragraph, int $index) => [
+                'illustration' => $this->imageUrl($this->assets->get(sprintf('illustration-%d', ++$index))),
                 'text' => $paragraph,
             ]),
         ];

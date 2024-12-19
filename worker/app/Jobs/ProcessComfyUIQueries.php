@@ -11,8 +11,6 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Storage;
-use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 use Throwable;
 
 class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
@@ -29,26 +27,18 @@ class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
             try {
 
                 $assets = $comfyUIService->fetchOutputs(
-                    $comfyUIService->execute('main.workflow.json', $work),
+                    $comfyUIService->execute('main.workflow.json', $work), $work,
                 );
 
                 if ($assets === false) {
                     throw new Exception('Failed to generate images...');
                 }
 
-                foreach ($assets as $asset) {
-
-                    ImageOptimizer::optimize(
-                        Storage::disk('public')->path($asset),
-                    );
-
-                }
-
-                $backendService->uploadAssets($work, $assets);
+                $backendService->updateAssets($work, $assets);
 
             } catch (Throwable $error) {
 
-                $backendService->reportFailure($work->id, $error->getMessage());
+                $backendService->reportFailure($work->id, (string) $error->getMessage());
 
             }
 
