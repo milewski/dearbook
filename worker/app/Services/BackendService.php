@@ -45,7 +45,7 @@ class BackendService
     public function updateAssets(AssetsWork $work, Collection $assets): void
     {
         $this->request()->post("/work/$work->id/assets", [
-            'assets' => $assets->toArray()
+            'assets' => $assets->toArray(),
         ]);
     }
 

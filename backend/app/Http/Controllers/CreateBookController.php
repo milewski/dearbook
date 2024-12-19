@@ -6,9 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateBookRequest;
 use App\Jobs\ProcessOllamaQueries;
-use App\Models\Book;
 use App\Services\BookService;
-use Illuminate\Support\Facades\RateLimiter;
 
 class CreateBookController extends Controller
 {
