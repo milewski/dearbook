@@ -113,14 +113,14 @@ class BookService
         ];
 
         $prompt = <<<PROMPT
-        Analyze the following user input prompt and identify the language it was written in.
-        Respond with the ISO639-1 language code.
+        Analyze the following user input and identify the language it was written in.
+        Do not attempt to understand the meaning of the content; simply return the language it is written in.
 
         ----- start_of_user_input_content
         $prompt
         ----- end_of_user_input_content
 
-        Respond using JSON
+        Respond with the ISO639-1 language code using JSON.
         PROMPT;
 
         return [ $prompt, $schema ];
