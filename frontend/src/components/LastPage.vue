@@ -30,6 +30,3 @@
     </div>
 
 </template>
-<script setup lang="ts">
-    import { AspectRatio } from '../../@/components/ui/aspect-ratio'
-</script>

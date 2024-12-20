@@ -71,7 +71,8 @@
                                          src="../assets/placeholder.png"
                                          alt="">
 
-                                    <div class="absolute w-full flex top-0 bottom-0 m-auto justify-center items-center ">
+                                    <div
+                                        class="absolute w-full flex top-0 bottom-0 m-auto justify-center items-center ">
 
                                         <HoverCard :open-delay="0">
 
@@ -85,7 +86,8 @@
 
                                                 <div>{{ book.reason }}</div>
 
-                                                <Button class="w-full" variant="destructive" @click="deleteMyBook(book.id)">
+                                                <Button class="w-full" variant="destructive"
+                                                        @click="deleteMyBook(book.id)">
                                                     Ok
                                                 </Button>
 
@@ -133,201 +135,29 @@
 
                     <DrawerFooter>
 
+                        <Tabs default-value="simple" class="w-full">
 
-                            <Tabs default-value="simple" class="w-full">
+                            <TabsList class="grid w-full grid-cols-2 rounded-full">
 
-                                <TabsList class="grid w-full grid-cols-2 rounded-full">
+                                <TabsTrigger value="simple" class="rounded-full">
+                                    Simple
+                                </TabsTrigger>
 
-                                    <TabsTrigger value="simple" class="rounded-full">
-                                        Simple
-                                    </TabsTrigger>
+                                <TabsTrigger value="advanced" class="rounded-full">
+                                    Advanced
+                                </TabsTrigger>
 
-                                    <TabsTrigger value="advanced" class="rounded-full">
-                                        Advanced
-                                    </TabsTrigger>
+                            </TabsList>
 
-                                </TabsList>
+                            <TabsContent value="simple">
+                                <Simple @on-response="onResponse" :fakeWallet="fakeWallet"/>
+                            </TabsContent>
 
-                                <TabsContent value="simple">
+                            <TabsContent value="advanced">
+                                <Advanced @on-response="onResponse" :fakeWallet="fakeWallet"/>
+                            </TabsContent>
 
-                                    <form @submit="onSubmitSimple">
-
-                                        <Card class="rounded-2xl">
-
-                                            <CardHeader>
-
-                                                <CardTitle>Bring Your Story to Life</CardTitle>
-
-                                                <CardDescription>
-                                                    Describe your story with as much detail as you like, in any language!
-                                                </CardDescription>
-
-                                            </CardHeader>
-
-                                            <CardContent class="space-y-2">
-
-                                                <div class="grid w-full gap-2">
-
-                                                    <FormField v-slot="{ componentField }" name="prompt">
-
-                                                        <FormItem>
-
-                                                            <FormControl>
-
-                                                                <Textarea
-                                                                    class="auto-expand"
-                                                                    :placeholder="randomBookTitle"
-                                                                    v-bind="componentField"
-                                                                    rows="5"/>
-
-                                                            </FormControl>
-
-                                                            <FormMessage/>
-
-                                                        </FormItem>
-
-
-                                                    </FormField>
-
-                                                </div>
-
-                                            </CardContent>
-
-                                            <CardFooter>
-
-                                                <Button type="submit"
-                                                        :disabled="formLoading || !(formSimple.isFieldValid('prompt') && formSimple.values.prompt)"
-                                                        class="bg-[#F18533] hover:bg-[#F18533] w-full rounded-full">
-
-                                                    <div>Create!</div>
-
-                                                    <LoaderPinwheel v-if="formLoading" class="animate-spin"/>
-
-                                                </Button>
-
-                                            </CardFooter>
-
-                                        </Card>
-
-                                    </form>
-
-                                </TabsContent>
-
-                                <TabsContent value="advanced">
-
-                                    <form @submit="onSubmitAdvanced">
-
-                                        <Card class="rounded-2xl">
-
-                                            <CardHeader>
-
-                                                <CardTitle>Bring Your Story to Life</CardTitle>
-
-                                                <CardDescription>
-                                                    Take full control over your story’s title and description with more detailed customization options.
-                                                </CardDescription>
-
-                                            </CardHeader>
-
-                                            <CardContent class="space-y-2">
-
-                                                <div class="grid w-full gap-2">
-
-                                                    <FormField v-slot="{ componentField }" name="title">
-
-                                                        <FormItem>
-
-                                                            <FormControl>
-
-                                                                <div class="grid w-full  items-center gap-1.5">
-
-                                                                    <Label for="title" class="sm:hidden">Title</Label>
-                                                                    <Input v-bind="componentField" type="text" class="w-full" :placeholder="`Title, e.g. '${ randomBookTitle }'`"/>
-
-                                                                </div>
-
-                                                            </FormControl>
-
-                                                            <FormMessage/>
-
-                                                        </FormItem>
-
-                                                    </FormField>
-
-                                                    <div class="sm:flex space-y-2 sm:space-y-0 sm:space-x-4">
-
-                                                        <FormField as="div" class="flex-1" v-slot="{ componentField }" name="prompt">
-
-                                                            <FormItem>
-
-                                                                <FormControl>
-
-                                                                    <Label for="title" class="sm:hidden">Story</Label>
-
-                                                                    <Textarea
-                                                                        class="auto-expand"
-                                                                        placeholder="Main storyline: What exciting adventure will your story unfold?"
-                                                                        v-bind="componentField"
-                                                                        rows="5"/>
-
-                                                                </FormControl>
-
-                                                                <FormMessage/>
-
-                                                            </FormItem>
-
-                                                        </FormField>
-
-                                                        <FormField as="div" class="flex-1" v-slot="{ componentField }" name="negative">
-
-                                                            <FormItem>
-
-                                                                <FormControl>
-
-                                                                    <Label for="negative" class="sm:hidden">Exclusion</Label>
-
-                                                                    <Textarea
-                                                                        class="auto-expand"
-                                                                        placeholder="Describe elements you don't want in the illustrations (e.g., humans, forests, trees)"
-                                                                        v-bind="componentField"
-                                                                        rows="5"/>
-
-                                                                </FormControl>
-
-                                                                <FormMessage/>
-
-                                                            </FormItem>
-
-                                                        </FormField>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </CardContent>
-
-                                            <CardFooter>
-
-                                                <Button type="submit"
-                                                        :disabled="formLoading || !(formAdvanced.isFieldValid('prompt') && formAdvanced.isFieldValid('title'))"
-                                                        class="bg-[#F18533] hover:bg-[#F18533] w-full rounded-full">
-
-                                                    <div>Create!</div>
-
-                                                    <LoaderPinwheel v-if="formLoading" class="animate-spin"/>
-
-                                                </Button>
-
-                                            </CardFooter>
-
-                                        </Card>
-
-                                    </form>
-
-                                </TabsContent>
-
-                            </Tabs>
-
+                        </Tabs>
 
 
                     </DrawerFooter>
@@ -345,42 +175,28 @@
 <script setup lang="ts">
 
     import { Button } from '../../@/components/ui/button'
-    import { FormControl, FormField, FormItem, FormMessage } from '../../@/components/ui/form'
-    import { Textarea } from '../../@/components/ui/textarea'
-    import { Input } from '../../@/components/ui/input'
-    import { Label } from '../../@/components/ui/label'
-    import { LoaderPinwheel, EyeIcon, ClockAlertIcon } from 'lucide-vue-next'
+    import { ClockAlertIcon, EyeIcon, LoaderPinwheel } from 'lucide-vue-next'
     import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../../@/components/ui/drawer'
-    import { toTypedSchema } from '@vee-validate/zod'
-    import * as z from 'zod'
-    import { useForm } from 'vee-validate'
-    import { ref, watch } from 'vue'
+    import { ref } from 'vue'
     import { useLocalStorage } from '@vueuse/core'
     import { Keyboard, Mousewheel, Pagination } from 'swiper/modules'
     import { Swiper, SwiperSlide } from 'swiper/vue'
-    import { BookIndexResource, createBook, createBookAdvanced, deleteBook, myBooks } from '../api.ts'
-    import { randomSearchTerm } from '../utilities.ts'
+    import { BookIndexResource, deleteBook, myBooks } from '../api.ts'
     import { HoverCard, HoverCardContent, HoverCardTrigger } from '../../@/components/ui/hover-card'
     import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../@/components/ui/tabs'
-    import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../@/components/ui/card'
     import { ScrollArea } from '../../@/components/ui/scroll-area'
+    import Advanced from './forms/Advanced.vue'
+    import Simple from './forms/Simple.vue'
+
+    export type UserBookType = Array<BookIndexResource | { id: string, type: 'placeholder' } | {
+        id: string,
+        reason: string,
+        type: 'failed'
+    }>
 
     const props = defineProps<{ viewBook: (bookId: number) => Promise<void>, loading: number | undefined }>()
 
-    const formSchemaSimple = toTypedSchema(z.object({ prompt: z.string().max(500).min(10) }))
-    const formSimple = useForm({ validationSchema: formSchemaSimple })
-
-    const formSchemaAdvanced= toTypedSchema(z.object({
-        title: z.string().max(255).min(10),
-        prompt: z.string().max(500).min(10),
-        negative: z.string().max(500),
-    }))
-
-    const formAdvanced= useForm({ validationSchema: formSchemaAdvanced})
-
-    const formLoading = ref(false)
     const createDrawerState = ref(false)
-    const randomBookTitle = ref()
 
     const fakeWallet = useLocalStorage<Record<string, boolean | BookIndexResource>>('fake_wallet', makeFakeWallet(12))
 
@@ -461,72 +277,12 @@
 
     }
 
-    const userBooks = ref<Array<BookIndexResource | { id: string, type: 'placeholder' } | {
-        id: string,
-        reason: string,
-        type: 'failed'
-    }>>([])
+    const userBooks = ref<UserBookType>([])
 
-    watch(createDrawerState, () => {
-        randomBookTitle.value = randomSearchTerm()
-    })
-
-    const onSubmitSimple = formSimple.handleSubmit(async values => {
-
-        formLoading.value = true
-
-        await createBook(values.prompt, fakeWallet.value!)
-            .then(response => {
-
-                if (response.id) {
-
-                    userBooks.value.unshift({
-                        id: response.id,
-                        type: 'placeholder',
-                    })
-
-                }
-
-            })
-            .finally(() => {
-                formLoading.value = false
-                randomBookTitle.value = randomSearchTerm()
-                formSimple.resetForm()
-            })
-
-    })
-
-    const onSubmitAdvanced = formAdvanced.handleSubmit(async values => {
-
-        formLoading.value = true
-
-        await createBookAdvanced(values.title, values.prompt, values.negative, fakeWallet.value!)
-            .then(response => {
-
-                if (response.id) {
-
-                    userBooks.value.unshift({
-                        id: response.id,
-                        type: 'placeholder',
-                    })
-
-                }
-
-            })
-            .finally(() => {
-                formLoading.value = false
-                randomBookTitle.value = randomSearchTerm()
-                formAdvanced.resetForm()
-            })
-
-    })
+    function onResponse(placeholder) {
+        userBooks.value.unshift(placeholder)
+    }
 
     refresh()
 
 </script>
-
-<style>
-    .auto-expand {
-        field-sizing: content
-    }
-</style>

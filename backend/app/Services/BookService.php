@@ -73,7 +73,7 @@ class BookService
             return new Storyline(
                 language: $language,
                 data: $book = $this->generateBookMainStoryLine($language, $generationData),
-                illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
+                illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs, $generationData),
             );
 
         });
@@ -287,10 +287,10 @@ class BookService
      * @throws Throwable
      * @throws ConnectionException
      */
-    private function generateIllustrationDirectionFromParagraphs(array $paragraphs): array
+    private function generateIllustrationDirectionFromParagraphs(array $paragraphs, GenerationDataAdvanced|GenerationDataSimple $data): array
     {
         $illustrations = OllamaService::resolve()
-            ->pool($this->describeIllustrationPrompt($paragraphs))
+            ->pool($this->describeIllustrationPrompt($paragraphs, $data))
             ->map(fn (Collection $response) => $response->get('illustration'));
 
         if (count($illustrations) !== count($paragraphs)) {
@@ -383,13 +383,13 @@ class BookService
         return [ $prompt, $schema ];
     }
 
-    private function describeIllustrationPrompt(array $paragraphs): Collection
+    private function describeIllustrationPrompt(array $paragraphs, GenerationDataAdvanced|GenerationDataSimple $data): Collection
     {
         $story = collect($paragraphs)
             ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
-        return collect($paragraphs)->map(function (string $paragraph) use ($story) {
+        return collect($paragraphs)->map(function (string $paragraph) use ($story, $data) {
 
             $schema = [
                 'type' => 'object',
@@ -400,6 +400,11 @@ class BookService
                     ],
                 ],
             ];
+
+            $exclusion = match ($data instanceof GenerationDataAdvanced) {
+                true => "Ensure the prompt does not make any mention or include these elements: '$data->negative'",
+                false => '',
+            };
 
             $prompt = <<<PROMPT
             Generate a creative image prompt for a generative AI tool to create an illustration for the following paragraph in the children's book. You will receive the full story context for reference, but respond with one image prompt at a time, focusing on the provided paragraph.
@@ -417,6 +422,8 @@ class BookService
             ----- start_of_paragraph
             $paragraph
             ----- end_of_paragraph
+
+            $exclusion
 
             For the paragraph provided, do the following:
             1. Identify the key scene and describe it in detail, including any relevant emotions or atmosphere.
