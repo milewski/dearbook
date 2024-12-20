@@ -314,10 +314,10 @@ class BookService
         ];
 
         $prompt = <<<PROMPT
-        Write a humorous and engaging children's book with exactly 10 paragraphs.
-        Each paragraph must be short, written in a simple and playful tone, and easy for young children to understand and enjoy.
+        Write a humorous and engaging children's book with exactly 10 paragraphs, each paragraph should be written in a simple and playful tone suitable for children,
+        and needs to be very short in length, have it written with language that’s easy to understand and captivating for young children.
 
-        Use the following user-provided input as the theme or storyline, and ensure the story adheres to the specified rules:
+        Use the following user-provided input as the theme or storyline, but ensure you follow the specified rules:
 
         ----- start_of_user_input_content
         $prompt
@@ -327,7 +327,7 @@ class BookService
         Avoid mixing any other language or text within the output.
         Maintain consistency in the specified language throughout.
 
-        Provide the response formatted as valid JSON
+        Respond using JSON
         PROMPT;
 
         return [ $prompt, $schema ];

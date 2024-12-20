@@ -18,6 +18,14 @@ class StorylineData extends Data
 
     public function isValid(): bool
     {
+        foreach ($this->paragraphs as $paragraph) {
+
+            if (blank($paragraph)) {
+                return false;
+            }
+
+        }
+
         return count($this->paragraphs) === 10 && filled($this->title) && filled($this->synopsis);
     }
 }
