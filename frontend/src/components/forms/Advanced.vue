@@ -149,7 +149,7 @@
 
         formLoading.value = true
 
-        await createBookAdvanced(values.title, values.prompt, values.negative, fakeWallet.value!)
+        await createBookAdvanced(values.title, values.prompt, values.negative, fakeWallet)
             .then(response => {
 
                 if (response.id) {
