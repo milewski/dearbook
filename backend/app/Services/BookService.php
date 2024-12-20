@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Locale;
+use PrinsFrank\Standards\Language\LanguageAlpha2;
 use Throwable;
 
 class BookService
@@ -57,8 +59,11 @@ class BookService
 
         return retry(3, function () use ($book) {
 
+            $language = $this->extractPromptLanguage($book->user_prompt);
+
             return new Storyline(
-                data: $book = $this->generateBookMainStoryLine($book->user_prompt),
+                language: $language,
+                data: $book = $this->generateBookMainStoryLine($language, $book->user_prompt),
                 illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
             );
 
@@ -77,6 +82,48 @@ class BookService
                 ...$this->askIfPromptIsSafeForChildren($prompt),
             ),
         );
+    }
+
+    /**
+     * @throws Exception
+     * @throws Throwable
+     * @throws ConnectionException
+     */
+    private function extractPromptLanguage(string $prompt): LanguageAlpha2
+    {
+        $response = $this->ollama->generateJsonSchema(
+            ...$this->askWhatLanguagePromptWasWritten($prompt),
+        );
+
+        return LanguageAlpha2::tryFrom(
+            Locale::getPrimaryLanguage($response->get('language')),
+        );
+    }
+
+    private function askWhatLanguagePromptWasWritten(string $prompt): array
+    {
+        $schema = [
+            'type' => 'object',
+            'required' => [ 'language' ],
+            'properties' => [
+                'language' => [
+                    'type' => 'string',
+                ],
+            ],
+        ];
+
+        $prompt = <<<PROMPT
+        Analyze the following user input prompt and identify the language it was written in.
+        Respond with the ISO639-1 language code.
+
+        ----- start_of_user_input_content
+        $prompt
+        ----- end_of_user_input_content
+
+        Respond using JSON
+        PROMPT;
+
+        return [ $prompt, $schema ];
     }
 
     private function askIfPromptIsSafeForChildren(string $prompt): array
@@ -107,7 +154,7 @@ class BookService
         return [ $prompt, $schema ];
     }
 
-    public function retryUncompletedBooks(): void
+    public function pendingBooks(): Collection
     {
         Book::query()
             ->whereIn('state', [
@@ -118,6 +165,12 @@ class BookService
             ->update([
                 'fetched_at' => null,
             ]);
+
+        return Book::query()
+            ->where('state', BookState::PendingStoryLine)
+            ->whereNull('fetched_at')
+            ->orderBy('created_at')
+            ->get();
     }
 
     public function markBookAsFailed(Book $book, string $reason): void
@@ -130,6 +183,7 @@ class BookService
     public function updateStoryline(Book $book, Storyline $storyline): bool
     {
         $book->title = $storyline->data->title;
+        $book->language = $storyline->language;
         $book->synopsis = $storyline->data->synopsis;
         $book->paragraphs = $storyline->data->paragraphs;
         $book->illustrations = $storyline->illustrations;
@@ -167,7 +221,7 @@ class BookService
         $book = Book::query()
             ->where('state', BookState::PendingIllustrations)
             ->where('fetched_at', null)
-            ->orderByDesc('created_at')
+            ->orderBy('created_at')
             ->lockForUpdate()
             ->first();
 
@@ -223,11 +277,11 @@ class BookService
      * @throws Exception
      * @throws ConnectionException
      */
-    private function generateBookMainStoryLine(?string $prompt): StorylineData
+    private function generateBookMainStoryLine(LanguageAlpha2 $language, string $prompt): StorylineData
     {
         $data = StorylineData::from(
             $this->ollama->generateJsonSchema(
-                ...$this->generateStoryFromPrompt($prompt),
+                ...$this->generateStoryFromPrompt($language, $prompt),
             ),
         );
 
@@ -238,7 +292,7 @@ class BookService
         return $data;
     }
 
-    private function generateStoryFromPrompt(string $prompt): array
+    private function generateStoryFromPrompt(LanguageAlpha2 $language, string $prompt): array
     {
         $schema = [
             'type' => 'object',
@@ -269,10 +323,8 @@ class BookService
         $prompt
         ----- end_of_user_input_content
 
-        Each story should be unique in its plot, tone, and characters.
-
-        It is crucial to generate the storyline in the same language as the user's input.
-        For example, if the user provides a prompt in Chinese, the system should create the story, synopsis, and title in Chinese as well.
+        Generate the story in the specified language: "$language->name."
+        Do not mix languages; ensure the entire story is written exclusively in "$language->name."
 
         Respond using JSON
         PROMPT;
