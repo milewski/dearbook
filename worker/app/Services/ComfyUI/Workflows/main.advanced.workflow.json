@@ -209,7 +209,7 @@
   },
   "187:2": {
     "inputs": {
-      "text": "(humans, boy, girl, person, kids, children)",
+      "text": "(:negative:)",
       "clip": [
         "189",
         1

@@ -491,7 +491,7 @@
             .finally(() => {
                 formLoading.value = false
                 randomBookTitle.value = randomSearchTerm()
-                form.resetForm()
+                formSimple.resetForm()
             })
 
     })
@@ -516,7 +516,7 @@
             .finally(() => {
                 formLoading.value = false
                 randomBookTitle.value = randomSearchTerm()
-                form.resetForm()
+                formAdvanced.resetForm()
             })
 
     })

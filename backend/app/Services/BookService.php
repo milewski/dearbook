@@ -331,6 +331,7 @@ class BookService
                 ],
                 'synopsis' => [
                     'type' => 'string',
+                    'minLength' => 100,
                 ],
                 'paragraphs' => [
                     'type' => 'array',
@@ -342,7 +343,12 @@ class BookService
         ];
 
         $title = match ($data instanceof GenerationDataAdvanced) {
-            true => "The story title should be: $data->title",
+            true => "Book title: '$data->title'",
+            false => '',
+        };
+
+        $exclusion = match ($data instanceof GenerationDataAdvanced) {
+            true => "Ensure the story does not make any mention or include these elements: '$data->negative'",
             false => '',
         };
 
@@ -361,6 +367,8 @@ class BookService
         ----- start_of_user_input_content
         $data->prompt
         ----- end_of_user_input_content
+
+        $exclusion
 
         Hard Rules:
          - The story must be written exclusively in "$language->name."
