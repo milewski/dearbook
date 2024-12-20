@@ -9,7 +9,7 @@
                 <img src="../assets/logo.png" class="w-40 mb-10 sm:mb-16" alt="dearbook">
 
                 <h1 class="text-3xl sm:text-4xl text-center font-bold *:hidden *:sm:block">
-                    This book was created by DearBook, <br> an AI-powered children's book <br> generating platform
+                    This book was made using DearBook, <br> an AI-powered children's book creator.
                 </h1>
 
                 <p class="sm:text-2xl mt-2 sm:mt-5 text-center">
