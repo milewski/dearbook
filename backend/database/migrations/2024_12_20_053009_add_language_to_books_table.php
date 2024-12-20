@@ -14,10 +14,6 @@ return new class extends Migration {
         });
 
         Book::query()->update([ 'language' => LanguageAlpha2::English ]);
-
-        Schema::table('books', function (Blueprint $table) {
-            $table->string('language')->change();
-        });
     }
 
     public function down(): void
