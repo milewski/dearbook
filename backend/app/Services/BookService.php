@@ -154,7 +154,7 @@ class BookService
         return [ $prompt, $schema ];
     }
 
-    public function retryUncompletedBooks(): void
+    public function pendingBooks(): Collection
     {
         Book::query()
             ->whereIn('state', [
@@ -165,6 +165,11 @@ class BookService
             ->update([
                 'fetched_at' => null,
             ]);
+
+        return Book::query()
+            ->where('state', BookState::PendingStoryLine)
+            ->whereNull('fetched_at')
+            ->get();
     }
 
     public function markBookAsFailed(Book $book, string $reason): void
