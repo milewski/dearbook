@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateBookAdvancedRequest;
-use App\Http\Requests\CreateBookRequest;
 use App\Jobs\ProcessOllamaQueries;
 use App\Services\BookService;
 

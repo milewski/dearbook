@@ -152,7 +152,7 @@ class BookService
 
         $input = match ($data instanceof GenerationDataSimple) {
             true => $data->prompt,
-            false => "$data->prompt, $data->title"
+            false => "$data->prompt, $data->title",
         };
 
         $prompt = <<<PROMPT
