@@ -96,7 +96,7 @@ class BookService
         );
 
         return LanguageAlpha2::tryFrom(
-            Locale::getPrimaryLanguage($response->get('language'))
+            Locale::getPrimaryLanguage($response->get('language')),
         );
     }
 

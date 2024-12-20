@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types = 1);
+
 use App\Models\Book;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use PrinsFrank\Standards\Language\LanguageAlpha2;
 
-return new class extends Migration {
+return new class () extends Migration
+{
     public function up(): void
     {
         Schema::table('books', function (Blueprint $table) {
