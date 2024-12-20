@@ -26,18 +26,10 @@ class ComfyUIService
      * @throws Throwable
      * @throws ConnectionException
      */
-    public function execute(string $workflow, AssetsWork $work): string
+    public function execute(AssetsWork $work): string
     {
-        $tokens = Tokens::make()
-            ->add(':title:', $work->title)
-            ->add(':synopsis:', $work->synopsis);
-
-        foreach ($work->illustrations as $index => $illustration) {
-            $tokens->add(sprintf(':illustration-%s:', ++$index), $illustration);
-        }
-
         return $this->prompt(
-            prompt: $this->prepareWorkflow($workflow, $tokens),
+            prompt: $this->prepareWorkflow($work->workflow(), $work->tokens()),
             clientId: Str::uuid()->toString(),
         );
     }

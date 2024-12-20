@@ -58,6 +58,16 @@ export async function createBook(prompt: string, wallet: string): Promise<{ id: 
 
 }
 
+export async function createBookAdvanced(title: string, prompt: string, negative: string, wallet: string): Promise<{ id: string }> {
+
+    return fetch(`https://${ API_HOST }/book/create/advanced`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ title, prompt, negative, wallet }),
+    }).then(response => response.json())
+
+}
+
 export async function booksList(): Promise<BookIndexResource[]> {
 
     return fetch(`https://${ API_HOST }/books`, { headers })

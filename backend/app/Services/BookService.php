@@ -5,11 +5,15 @@ declare(strict_types = 1);
 namespace App\Services;
 
 use App\Data\ChildrenAwareData;
+use App\Data\GenerationDataAdvanced;
+use App\Data\GenerationDataSimple;
 use App\Data\Storyline;
 use App\Data\StorylineData;
 use App\Enums\BookState;
+use App\Enums\GenerationType;
 use App\Exceptions\InvalidDataGeneratedByOllama;
 use App\Exceptions\UnsafeForChildrenException;
+use App\Http\Requests\CreateBookAdvancedRequest;
 use App\Http\Requests\CreateBookRequest;
 use App\Http\Requests\StoreAssetsRequest;
 use App\Models\Book;
@@ -51,19 +55,24 @@ class BookService
      */
     public function generateStoryline(Book $book): Storyline
     {
-        $childrenAwareData = $this->isSafeForChildren($book->user_prompt);
+        $generationData = match ($book->generation_type) {
+            GenerationType::Simple => GenerationDataSimple::from($book->generation_data),
+            GenerationType::Advanced => GenerationDataAdvanced::from($book->generation_data),
+        };
+
+        $childrenAwareData = $this->isSafeForChildren($generationData);
 
         if ($childrenAwareData->isSafe === false) {
             throw new UnsafeForChildrenException($childrenAwareData->reason);
         }
 
-        return retry(3, function () use ($book) {
+        return retry(3, function () use ($book, $generationData) {
 
-            $language = $this->extractPromptLanguage($book->user_prompt);
+            $language = $this->extractPromptLanguage($generationData->prompt);
 
             return new Storyline(
                 language: $language,
-                data: $book = $this->generateBookMainStoryLine($language, $book->user_prompt),
+                data: $book = $this->generateBookMainStoryLine($language, $generationData),
                 illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
             );
 
@@ -75,11 +84,11 @@ class BookService
      * @throws Throwable
      * @throws ConnectionException
      */
-    private function isSafeForChildren(string $prompt): ChildrenAwareData
+    private function isSafeForChildren(GenerationDataSimple|GenerationDataAdvanced $data): ChildrenAwareData
     {
         return ChildrenAwareData::from(
             $this->ollama->generateJsonSchema(
-                ...$this->askIfPromptIsSafeForChildren($prompt),
+                ...$this->askIfPromptIsSafeForChildren($data),
             ),
         );
     }
@@ -126,7 +135,7 @@ class BookService
         return [ $prompt, $schema ];
     }
 
-    private function askIfPromptIsSafeForChildren(string $prompt): array
+    private function askIfPromptIsSafeForChildren(GenerationDataSimple|GenerationDataAdvanced $data): array
     {
         $schema = [
             'type' => 'object',
@@ -141,11 +150,16 @@ class BookService
             ],
         ];
 
+        $input = match ($data instanceof GenerationDataSimple) {
+            true => $data->prompt,
+            false => "$data->prompt, $data->title"
+        };
+
         $prompt = <<<PROMPT
         Analyze the following user input prompt and flag it as unsafe if it contains any language related to pornography, sex, or drugs.
 
         ----- start_of_user_input_content
-        $prompt
+        $input
         ----- end_of_user_input_content
 
         Respond using JSON
@@ -208,8 +222,22 @@ class BookService
     public function createPendingBook(CreateBookRequest $request): Book
     {
         $book = new Book();
-        $book->user_prompt = $request->prompt;
         $book->wallet = $request->wallet;
+        $book->generation_type = GenerationType::Simple;
+        $book->generation_data = GenerationDataSimple::from($request->toArray());
+
+        $book->save();
+
+        return $book;
+    }
+
+    public function createPendingBookAdvanced(CreateBookAdvancedRequest $request): Book
+    {
+        $book = new Book();
+
+        $book->wallet = $request->wallet;
+        $book->generation_type = GenerationType::Advanced;
+        $book->generation_data = GenerationDataAdvanced::from($request->toArray());
 
         $book->save();
 
@@ -277,11 +305,11 @@ class BookService
      * @throws Exception
      * @throws ConnectionException
      */
-    private function generateBookMainStoryLine(LanguageAlpha2 $language, string $prompt): StorylineData
+    private function generateBookMainStoryLine(LanguageAlpha2 $language, GenerationDataAdvanced|GenerationDataSimple $data): StorylineData
     {
         $data = StorylineData::from(
             $this->ollama->generateJsonSchema(
-                ...$this->generateStoryFromPrompt($language, $prompt),
+                ...$this->generateStoryFromPrompt($language, $data),
             ),
         );
 
@@ -292,7 +320,7 @@ class BookService
         return $data;
     }
 
-    private function generateStoryFromPrompt(LanguageAlpha2 $language, string $prompt): array
+    private function generateStoryFromPrompt(LanguageAlpha2 $language, GenerationDataAdvanced|GenerationDataSimple $data): array
     {
         $schema = [
             'type' => 'object',
@@ -313,6 +341,11 @@ class BookService
             ],
         ];
 
+        $title = match ($data instanceof GenerationDataAdvanced) {
+            true => "The story title should be: $data->title",
+            false => '',
+        };
+
         $prompt = <<<PROMPT
         You are a children book writer,
         your sole purpose is to create engaging and fun stories for kids.
@@ -323,8 +356,10 @@ class BookService
 
         Use the following user-provided input as the theme or storyline, but ensure you follow the specified rules:
 
+        $title
+
         ----- start_of_user_input_content
-        $prompt
+        $data->prompt
         ----- end_of_user_input_content
 
         Hard Rules:
@@ -332,6 +367,7 @@ class BookService
          - Avoid mixing any other language or text within the output.
          - Maintain consistency in the specified language throughout.
          - Don't wrap each paragraph in any additional symbols like {} or "".
+         - Ensure the synopsis has at least 100 characters.
 
         Respond using JSON
         PROMPT;
