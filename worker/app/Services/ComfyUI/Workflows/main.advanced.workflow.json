@@ -1,0 +1,836 @@
+{
+  "88": {
+    "inputs": {
+      "lora_name": "sdxl_lightning_8step_lora.safetensors",
+      "strength_model": 1,
+      "strength_clip": 1,
+      "model": [
+        "190",
+        0
+      ],
+      "clip": [
+        "190",
+        1
+      ]
+    },
+    "class_type": "LoraLoader"
+  },
+  "91": {
+    "inputs": {
+      "lora_name": "Childrens_book_illustration-000001.safetensors",
+      "strength_model": 0.8,
+      "strength_clip": 0.8,
+      "model": [
+        "95",
+        0
+      ],
+      "clip": [
+        "95",
+        1
+      ]
+    },
+    "class_type": "LoraLoader"
+  },
+  "95": {
+    "inputs": {
+      "ckpt_name": "juggernautXL_juggXIByRundiffusion.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple"
+  },
+  "189": {
+    "inputs": {
+      "lora_name": "childrens_story_book.safetensors",
+      "strength_model": 0.6,
+      "strength_clip": 0.6,
+      "model": [
+        "88",
+        0
+      ],
+      "clip": [
+        "88",
+        1
+      ]
+    },
+    "class_type": "LoraLoader"
+  },
+  "190": {
+    "inputs": {
+      "lora_name": "Drawing_cute_animals__Isa_Bel-000008.safetensors",
+      "strength_model": 0.6,
+      "strength_clip": 0.6,
+      "model": [
+        "91",
+        0
+      ],
+      "clip": [
+        "91",
+        1
+      ]
+    },
+    "class_type": "LoraLoader"
+  },
+  "195": {
+    "inputs": {
+      "text": "(:negative:)",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "196": {
+    "inputs": {
+      "width": 768,
+      "height": 768,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "201": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-1:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "204": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-2:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "207": {
+    "inputs": {
+      "text": "Children's Illustration Style book cover: \n\n\":title:\" \n\ncinematic photo, 4k, highly detailed, uhd image, intricate details",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "209": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-3:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "211": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-4:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "214": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-5:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "216": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-6:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "217": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-7:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "219": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-8:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "221": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-9:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "223": {
+    "inputs": {
+      "text": "childrens_book_illustration\n\n:illustration-10:",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "187:1": {
+    "inputs": {
+      "text": "Children's Book Illustration Style\n\n:title: - :synopsis:\n\n(only 1 subject:2)\n\n(background, environment, clean background:1.5)",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "187:2": {
+    "inputs": {
+      "text": "(:negative:)",
+      "clip": [
+        "189",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode"
+  },
+  "188:0": {
+    "inputs": {
+      "width": 1536,
+      "height": 864,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "188:1": {
+    "inputs": {
+      "seed": 84991852352147,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "187:1",
+        0
+      ],
+      "negative": [
+        "187:2",
+        0
+      ],
+      "latent_image": [
+        "188:0",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "188:2": {
+    "inputs": {
+      "samples": [
+        "188:1",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "188:3": {
+    "inputs": {
+      "filename_prefix": "backdrop",
+      "images": [
+        "188:2",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "203:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "201",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "203:1": {
+    "inputs": {
+      "samples": [
+        "203:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "203:2": {
+    "inputs": {
+      "filename_prefix": "illustration-1",
+      "images": [
+        "203:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "205:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "204",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "205:1": {
+    "inputs": {
+      "samples": [
+        "205:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "205:2": {
+    "inputs": {
+      "filename_prefix": "illustration-2",
+      "images": [
+        "205:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "165:0": {
+    "inputs": {
+      "width": 688,
+      "height": 1032,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage"
+  },
+  "165:1": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "207",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "165:0",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "165:2": {
+    "inputs": {
+      "samples": [
+        "165:1",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "165:3": {
+    "inputs": {
+      "filename_prefix": "cover",
+      "images": [
+        "165:2",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "210:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "209",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "210:1": {
+    "inputs": {
+      "samples": [
+        "210:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "210:2": {
+    "inputs": {
+      "filename_prefix": "illustration-3",
+      "images": [
+        "210:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "212:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "211",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "212:1": {
+    "inputs": {
+      "samples": [
+        "212:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "212:2": {
+    "inputs": {
+      "filename_prefix": "illustration-4",
+      "images": [
+        "212:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "213:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "214",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "213:1": {
+    "inputs": {
+      "samples": [
+        "213:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "213:2": {
+    "inputs": {
+      "filename_prefix": "illustration-5",
+      "images": [
+        "213:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "215:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "216",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "215:1": {
+    "inputs": {
+      "samples": [
+        "215:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "215:2": {
+    "inputs": {
+      "filename_prefix": "illustration-6",
+      "images": [
+        "215:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "218:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "217",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "218:1": {
+    "inputs": {
+      "samples": [
+        "218:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "218:2": {
+    "inputs": {
+      "filename_prefix": "illustration-7",
+      "images": [
+        "218:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "220:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "219",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "220:1": {
+    "inputs": {
+      "samples": [
+        "220:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "220:2": {
+    "inputs": {
+      "filename_prefix": "illustration-8",
+      "images": [
+        "220:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "222:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "221",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "222:1": {
+    "inputs": {
+      "samples": [
+        "222:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "222:2": {
+    "inputs": {
+      "filename_prefix": "illustration-9",
+      "images": [
+        "222:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  },
+  "224:0": {
+    "inputs": {
+      "seed": 84991852352141,
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "189",
+        0
+      ],
+      "positive": [
+        "223",
+        0
+      ],
+      "negative": [
+        "195",
+        0
+      ],
+      "latent_image": [
+        "196",
+        0
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "224:1": {
+    "inputs": {
+      "samples": [
+        "224:0",
+        0
+      ],
+      "vae": [
+        "95",
+        2
+      ]
+    },
+    "class_type": "VAEDecode"
+  },
+  "224:2": {
+    "inputs": {
+      "filename_prefix": "illustration-10",
+      "images": [
+        "224:1",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  }
+}

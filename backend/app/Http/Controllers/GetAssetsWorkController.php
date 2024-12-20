@@ -22,6 +22,8 @@ class GetAssetsWorkController extends Controller
                 'title' => $book->title,
                 'synopsis' => $book->synopsis,
                 'illustrations' => $book->illustrations,
+                'generation_type' => $book->generation_type->value,
+                'generation_data' => $book->generationData()->toArray(),
             ];
 
         }

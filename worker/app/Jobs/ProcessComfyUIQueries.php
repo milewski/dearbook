@@ -29,7 +29,7 @@ class ProcessComfyUIQueries implements ShouldBeUnique, ShouldQueue
             try {
 
                 $assets = $comfyUIService->fetchOutputs(
-                    $comfyUIService->execute('main.workflow.json', $work),
+                    $comfyUIService->execute($work),
                 );
 
                 if ($assets === false) {

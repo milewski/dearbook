@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 use App\Http\Controllers\BooksController;
 use App\Http\Controllers\CheckBatchesController;
+use App\Http\Controllers\CreateBookAdvancedController;
 use App\Http\Controllers\CreateBookController;
 use App\Http\Controllers\DeleteBookController;
 use App\Http\Controllers\FailWorkController;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/books', BooksController::class);
 Route::get('/book/{book}', ViewBookController::class);
 Route::post('/book/create', CreateBookController::class);
+Route::post('/book/create/advanced', CreateBookAdvancedController::class);
 Route::post('/check/batches', CheckBatchesController::class);
 
 Route::get('/my/books', MyBooksController::class);

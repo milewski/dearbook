@@ -37,7 +37,7 @@ class BackendService
             return null;
         }
 
-        return AssetsWork::from($response);
+        return AssetsWork::fromResponse($response);
     }
 
     /**

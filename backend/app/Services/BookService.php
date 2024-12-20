@@ -5,11 +5,15 @@ declare(strict_types = 1);
 namespace App\Services;
 
 use App\Data\ChildrenAwareData;
+use App\Data\GenerationDataAdvanced;
+use App\Data\GenerationDataSimple;
 use App\Data\Storyline;
 use App\Data\StorylineData;
 use App\Enums\BookState;
+use App\Enums\GenerationType;
 use App\Exceptions\InvalidDataGeneratedByOllama;
 use App\Exceptions\UnsafeForChildrenException;
+use App\Http\Requests\CreateBookAdvancedRequest;
 use App\Http\Requests\CreateBookRequest;
 use App\Http\Requests\StoreAssetsRequest;
 use App\Models\Book;
@@ -51,20 +55,25 @@ class BookService
      */
     public function generateStoryline(Book $book): Storyline
     {
-        $childrenAwareData = $this->isSafeForChildren($book->user_prompt);
+        $generationData = match ($book->generation_type) {
+            GenerationType::Simple => GenerationDataSimple::from($book->generation_data),
+            GenerationType::Advanced => GenerationDataAdvanced::from($book->generation_data),
+        };
+
+        $childrenAwareData = $this->isSafeForChildren($generationData);
 
         if ($childrenAwareData->isSafe === false) {
             throw new UnsafeForChildrenException($childrenAwareData->reason);
         }
 
-        return retry(3, function () use ($book) {
+        return retry(3, function () use ($book, $generationData) {
 
-            $language = $this->extractPromptLanguage($book->user_prompt);
+            $language = $this->extractPromptLanguage($generationData->prompt);
 
             return new Storyline(
                 language: $language,
-                data: $book = $this->generateBookMainStoryLine($language, $book->user_prompt),
-                illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs),
+                data: $book = $this->generateBookMainStoryLine($language, $generationData),
+                illustrations: $this->generateIllustrationDirectionFromParagraphs($book->paragraphs, $generationData),
             );
 
         });
@@ -75,11 +84,11 @@ class BookService
      * @throws Throwable
      * @throws ConnectionException
      */
-    private function isSafeForChildren(string $prompt): ChildrenAwareData
+    private function isSafeForChildren(GenerationDataSimple|GenerationDataAdvanced $data): ChildrenAwareData
     {
         return ChildrenAwareData::from(
             $this->ollama->generateJsonSchema(
-                ...$this->askIfPromptIsSafeForChildren($prompt),
+                ...$this->askIfPromptIsSafeForChildren($data),
             ),
         );
     }
@@ -126,7 +135,7 @@ class BookService
         return [ $prompt, $schema ];
     }
 
-    private function askIfPromptIsSafeForChildren(string $prompt): array
+    private function askIfPromptIsSafeForChildren(GenerationDataSimple|GenerationDataAdvanced $data): array
     {
         $schema = [
             'type' => 'object',
@@ -141,11 +150,16 @@ class BookService
             ],
         ];
 
+        $input = match ($data instanceof GenerationDataSimple) {
+            true => $data->prompt,
+            false => "$data->prompt, $data->title",
+        };
+
         $prompt = <<<PROMPT
         Analyze the following user input prompt and flag it as unsafe if it contains any language related to pornography, sex, or drugs.
 
         ----- start_of_user_input_content
-        $prompt
+        $input
         ----- end_of_user_input_content
 
         Respond using JSON
@@ -208,8 +222,22 @@ class BookService
     public function createPendingBook(CreateBookRequest $request): Book
     {
         $book = new Book();
-        $book->user_prompt = $request->prompt;
         $book->wallet = $request->wallet;
+        $book->generation_type = GenerationType::Simple;
+        $book->generation_data = GenerationDataSimple::from($request->toArray());
+
+        $book->save();
+
+        return $book;
+    }
+
+    public function createPendingBookAdvanced(CreateBookAdvancedRequest $request): Book
+    {
+        $book = new Book();
+
+        $book->wallet = $request->wallet;
+        $book->generation_type = GenerationType::Advanced;
+        $book->generation_data = GenerationDataAdvanced::from($request->toArray());
 
         $book->save();
 
@@ -259,10 +287,10 @@ class BookService
      * @throws Throwable
      * @throws ConnectionException
      */
-    private function generateIllustrationDirectionFromParagraphs(array $paragraphs): array
+    private function generateIllustrationDirectionFromParagraphs(array $paragraphs, GenerationDataAdvanced|GenerationDataSimple $data): array
     {
         $illustrations = OllamaService::resolve()
-            ->pool($this->describeIllustrationPrompt($paragraphs))
+            ->pool($this->describeIllustrationPrompt($paragraphs, $data))
             ->map(fn (Collection $response) => $response->get('illustration'));
 
         if (count($illustrations) !== count($paragraphs)) {
@@ -277,11 +305,11 @@ class BookService
      * @throws Exception
      * @throws ConnectionException
      */
-    private function generateBookMainStoryLine(LanguageAlpha2 $language, string $prompt): StorylineData
+    private function generateBookMainStoryLine(LanguageAlpha2 $language, GenerationDataAdvanced|GenerationDataSimple $data): StorylineData
     {
         $data = StorylineData::from(
             $this->ollama->generateJsonSchema(
-                ...$this->generateStoryFromPrompt($language, $prompt),
+                ...$this->generateStoryFromPrompt($language, $data),
             ),
         );
 
@@ -292,7 +320,7 @@ class BookService
         return $data;
     }
 
-    private function generateStoryFromPrompt(LanguageAlpha2 $language, string $prompt): array
+    private function generateStoryFromPrompt(LanguageAlpha2 $language, GenerationDataAdvanced|GenerationDataSimple $data): array
     {
         $schema = [
             'type' => 'object',
@@ -303,6 +331,7 @@ class BookService
                 ],
                 'synopsis' => [
                     'type' => 'string',
+                    'minLength' => 100,
                 ],
                 'paragraphs' => [
                     'type' => 'array',
@@ -312,6 +341,16 @@ class BookService
                 ],
             ],
         ];
+
+        $title = match ($data instanceof GenerationDataAdvanced) {
+            true => "Book title: '$data->title'",
+            false => '',
+        };
+
+        $exclusion = match ($data instanceof GenerationDataAdvanced) {
+            true => "Ensure the story does not make any mention or include these elements: '$data->negative'",
+            false => '',
+        };
 
         $prompt = <<<PROMPT
         You are a children book writer,
@@ -323,15 +362,20 @@ class BookService
 
         Use the following user-provided input as the theme or storyline, but ensure you follow the specified rules:
 
+        $title
+
         ----- start_of_user_input_content
-        $prompt
+        $data->prompt
         ----- end_of_user_input_content
+
+        $exclusion
 
         Hard Rules:
          - The story must be written exclusively in "$language->name."
          - Avoid mixing any other language or text within the output.
          - Maintain consistency in the specified language throughout.
          - Don't wrap each paragraph in any additional symbols like {} or "".
+         - Ensure the synopsis has at least 100 characters.
 
         Respond using JSON
         PROMPT;
@@ -339,13 +383,13 @@ class BookService
         return [ $prompt, $schema ];
     }
 
-    private function describeIllustrationPrompt(array $paragraphs): Collection
+    private function describeIllustrationPrompt(array $paragraphs, GenerationDataAdvanced|GenerationDataSimple $data): Collection
     {
         $story = collect($paragraphs)
             ->map(fn (string $paragraph, int $index) => sprintf('%d: %s', ++$index, $paragraph))
             ->implode(PHP_EOL);
 
-        return collect($paragraphs)->map(function (string $paragraph) use ($story) {
+        return collect($paragraphs)->map(function (string $paragraph) use ($story, $data) {
 
             $schema = [
                 'type' => 'object',
@@ -356,6 +400,11 @@ class BookService
                     ],
                 ],
             ];
+
+            $exclusion = match ($data instanceof GenerationDataAdvanced) {
+                true => "Ensure the prompt does not make any mention or include these elements: '$data->negative'",
+                false => '',
+            };
 
             $prompt = <<<PROMPT
             Generate a creative image prompt for a generative AI tool to create an illustration for the following paragraph in the children's book. You will receive the full story context for reference, but respond with one image prompt at a time, focusing on the provided paragraph.
@@ -373,6 +422,8 @@ class BookService
             ----- start_of_paragraph
             $paragraph
             ----- end_of_paragraph
+
+            $exclusion
 
             For the paragraph provided, do the following:
             1. Identify the key scene and describe it in detail, including any relevant emotions or atmosphere.
