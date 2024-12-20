@@ -215,7 +215,6 @@ class BookService
         $book = Book::query()
             ->where('state', BookState::PendingIllustrations)
             ->where('fetched_at', null)
-            ->orderByDesc('created_at')
             ->lockForUpdate()
             ->first();
 

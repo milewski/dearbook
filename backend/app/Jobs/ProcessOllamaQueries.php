@@ -35,7 +35,10 @@ class ProcessOllamaQueries implements ShouldBeUnique, ShouldQueue
 
         } catch (Throwable $error) {
 
-            BookService::resolve()->markBookAsFailed($this->book, $error->getMessage());
+            BookService::resolve()->markBookAsFailed(
+                book: $this->book,
+                reason: $error->getMessage()
+            );
 
         }
     }
