@@ -13,6 +13,7 @@
         "laravel/framework": "^11.9",
         "laravel/telescope": "^5.2",
         "laravel/tinker": "^2.9",
+        "prinsfrank/standards": "^3.11",
         "spatie/laravel-data": "^4.11",
         "spatie/laravel-image-optimizer": "^1.8"
     },
