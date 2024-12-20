@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-intl": "*",
         "attestto/solana-php-sdk": "dev-master",
         "laravel/framework": "^11.9",
         "laravel/telescope": "^5.2",

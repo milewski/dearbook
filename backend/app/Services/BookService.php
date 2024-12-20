@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Locale;
 use PrinsFrank\Standards\Language\LanguageAlpha2;
 use Throwable;
 
@@ -94,7 +95,9 @@ class BookService
             ...$this->askWhatLanguagePromptWasWritten($prompt),
         );
 
-        return LanguageAlpha2::tryFrom($response->get('language'));
+        return LanguageAlpha2::tryFrom(
+            Locale::getPrimaryLanguage($response->get('language'))
+        );
     }
 
     private function askWhatLanguagePromptWasWritten(string $prompt): array
