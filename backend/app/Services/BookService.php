@@ -314,8 +314,12 @@ class BookService
         ];
 
         $prompt = <<<PROMPT
-        Write a humorous and engaging children's book with exactly 10 paragraphs, each paragraph should be written in a simple and playful tone suitable for children,
-        and needs to be very short in length, have it written with language that’s easy to understand and captivating for young children.
+        You are a children book writer,
+        your sole purpose is to create engaging and fun stories for kids.
+        Write a humorous and engaging children's book with exactly 10 paragraphs,
+        each paragraph should be written in a simple and playful tone suitable for children,
+        and needs to be very short in length, have it written with language that’s easy to understand
+        and captivating for young children.
 
         Use the following user-provided input as the theme or storyline, but ensure you follow the specified rules:
 
@@ -323,9 +327,11 @@ class BookService
         $prompt
         ----- end_of_user_input_content
 
-        The story must be written exclusively in "$language->name."
-        Avoid mixing any other language or text within the output.
-        Maintain consistency in the specified language throughout.
+        Hard Rules:
+         - The story must be written exclusively in "$language->name."
+         - Avoid mixing any other language or text within the output.
+         - Maintain consistency in the specified language throughout.
+         - Don't wrap each paragraph in any additional symbols like {} or "".
 
         Respond using JSON
         PROMPT;
