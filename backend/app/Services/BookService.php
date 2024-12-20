@@ -169,6 +169,7 @@ class BookService
         return Book::query()
             ->where('state', BookState::PendingStoryLine)
             ->whereNull('fetched_at')
+            ->orderBy('created_at')
             ->get();
     }
 
@@ -220,6 +221,7 @@ class BookService
         $book = Book::query()
             ->where('state', BookState::PendingIllustrations)
             ->where('fetched_at', null)
+            ->orderBy('created_at')
             ->lockForUpdate()
             ->first();
 
