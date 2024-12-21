@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAssetsRequest;
 use App\Http\Requests\StoreSpeechRequest;
 use App\Models\Book;
 use App\Services\BookService;
