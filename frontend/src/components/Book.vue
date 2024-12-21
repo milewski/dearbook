@@ -2,17 +2,59 @@
 
     <div v-if="book" class="book relative min-h-dvh flex justify-center items-center bg-[#242424] h-dvh">
 
-        <div @click="$emit('close')"
-             class="fixed z-50 bg-white w-10 h-10 rounded-full flex justify-center items-center top-10 right-5 cursor-pointer transition-all hover:scale-95 active:scale-75 transform-gpu">
+        <div class="fixed flex space-x-4 z-50 top-10 right-5">
 
-            <X :size="20"/>
+            <Popover @update:open="onPopoverToggle">
+
+                <PopoverTrigger>
+
+                    <div @click="$emit('share')"
+                         class="bg-white w-10 h-10 rounded-full flex justify-center items-center cursor-pointer transition-all hover:scale-95 active:scale-75 transform-gpu">
+                        <Share :size="20"/>
+                    </div>
+
+                </PopoverTrigger>
+
+                <PopoverContent align="end" class="sm:w-96">
+
+                    <div class="grid gap-4" v-if="copied === false">
+
+                        <div class="flex justify-between">
+                            <Label>Sharable link</Label>
+                        </div>
+
+                        <Input type="text" @focus="$event.target.select()" readonly :default-value="sharableBookUrl"/>
+
+                        <Button @click="copyToClipboard">
+                            Copy to clipboard
+                        </Button>
+
+                    </div>
+
+                    <div v-else class="flex flex-col justify-center items-center space-y-4">
+                        <div>Link copied to clipboard!</div>
+                        <ClipboardCheck :size="40" class="text-green-600"/>
+                    </div>
+
+                </PopoverContent>
+
+            </Popover>
+
+            <div @click="$emit('close')"
+                 class="bg-white w-10 h-10 rounded-full flex justify-center items-center cursor-pointer transition-all hover:scale-95 active:scale-75 transform-gpu">
+
+                <X :size="20"/>
+
+            </div>
 
         </div>
 
         <Swiper
+            @swiper="onSwiper"
             @key-press="closeOnEsc"
-            :modules="[ Pagination, EffectCreative, Keyboard, Mousewheel ]"
+            :modules="[ Pagination, EffectCreative, Keyboard, Mousewheel, Navigation ]"
             :mousewheel="true"
+            :navigation="true"
             :effect="'creative'"
             :keyboard="{ enabled: true, onlyInViewport: false }"
             :creative-effect="creativeEffect"
@@ -43,28 +85,36 @@
 <script lang="ts" setup>
 
     import { Swiper, SwiperSlide } from 'swiper/vue'
-    import { Pagination, EffectCreative, Keyboard, Mousewheel } from 'swiper/modules'
+    import { EffectCreative, Keyboard, Mousewheel, Navigation, Pagination } from 'swiper/modules'
     import { CreativeEffectOptions, Swiper as SwiperType } from 'swiper/types'
-    import { X } from 'lucide-vue-next'
+    import { ClipboardCheck, Share, X } from 'lucide-vue-next'
     import Slide1 from './Slide1.vue'
     import Intro from './Intro.vue'
+    import { Popover, PopoverContent, PopoverTrigger } from '../../@/components/ui/popover'
+    import { Input } from '../../@/components/ui/input'
+    import { Label } from '../../@/components/ui/label'
 
     import 'swiper/css'
     import 'swiper/css/pagination'
     import 'swiper/css/keyboard'
     import 'swiper/css/effect-creative'
+    import 'swiper/css/navigation'
+
     import { BookDetailResource } from '../api.ts'
     import LastPage from './LastPage.vue'
+    import { Button } from '../../@/components/ui/button'
+    import { ref } from 'vue'
 
+    const props = defineProps<{ book: BookDetailResource }>()
+    const sharableBookUrl = `https://${ window.location.host }?book=${ props.book.id }`
     const emit = defineEmits([ 'close' ])
+    const copied = ref(false)
 
     function closeOnEsc(swiper: SwiperType, keyCode: string): void {
         if (parseInt(keyCode) === 27) {
             emit('close')
         }
     }
-
-    defineProps<{ book: BookDetailResource }>()
 
     const creativeEffect: Partial<CreativeEffectOptions> = {
         perspective: true,
@@ -81,13 +131,51 @@
         },
     }
 
+    function copyToClipboard() {
+
+        navigator.clipboard.writeText(window.location.href)
+            .then(function () {
+                copied.value = true
+            }, function (err) {
+                console.error('Async: Could not copy text: ', err)
+            })
+
+    }
+
+    function onPopoverToggle(state) {
+
+        if (state === false) {
+
+            setTimeout(() => {
+                copied.value = false
+            }, 150)
+
+        }
+
+    }
+
 </script>
 
 <style>
 
-    .book .swiper-pagination-horizontal {
+    :root {
+        --swiper-navigation-size: 0px;
+        --swiper-navigation-top-offset: 50%;
+        --swiper-navigation-sides-offset: 50px;
+        --swiper-navigation-color: white;
 
         --swiper-pagination-bottom: 35px;
+    }
+
+    @screen sm {
+
+        :root {
+            --swiper-navigation-size: 44px;
+        }
+
+    }
+
+    .book .swiper-pagination-horizontal {
 
         @apply bg-white p-2 rounded-full;
 
