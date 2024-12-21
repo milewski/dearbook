@@ -8,8 +8,8 @@
                  @click="audioIsPlaying = !audioIsPlaying"
                  class="bg-white w-10 h-10 rounded-full flex justify-center items-center cursor-pointer transition-all hover:scale-95 active:scale-75 transform-gpu">
 
-                <Ear v-if="audioIsPlaying" :size="20" class="animate-pulse"/>
-                <EarOff v-else :size="20"/>
+                <Volume2 v-if="audioIsPlaying" :size="20" class="animate-pulse"/>
+                <VolumeOff v-else :size="20"/>
 
             </div>
 
@@ -98,7 +98,7 @@
     import { Swiper, SwiperSlide } from 'swiper/vue'
     import { EffectCreative, Keyboard, Mousewheel, Navigation, Pagination } from 'swiper/modules'
     import { CreativeEffectOptions, Swiper as SwiperType } from 'swiper/types'
-    import { ClipboardCheck, Share, X, Ear, EarOff } from 'lucide-vue-next'
+    import { ClipboardCheck, Share, X, Volume2, VolumeOff } from 'lucide-vue-next'
     import Slide1 from './Slide1.vue'
     import Intro from './Intro.vue'
     import { Popover, PopoverContent, PopoverTrigger } from '../../@/components/ui/popover'
