@@ -126,7 +126,7 @@
         },
         next: {
             opacity: 1,
-            translate: [ '100%', 0, 100 ],
+            translate: [ '100%', 0, 150 ],
             rotate: [ -60, 0, -20 ],
         },
     }
