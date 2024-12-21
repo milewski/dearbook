@@ -54,7 +54,11 @@ class AssetsWork extends Data
         }
 
         if ($this->generationType === GenerationType::Advanced) {
-            $tokens->add(':negative:', $this->generationData->negative);
+
+            if ($negative = $this->generationData->negative) {
+                $tokens->add(':negative:', $negative);
+            }
+
         }
 
         return $tokens;
