@@ -27,6 +27,7 @@ class Book extends Model
             'language' => LanguageAlpha2::class,
             'state' => BookState::class,
             'assets' => 'collection',
+            'speech' => 'collection',
             'illustrations' => 'collection',
             'paragraphs' => 'collection',
             'failed' => 'boolean',

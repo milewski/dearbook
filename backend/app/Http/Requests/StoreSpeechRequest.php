@@ -8,12 +8,12 @@ use App\Models\Book;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreAssetsRequest extends FormRequest
+class StoreSpeechRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'assets.*' => [ 'required', 'array', 'image' ],
+            'assets.*' => [ 'required', 'array', 'audio' ],
         ];
     }
 }
