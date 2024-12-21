@@ -4,6 +4,15 @@
 
         <div class="fixed flex space-x-4 z-50 top-10 right-5">
 
+            <div v-if="hasSpeech"
+                 @click="audioIsPlaying = !audioIsPlaying"
+                 class="bg-white w-10 h-10 rounded-full flex justify-center items-center cursor-pointer transition-all hover:scale-95 active:scale-75 transform-gpu">
+
+                <Ear v-if="audioIsPlaying" :size="20" class="animate-pulse"/>
+                <EarOff v-else :size="20"/>
+
+            </div>
+
             <Popover @update:open="onPopoverToggle">
 
                 <PopoverTrigger>
@@ -40,7 +49,7 @@
 
             </Popover>
 
-            <div @click="$emit('close')"
+            <div @click="$emit('close'); stopPlayingAudio()"
                  class="bg-white w-10 h-10 rounded-full flex justify-center items-center cursor-pointer transition-all hover:scale-95 active:scale-75 transform-gpu">
 
                 <X :size="20"/>
@@ -50,7 +59,9 @@
         </div>
 
         <Swiper
+            ref="swiper"
             @swiper="onSwiper"
+            @real-index-change="activeIndex = $event.activeIndex"
             @key-press="closeOnEsc"
             :modules="[ Pagination, EffectCreative, Keyboard, Mousewheel, Navigation ]"
             :mousewheel="true"
@@ -87,12 +98,13 @@
     import { Swiper, SwiperSlide } from 'swiper/vue'
     import { EffectCreative, Keyboard, Mousewheel, Navigation, Pagination } from 'swiper/modules'
     import { CreativeEffectOptions, Swiper as SwiperType } from 'swiper/types'
-    import { ClipboardCheck, Share, X } from 'lucide-vue-next'
+    import { ClipboardCheck, Share, X, Ear, EarOff } from 'lucide-vue-next'
     import Slide1 from './Slide1.vue'
     import Intro from './Intro.vue'
     import { Popover, PopoverContent, PopoverTrigger } from '../../@/components/ui/popover'
     import { Input } from '../../@/components/ui/input'
     import { Label } from '../../@/components/ui/label'
+    import lastPageAudio from '../assets/dearbook.mp3'
 
     import 'swiper/css'
     import 'swiper/css/pagination'
@@ -103,12 +115,15 @@
     import { BookDetailResource } from '../api.ts'
     import LastPage from './LastPage.vue'
     import { Button } from '../../@/components/ui/button'
-    import { ref } from 'vue'
+    import { ref, watch } from 'vue'
+    import { AudioManager } from './AudioManager.ts'
 
     const props = defineProps<{ book: BookDetailResource }>()
     const sharableBookUrl = `https://${ window.location.host }?book=${ props.book.id }`
     const emit = defineEmits([ 'close' ])
     const copied = ref(false)
+    const swiperInstance = ref<SwiperType>()
+    const activeIndex = ref(0)
 
     function closeOnEsc(swiper: SwiperType, keyCode: string): void {
         if (parseInt(keyCode) === 27) {
@@ -148,6 +163,47 @@
             }, 150)
 
         }
+
+    }
+
+    const hasSpeech = props.book.paragraphs.map(({ speech }) => speech).filter(Boolean).length && props.book.synopsis_speech
+    const audioIsPlaying = ref(false)
+
+    function onSwiper(swiper: SwiperType) {
+        swiperInstance.value = swiper
+    }
+
+    const audioManager = new AudioManager()
+
+    async function stopPlayingAudio() {
+        await audioManager.stop()
+    }
+
+    if (hasSpeech) {
+
+        audioManager.add(0, props.book.synopsis_speech)
+
+        for (const [ index, { speech } ] of props.book.paragraphs.entries()) {
+            audioManager.add(index + 1, speech)
+        }
+
+        audioManager.add(11, lastPageAudio)
+
+        watch([ activeIndex, audioIsPlaying ], function ([ index, playing ]) {
+
+            if (playing) {
+
+                audioManager.play(index, () => {
+                    swiperInstance.value?.slideNext(1000)
+                })
+
+            } else {
+
+                audioManager.stop()
+
+            }
+
+        })
 
     }
 

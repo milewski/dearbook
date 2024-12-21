@@ -13,10 +13,12 @@ export type BookDetailResource = {
     type: 'book',
     title: string,
     synopsis: string,
+    synopsis_speech: string | null,
     cover: string,
     backdrop: string,
     paragraphs: Array<{
         illustration: string,
+        speech: string | null,
         text: string
     }>
 }
