@@ -10,9 +10,10 @@
         </div>
 
         <Swiper
+            @swiper="onSwiper"
             @key-press="closeOnEsc"
             :modules="[ Pagination, EffectCreative, Keyboard, Mousewheel ]"
-            :mousewheel="true"
+            :mousewheel="false"
             :effect="'creative'"
             :keyboard="{ enabled: true, onlyInViewport: false }"
             :creative-effect="creativeEffect"
@@ -44,8 +45,8 @@
 
     import { Swiper, SwiperSlide } from 'swiper/vue'
     import { Pagination, EffectCreative, Keyboard, Mousewheel } from 'swiper/modules'
-    import { CreativeEffectOptions, Swiper as SwiperType } from 'swiper/types'
-    import { X } from 'lucide-vue-next'
+    import { CreativeEffectOptions, type Swiper as SwiperClass, Swiper as SwiperType } from 'swiper/types'
+    import { onMounted, onUnmounted, ref } from "vue";    import { X } from 'lucide-vue-next'
     import Slide1 from './Slide1.vue'
     import Intro from './Intro.vue'
 
@@ -57,8 +58,13 @@
     import LastPage from './LastPage.vue'
 
     const emit = defineEmits([ 'close' ])
+    const swiperInstanceRef = ref<SwiperClass>()
 
-    function closeOnEsc(swiper: SwiperType, keyCode: string): void {
+    function onSwiper(swiper: SwiperClass) {
+      swiperInstanceRef.value = swiper
+    }
+
+    function closeOnEsc(_: SwiperType, keyCode: string): void {
         if (parseInt(keyCode) === 27) {
             emit('close')
         }
@@ -80,6 +86,37 @@
             rotate: [ -60, 0, -20 ],
         },
     }
+
+    const isScrollingRef = ref<boolean>(false)
+    const scrollStopDelayRef = ref<NodeJS.Timeout | null>(null)
+    const onMouseWheel = (event: WheelEvent) => {
+      if (!swiperInstanceRef.value) return
+
+      if (!isScrollingRef.value) {
+        if (event.deltaY > -0 || event.deltaX > -0) {
+          swiperInstanceRef.value?.slideNext();
+        } else if (event.deltaY < 0 || event.deltaX < 0) {
+          swiperInstanceRef.value?.slidePrev();
+        }
+
+        isScrollingRef.value = true;
+      }
+
+      if (scrollStopDelayRef.value) clearTimeout(scrollStopDelayRef.value);
+      scrollStopDelayRef.value = setTimeout(() => {
+        isScrollingRef.value = false;
+      }, 100);
+
+      event.preventDefault()
+    }
+
+    onMounted(() => {
+      window.addEventListener('wheel', onMouseWheel, { passive: false })
+    })
+
+    onUnmounted(() => {
+      window.removeEventListener('wheel', onMouseWheel)
+    })
 
 </script>
 

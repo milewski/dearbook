@@ -31,6 +31,11 @@ mkcert -install -cert-file ./traefik/tls/cert.pem -key-file ./traefik/tls/key.pe
 
 ### Step 3: Start the Containers
 
+- Create the network for traefik
+```shell
+docker network create traefik-network
+```
+
 - Build the images and start the containers with:
 
 ```shell
