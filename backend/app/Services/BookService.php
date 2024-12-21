@@ -214,7 +214,7 @@ class BookService
             $name => $file->store(options: [ 'disk' => 'public' ]),
         ]);
 
-        $book->state = BookState::PendingSpeech;
+        $book->state = BookState::Completed;
         $book->fetched_at = null;
 
         return $book->save();
@@ -222,12 +222,9 @@ class BookService
 
     public function storeSpeech(Book $book, StoreSpeechRequest $request): bool
     {
-        $book->speech = collect($request->allFiles())->mapWithKeys(fn (UploadedFile $file, string $name) => [
+        $book->speech = collect($request->file('assets'))->mapWithKeys(fn (UploadedFile $file, string $name) => [
             $name => $file->store(options: [ 'disk' => 'public' ]),
         ]);
-
-        $book->state = BookState::Completed;
-        $book->fetched_at = null;
 
         return $book->save();
     }
