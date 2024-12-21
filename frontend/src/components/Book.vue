@@ -133,12 +133,9 @@
 
     function copyToClipboard() {
 
-        navigator.clipboard.writeText(window.location.href)
-            .then(function () {
-                copied.value = true
-            }, function (err) {
-                console.error('Async: Could not copy text: ', err)
-            })
+        navigator.clipboard.writeText(window.location.href).then(function () {
+            copied.value = true
+        })
 
     }
 
