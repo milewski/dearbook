@@ -8,7 +8,7 @@
 
         <div class="relative before:opacity-75 before:rounded-2xl sm:before:absolute before:from-black before:bg-gradient-to-t before:w-full before:h-96 before:left-0 before:bottom-0 sm:mb-0">
 
-            <img src="../assets/logo-outline.png" class="w-14 absolute top-10 right-10 mx-auto opacity-30" alt="">
+            <img src="../assets/logo-outline.png" class="w-14 absolute top-5 right-5 mx-auto opacity-30" alt="">
 
             <img class="rounded-2xl max-h-[90vh] max-w-[90vw]" :src="image" alt="">
 
