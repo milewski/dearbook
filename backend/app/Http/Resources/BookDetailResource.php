@@ -18,7 +18,7 @@ class BookDetailResource extends JsonResource
     {
         $getSpeechForPage = function (int $page) {
 
-            return with($this->resource->speech->get(sprintf('page-%d', $page)), function (?string $value) {
+            return with($this->resource->speech?->get(sprintf('page-%d', $page)), function (?string $value) {
                 return $value ? Storage::disk('public')->url($value) : null;
             });
 
