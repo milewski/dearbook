@@ -80,6 +80,8 @@ services:
     restart: unless-stopped
     volumes:
       - redis-data:/data
+    ports:
+      - 6379:6379
 
   timescaledb:
     <<: *local-network

@@ -16,6 +16,7 @@ use App\Exceptions\UnsafeForChildrenException;
 use App\Http\Requests\CreateBookAdvancedRequest;
 use App\Http\Requests\CreateBookRequest;
 use App\Http\Requests\StoreAssetsRequest;
+use App\Http\Requests\StoreSpeechRequest;
 use App\Models\Book;
 use App\Services\Traits\Resolvable;
 use Exception;
@@ -215,6 +216,15 @@ class BookService
 
         $book->state = BookState::Completed;
         $book->fetched_at = null;
+
+        return $book->save();
+    }
+
+    public function storeSpeech(Book $book, StoreSpeechRequest $request): bool
+    {
+        $book->speech = collect($request->file('assets'))->mapWithKeys(fn (UploadedFile $file, string $name) => [
+            $name => $file->store(options: [ 'disk' => 'public' ]),
+        ]);
 
         return $book->save();
     }

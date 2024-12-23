@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/typography": "^0.5.15",
     "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/typography": "^0.5.15",
     "@vee-validate/zod": "^4.14.6",
     "@vueuse/core": "^11.2.0",
     "autoprefixer": "^10.4.20",

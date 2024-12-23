@@ -8,7 +8,7 @@
 
         <div class="relative before:rounded-2xl before:opacity-75 before:absolute before:from-black before:bg-gradient-to-t before:w-full before:h-5/6 before:left-0 before:bottom-0 mb-[10vh] sm:mb-0">
 
-            <img class="rounded-2xl w-[80vw]" :src="backdrop" alt="">
+            <img class="rounded-2xl max-[80vw] max-h-[80vh]" :src="backdrop" alt="">
 
             <div class="absolute flex justify-center items-center flex-column text-white p-4 rounded-2xl bottom-5 w-full">
 
