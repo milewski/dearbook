@@ -297,15 +297,25 @@
 
         if (typeof history.pushState === 'function') {
 
-            const currentUrl = `${ window.location.protocol }//${ window.location.host }${ window.location.pathname }`
+            const queryString = new URLSearchParams(window.location.search)
+
+            let currentUrl = `${ window.location.protocol }//${ window.location.host }${ window.location.pathname }`
 
             if (visible && content) {
 
-                const path = currentUrl + `?book=${ content.id }`
+                queryString.set('book', content.id)
+
+                const path = currentUrl + `?${ queryString }`
 
                 window.history.pushState({ path }, '', path)
 
             } else {
+
+                queryString.delete('book')
+
+                if (queryString.size > 0) {
+                    currentUrl += `?${ queryString }`
+                }
 
                 window.history.pushState({ path: currentUrl }, '', currentUrl)
 

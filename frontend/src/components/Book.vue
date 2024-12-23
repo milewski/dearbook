@@ -168,7 +168,6 @@
 
     const hasSpeech = props.book.paragraphs.map(({ speech }) => speech).filter(Boolean).length
         && props.book.synopsis_speech
-        && window.location.search.includes('audio=true')
 
     const audioIsPlaying = ref(false)
 
